@@ -15,4 +15,4 @@ def process(data_dir: Path, out_dir: Path) -> None:
     out_dir : pathlib.Path
         Directory retained by the platform for aggregate results.
     """
-    inventory(data_dir, out_dir)
+    inventory(data_dir, out_dir, probe_signals=True)

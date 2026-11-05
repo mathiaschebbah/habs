@@ -37,7 +37,106 @@ def extent(values):
     }
 
 
-def inventory(data_dir, out_dir):
+def signal_sample(data_dir, joined):
+    """Inspect brief GSR and ECG windows in ten paired cohort-2 participants."""
+    import pyedflib
+
+    from starting_notebooks.bdf_loader import uV_to_uS
+
+    sessions = defaultdict(set)
+    for row in joined:
+        if row["cohort"] == "2":
+            sessions[row["participant_id"]].add(number(row["day"]))
+    people = sorted(p for p, days in sessions.items() if {1, 2} <= days)[:10]
+    samples, errors = [], []
+    for person in people:
+        for day in (1, 2):
+            folder = data_dir / "CURATED" / person
+            metadata = json.loads(
+                (folder / f"{person}_day-{day}_metadata.json").read_text()
+            )
+            segment = metadata["dataset_export"]["segments"]["emotion-video"]
+            markers = {
+                number(r["start_marker"])
+                for r in joined
+                if r["participant_id"] == person and number(r["day"]) == day
+            }
+            events = [
+                e
+                for e in metadata["events"]
+                if e.get("trial_type") == "emotion_video"
+                and number(e.get("marker_id")) in markers
+            ]
+            events.sort(key=lambda e: e["onset_s"])
+            try:
+                with pyedflib.EdfReader(str(folder / segment["file"])) as reader:
+                    labels = reader.getSignalLabels()
+                    for label in ("GSR", "ECG"):
+                        if label not in labels:
+                            errors.append(
+                                {
+                                    "participant": person,
+                                    "day": day,
+                                    "error": f"missing {label}",
+                                }
+                            )
+                            continue
+                        index = labels.index(label)
+                        rate = reader.getSampleFrequency(index)
+                        unit = reader.getPhysicalDimension(index)
+                        for event in events[:3]:
+                            onset = event["onset_s"] - segment["metadata_time_origin_s"]
+                            values = reader.readSignal(
+                                index, round(onset * rate), round(10 * rate)
+                            )
+                            if label == "GSR" and unit in ("uV", "µV"):
+                                values = uV_to_uS(values)
+                            values = [float(v) for v in values]
+                            finite = [v for v in values if math.isfinite(v)]
+                            samples.append(
+                                {
+                                    "channel": label,
+                                    "rate": rate,
+                                    "header_unit": unit,
+                                    "n": len(values),
+                                    "finite": len(finite),
+                                    "range": max(finite) - min(finite)
+                                    if finite
+                                    else None,
+                                    "clamped": sum(v <= 1 or v >= 40 for v in finite)
+                                    if label == "GSR"
+                                    else None,
+                                }
+                            )
+            except (OSError, ValueError, RuntimeError) as error:
+                errors.append({"participant": person, "day": day, "error": str(error)})
+    channels = {}
+    for name in ("GSR", "ECG"):
+        rows = [r for r in samples if r["channel"] == name]
+        total = sum(r["n"] for r in rows)
+        channels[name] = {
+            "windows": len(rows),
+            "samples": total,
+            "rates_hz": counts(r["rate"] for r in rows),
+            "header_units": counts(r["header_unit"] for r in rows),
+            "finite_fraction": sum(r["finite"] for r in rows) / max(1, total),
+            "flat_windows": sum(r["range"] == 0 for r in rows),
+            "range": extent(r["range"] for r in rows),
+            "gsr_endpoint_fraction": sum(r["clamped"] or 0 for r in rows)
+            / max(1, total)
+            if name == "GSR"
+            else None,
+        }
+    return {
+        "participants": len(people),
+        "sampling": "first 10 paired cohort-2 IDs; first 3 matched trials/day",
+        "channels": channels,
+        "errors": errors,
+        "pyedflib_version": pyedflib.__version__,
+    }
+
+
+def inventory(data_dir, out_dir, probe_signals=False):
     """Write aggregate coverage and metadata alignment without fitting models.
 
     Parameters
@@ -46,6 +145,8 @@ def inventory(data_dir, out_dir):
         Read-only dataset root containing CSV tables and session metadata.
     out_dir : pathlib.Path
         Destination for the aggregate JSON report.
+    probe_signals : bool
+        Read brief GSR and ECG windows from a small cohort-2 subset.
 
     Returns
     -------
@@ -193,7 +294,9 @@ def inventory(data_dir, out_dir):
             )
             / max(1, len(rated)),
         }
-    report["raw_signals_read"] = False
+    report["raw_signals_read"] = probe_signals
+    if probe_signals:
+        report["signal_sample"] = signal_sample(data_dir, joined)
     (out_dir / "inventory.json").write_text(
         json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
