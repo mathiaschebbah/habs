@@ -2,10 +2,17 @@
 
 ## Étude de l'excitation individuelle
 
-Le [dossier de recherche](docs/research/README.md) rassemble la revue bibliographique,
-les sondages de faisabilité exécutés sur la plateforme et le protocole proposé.
-Le point d'entrée `process.py` réalise actuellement un inventaire des annotations
-et un contrôle limité des signaux GSR/ECG. Il n'entraîne pas de modèle.
+Le [dossier de recherche](docs/research/README.md) rassemble la bibliographie,
+la réconciliation des données et le protocole prédictif. L'étude demande si
+l'EDA, l'EEG et l'ECG améliorent la prédiction des variations d'activation déclarée
+au-delà du contenu vidéo et d'une calibration personnelle.
+
+La préparation exhaustive conserve 22 972 essais sur 314 identifiants, dont
+173 ont deux séances suffisantes. Les modèles utilisent 267 identifiants au
+total, avec 50 identifiants réservés au test dans trois cohortes analysées
+séparément. Les [paramètres de développement](results/development.json) sont figés.
+`process.py` exécute actuellement la validation par simulation avant l'évaluation
+finale. Les commandes de reproduction seront regroupées avec les résultats.
 
 **Build advanced AI models on real EEG data and contribute to the next generation of neurotechnology.**
 

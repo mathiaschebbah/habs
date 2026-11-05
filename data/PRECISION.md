@@ -1,5 +1,12 @@
 # Précision attendue et seuil d'intérêt
 
+Cette note conserve le calcul de planification initial. Après réconciliation,
+la cohorte principale compte 26 identifiants de test, et les cohortes de
+réplication en comptent 10 et 14. Ces effectifs ne sont pas regroupés en un
+échantillon indépendant de 50 personnes. Le calcul ci-dessous à 25 personnes
+reste une illustration théorique ; la validation exécutée suit le
+[plan de simulation](../journal/02_method_validation.md).
+
 Le nombre pertinent est celui des personnes de test, pas le nombre de fenêtres. Le plan proposé sur les 75 identifiants admissibles avant contrôle qualité réserve 25 personnes au test. Le critère principal est une différence appariée d'erreur quadratique centrée, en points², par personne.
 
 Le [calcul reproductible](planning.py) produit [80 scénarios](precision_scenarios.csv) pour 20, 25, 30, 50 ou 75 personnes de test, quatre dispersions interpersonnelles supposées et quatre effets moyens. Seul le scénario à 25 personnes correspond à la partition envisagée actuellement ; les autres servent à comprendre la sensibilité à la taille. Aucune dispersion des gains HABS n'a encore été estimée.

@@ -15,6 +15,7 @@ from sklearn.model_selection import GroupKFold
 from threadpoolctl import threadpool_limits
 
 from model import CalibratedArousal, InsufficientSupport, build_learner
+from simulation import interval_calibration
 from study import (
     effect_summary,
     paired_people,
@@ -303,6 +304,12 @@ def run(
                 compression={"method": "gzip", "mtime": 0},
             )
             if cohort == 2:
+                case["interval_calibration"] = interval_calibration(
+                    predictions.affine,
+                    predictions["all"],
+                    predictions.participant_id,
+                    split["test_grid"].order,
+                )
                 project = skore.Project(
                     "habs-arousal", mode="local", workspace=out_dir / "reports"
                 )

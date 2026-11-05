@@ -1,8 +1,8 @@
 # Préparation de l'étude de l'excitation individuelle
 
-L'étude proposée demande si les signaux électrodermaux prédisent les variations d'excitation déclarée lors d'une seconde session, au-delà de la vidéo et d'une calibration de la façon habituelle de noter. Le critère principal ne récompense pas une simple correction constante du niveau personnel.
+L'étude demande si l'EDA, l'EEG et l'ECG prédisent les variations d'excitation déclarée lors d'une seconde session, au-delà de la vidéo et d'une calibration personnelle. Le critère principal ne récompense pas une simple correction constante du niveau personnel.
 
-La recherche bibliographique a récupéré 529 notices, rapprochées en 483 notices après rapprochement, dont 54 sont retenus et annotés. Elle est documentée, mais sa couverture et la profondeur de lecture restent limitées : 30 références ont été examinées dans leurs sections accessibles et 24 au niveau du résumé ou de la notice. Aucun modèle HABS n'a été entraîné dans cette préparation.
+La recherche bibliographique a récupéré 529 notices, soit 483 après rapprochement, dont 54 sont retenues et annotées. Elle est documentée, mais sa couverture et la profondeur de lecture restent limitées : 30 références ont été examinées dans leurs sections accessibles et 24 au niveau du résumé ou de la notice. Ce dossier distingue la préparation initiale des analyses exécutées ensuite.
 
 ## Parcours de lecture
 
@@ -13,9 +13,9 @@ La recherche bibliographique a récupéré 529 notices, rapprochées en 483 noti
 
 ## Ce que les données permettent aujourd'hui
 
-La cohorte 2 contient 75 identifiants avec au moins 20 essais reliés dans chacun des deux jours, avant contrôle qualité. Elle offre le meilleur point de départ parmi les cohortes examinées. Le schéma proposé est 50 personnes de développement et 25 de test, avec calibration J1 et évaluation J2.
+La réconciliation exhaustive conserve 22 972 essais vérifiés dans les BDF, répartis entre 314 identifiants. L'usage de capteurs complémentaires permet de conserver 173 identifiants avec deux séances suffisamment observées. Après les contraintes de support par vidéo, les cohortes 1, 2 et 4 comprennent respectivement 10, 26 et 14 identifiants réservés au test. La référence et le développement utilisent 217 autres identifiants. Les analyses restent séparées par cohorte, car l'unicité des personnes entre cohortes n'est pas vérifiée.
 
-Deux limites empêchent de traiter le protocole comme définitivement gelé : le filtrage amont des annotations n'est pas entièrement documenté, et la conversion GSR atteint ses bornes dans une partie du petit échantillon inspecté. Les questions précises à poser aux organisateurs sont dans la note de faisabilité. Le projet reste une étude prédictive du jeu livré ; il ne prétend pas mesurer une émotion indépendante des autoévaluations.
+Les paramètres et partitions sont maintenant figés dans [development.json](../../results/development.json). Le filtrage amont des annotations, les unités périphériques et les identités entre cohortes ne sont toujours pas entièrement documentés. Les fenêtres invalides restent manquantes ; aucune note n'est reconstruite. Le projet reste une étude prédictive du jeu livré ; il ne prétend pas mesurer une émotion indépendante des autoévaluations.
 
 ## Dossier de preuves
 
@@ -43,8 +43,8 @@ python3 -m unittest discover -s tests -v
 python3 data/planning.py data/precision_scenarios.csv
 ```
 
-`process.py` appelle le même inventaire, complété par le petit sondage GSR/ECG, sur la plateforme HABS. L'exécution du workflow HABS est manuelle. Les packages du contrôle de signal sont ceux déjà épinglés dans `requirements.txt`. Le sondage local sur `sample/` confirme seulement le format des métadonnées : cet échantillon n'inclut pas les tables de notes ni les fichiers vidéo nécessaires à l'étude.
+Ces commandes reproduisent la préparation initiale. `process.py` effectue désormais une extraction exhaustive et une validation prédictive sur la plateforme HABS. L'exécution du workflow reste manuelle. Les dépendances sont épinglées dans `requirements.txt`. Le dossier `sample/` ne contient pas les tables et les enregistrements vidéo nécessaires à l'étude complète.
 
 ## Étape suivante
 
-Documenter les réponses sur le filtrage, les unités et les identités, puis finaliser la qualité du signal et le manifeste. L'implémentation de B0–B3 et la simulation du protocole viendront ensuite. Les performances obtenues plus tard devront être séparées de cette préparation prospective.
+Achever la [validation par simulation](../../journal/02_method_validation.md), puis évaluer les modèles figés sur les identifiants réservés. Les performances réelles seront distinguées des mécanismes synthétiques et des contrôles de préparation.

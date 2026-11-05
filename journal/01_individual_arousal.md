@@ -149,7 +149,7 @@ Les sorties reproductibles attendues sont un manifeste d'inclusion/partition, un
 
 ## Mise en œuvre du 5 novembre 2026
 
-L'étude est autorisée à l'exécution par la demande de mener les recherches jusqu'aux résultats et au papier. Le premier traitement exhaustif porte sur la qualité et les caractéristiques déterministes de cohorte 2, sans évaluation de modèle. Les versions de dépendances sont épinglées. Les tables individuelles restent dans le stockage HABS ; les journaux publics ne contiennent que des agrégats.
+Le premier traitement exhaustif porte sur la qualité et les caractéristiques déterministes de cohorte 2, sans évaluation de modèle. Les versions de dépendances sont épinglées. Les tables individuelles restent dans le stockage HABS ; les journaux publics ne contiennent que des agrégats.
 
 La conversion GSR utilisée est celle documentée et livrée dans le dépôt. Son bornage fait l'objet d'une analyse explicite. Sans vérification externe des unités, les conclusions porteront sur cette mesure opérationnelle et ses caractéristiques, sans validation physiologique absolue. La sensibilité sur le voltage non converti sera évaluée sur le même ensemble d'essais que l'analyse principale ; elle ne remplacera pas un résultat défavorable de celle-ci.
 

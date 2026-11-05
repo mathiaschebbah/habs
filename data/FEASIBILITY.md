@@ -1,6 +1,26 @@
 # Faisabilité de l'étude de l'excitation individuelle
 
-État au 5 novembre 2026. Les constats ci-dessous proviennent de deux sondages réels, confirmés par une troisième exécution de l'inventaire sur les données montées par HABS. Aucun modèle prédictif n'a été ajusté.
+Cette note conserve les premiers sondages du 5 novembre 2026. Leurs effectifs ont été révisés par la réconciliation exhaustive ci-dessous. Les valeurs des sections suivantes décrivent l'inventaire initial, avant ces corrections.
+
+## Mise à jour après réconciliation exhaustive
+
+Les 27 221 notes numériques concernent 317 identifiants. La réconciliation conserve 22 972 essais pour 314 identifiants, tous vérifiés dans les annotations temporelles BDF. Elle corrige 2 517 jours erronés et restitue 173 jours absents, seulement lorsque l'événement est unique. Parmi les correspondances encore absentes, 4 206 concernent une vidéo absente des enregistrements disponibles ; sept sont répétées ou contradictoires. Les 36 fenêtres hors segment restent exclues.
+
+| Cohorte | Identifiants alignés | Deux séances suffisantes, EEG | Deux séances suffisantes, EDA | Développement | Test |
+|---|---:|---:|---:|---:|---:|
+| 1 | 105 | 32 | 21 | 19 | 10 |
+| 2 | 113 | 76 | 47 | 50 | 26 |
+| 3 | 30 | 25 | 7 | non retenue | non retenue |
+| 4 | 52 | 40 | 40 | 26 | 14 |
+| 5 | 14 | 0 | 0 | non retenue | non retenue |
+
+Une séance suffisante contient au moins vingt essais. Le recours aux signaux complémentaires conserve 173 identifiants avec deux séances. Les copies prétraitées récupèrent aussi 396 essais EDA. Ces contrôles établissent une lisibilité technique, pas l'absence de tout artefact physiologique.
+
+Après vérification du nombre de spectateurs sources par vidéo, les cohortes 1, 2 et 4 apportent 95 identifiants de développement et 50 de test. La référence utilise aussi 122 identifiants distincts de ces candidats inter-session, soit 267 identifiants contribuant à l'analyse. La cohorte 3 ne satisfait pas le support vidéo requis dans le développement ; la cohorte 5 ne possède pas deux séances. Aucune fusion entre cohortes ne suppose leur indépendance biologique.
+
+Le seuil de 60 personnes du protocole initial est un repère de prudence, pas l'effectif du jeu. Le nombre de personnes de test reste distinct du nombre total utilisé pour construire les modèles. L'élargissement ne justifie pas à lui seul une conclusion confirmatoire.
+
+Sources : [réconciliation](../results/alignment.json), [qualité des trois signaux](../results/multimodal_quality.json), [partition et paramètres figés](../results/development.json). Les résultats prédictifs réservés ne sont pas contenus dans ces fichiers de préparation.
 
 ## Provenance
 
