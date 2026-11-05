@@ -146,3 +146,9 @@ Ne pas conclure que les participants se trompent sur leurs émotions, que la phy
 7. Rédiger un rapport court avec deux figures principales : distribution des gains individuels et comparaison B0–B3 avec incertitude. Ajouter un schéma de calibration/test et le diagramme d'inclusion en annexe.
 
 Les sorties reproductibles attendues sont un manifeste d'inclusion/partition, une table de caractéristiques par essai, les prédictions hors échantillon, les différences par personne et un rapport d'exclusions. Les données et signaux individuels restent dans l'espace autorisé ; publier seulement ce que les conditions HABS permettent. Les jobs durent moins d'une heure et sauvegardent leurs résultats par étape. Le code de préparation actuel ne lance pas automatiquement cette étude.
+
+## Mise en œuvre du 5 novembre 2026
+
+L'étude est autorisée à l'exécution par la demande de mener les recherches jusqu'aux résultats et au papier. Le premier traitement exhaustif porte sur la qualité et les caractéristiques déterministes de cohorte 2, sans évaluation de modèle. Les versions de dépendances sont épinglées. Les tables individuelles restent dans le stockage HABS ; les journaux publics ne contiennent que des agrégats.
+
+La conversion GSR utilisée est celle documentée et livrée dans le dépôt. Son bornage fait l'objet d'une analyse explicite. Sans vérification externe des unités, les conclusions porteront sur cette mesure opérationnelle et ses caractéristiques, sans validation physiologique absolue. La sensibilité sur le voltage non converti sera évaluée sur le même ensemble d'essais que l'analyse principale ; elle ne remplacera pas un résultat défavorable de celle-ci.

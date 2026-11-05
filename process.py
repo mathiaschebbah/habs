@@ -1,18 +1,18 @@
-"""Check annotation coverage before the physiological arousal study."""
+"""Run the current HABS study stage on the mounted dataset."""
 
 from pathlib import Path
 
-from data.inventory import inventory
+from features import extract
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Summarize the mounted dataset without training a predictive model.
+    """Extract trial features and save their quality report.
 
     Parameters
     ----------
     data_dir : pathlib.Path
-        Read-only dataset root supplied by the HABS platform.
+        Read-only dataset supplied by HABS.
     out_dir : pathlib.Path
-        Directory retained by the platform for aggregate results.
+        Private directory retained by the HABS platform.
     """
-    inventory(data_dir, out_dir, probe_signals=True)
+    extract(data_dir, out_dir)

@@ -11,3 +11,7 @@ pyedflib==0.1.42
 numpy==2.4.6
 pandas==3.0.1
 scipy==1.17.1
+scikit-learn==1.9.1
+skrub==0.11.0
+skore[jupyter]==0.29.1
+matplotlib==3.11.2
