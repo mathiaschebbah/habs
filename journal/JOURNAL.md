@@ -29,3 +29,11 @@ Deux sondages CI réussis, confirmés par une troisième exécution, ont vérifi
 ## Points ouverts
 
 Confirmer le filtrage des annotations, la provenance des notes des métadonnées, l'unicité des personnes et les unités/calibration périphériques. La liste de questions est prête dans la note de faisabilité ; aucune réponse des organisateurs n'est supposée.
+
+## Exécution de l'étude
+
+L'examen de toutes les cohortes récupère 2 690 annotations par correction ou restitution du jour, puis vérifie 22 972 liens dans les marqueurs BDF. Les données alignées couvrent 314 identifiants. En utilisant les modalités disponibles plutôt qu'en exigeant la GSR, 173 identifiants disposent de deux sessions d'au moins 20 essais. Les 4 206 vidéos absentes des enregistrements disponibles et les sept correspondances restantes incertaines ne sont pas reconstruites.
+
+Le développement des modèles est lancé après des tests de séparation des participants, de masquage des notes futures, de conservation de la grille de prédiction et de comparaison à calibration identique. L'essai complet sur données synthétiques fonctionne ; il ne constitue pas un résultat HABS. Les performances des personnes réservées au test ne sont pas encore évaluées. Une analyse indépendante par cohorte évite les fuites entre éventuelles réinscriptions.
+
+Les calculs utilisent un environnement pip/venv, pandas, scikit-learn, skrub et des rapports skore locaux. Les versions sont épinglées. Les tables et rapports individuels restent dans le stockage privé HABS ; seuls les agrégats et le code sont versionnés.

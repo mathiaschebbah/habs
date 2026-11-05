@@ -65,8 +65,13 @@ def read_recording(path, include_eeg=True):
                 butter(3, [5, 25], btype="bandpass", fs=rate, output="sos"), signal
             )
             scale = np.median(np.abs(filtered - np.median(filtered)))
+            polarity = (
+                1
+                if np.quantile(filtered, 0.995) >= -np.quantile(filtered, 0.005)
+                else -1
+            )
             peaks, _ = find_peaks(
-                np.abs(filtered),
+                polarity * filtered,
                 distance=round(0.30 * rate),
                 height=max(3 * scale, 1e-12),
                 prominence=max(3 * scale, 1e-12),
@@ -294,7 +299,11 @@ def extract(data_dir, out_dir, workers=4):
             .astype(bool)
         )
     frame["any_valid"] = frame[["eda_valid", "eeg_valid", "ecg_valid"]].any(axis=1)
-    frame.to_csv(out_dir / "trials.csv.gz", index=False, compression="gzip")
+    frame.to_csv(
+        out_dir / "trials.csv.gz",
+        index=False,
+        compression={"method": "gzip", "mtime": 0},
+    )
     summary = {
         "rows": len(frame),
         "people": int(frame.participant_id.nunique()),

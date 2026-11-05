@@ -1,12 +1,13 @@
-"""Audit the remaining annotation links before fixing the analysis population."""
+"""Extract measurements and develop the calibrated HABS prediction models."""
 
+import importlib
 from pathlib import Path
 
-from alignment import reconcile
+from features import extract
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Audit unlinked videos without changing any uncertain match.
+    """Run development analyses without scoring the reserved final participants.
 
     Parameters
     ----------
@@ -15,4 +16,6 @@ def process(data_dir: Path, out_dir: Path) -> None:
     out_dir : pathlib.Path
         Private result directory retained by HABS.
     """
-    reconcile(data_dir, out_dir)
+    extract(data_dir, out_dir)
+    experiment = importlib.import_module("experiments.01_individual_arousal")
+    experiment.run(out_dir / "trials.csv.gz", out_dir / "study", stage="development")

@@ -110,8 +110,16 @@
       }
     }
   },
+  "unresolved_video_audit": {
+    "video_not_in_available_recordings": 4206,
+    "repeated_video_or_annotation": 6,
+    "unique_video_other_day": 1
+  },
+  "candidate_marker_differences": {
+    "-588": 1
+  },
   "provenance": {
-    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42052070098",
-    "commit": "5af40c9"
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42064544155",
+    "commit": "0603e38"
   }
 }
