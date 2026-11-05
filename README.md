@@ -1,5 +1,12 @@
 # HABS Neuro-AI Hackathon
 
+## Étude de l'excitation individuelle
+
+Le [dossier de recherche](docs/research/README.md) rassemble la revue bibliographique,
+les sondages de faisabilité exécutés sur la plateforme et le protocole proposé.
+Le point d'entrée `process.py` réalise actuellement un inventaire des annotations
+et un contrôle limité des signaux GSR/ECG. Il n'entraîne pas de modèle.
+
 **Build advanced AI models on real EEG data and contribute to the next generation of neurotechnology.**
 
 Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://hackathon.habs.ai/)

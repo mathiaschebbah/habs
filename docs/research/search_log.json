@@ -1,0 +1,119 @@
+[
+  {
+    "id": "S01",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper EEG emotion recognition stimulus identity confounding subject independent validation video memorization self reported emotion",
+    "objective": "Identify primary empirical studies of stimulus and participant confounding, methods and datasets, published by 5 November 2026; distinguish reviews and preprints.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S02",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper physiological emotional response coherence subjective experience within person individual differences arousal electrodermal activity",
+    "objective": "Find primary studies measuring within-person physiology subjective experience correspondence, with design limitations and reproducibility.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S03",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper emotion self report response styles person mean centering within between person rating scale individual differences",
+    "objective": "Find measurement studies and statistical methods distinguishing response styles, stable personal differences and within-person variation.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S04",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper EEG physiological emotion recognition cross session calibration personalization self assessment arousal",
+    "objective": "Find repeated-session and personalized physiological arousal prediction studies, recording calibration size, held-out testing and baselines.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S05",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper crossed random effects subjects stimuli cross validation bootstrap stimulus sampling psychology prediction",
+    "objective": "Prioritize methodological papers on generalizing over participants and stimuli, leakage-free validation and uncertainty.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S06",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper electrodermal activity short 10 second film stimuli arousal skin conductance recommendations latency",
+    "objective": "Find primary validation or consensus measurement papers for skin conductance features on brief emotional trials.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S07",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper PRISMA S systematic literature search reporting selection bias missing not at random affective datasets",
+    "objective": "Find reporting guidance and methodological evidence relevant to a reproducible scoped review and outcome-dependent selection.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S08",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper within person emotion physiology prediction stimulus baseline residual arousal individual self report calibration",
+    "objective": "Prioritize direct precedents, null results and strong baselines that could invalidate the novelty of incremental individual prediction.",
+    "requested": 12,
+    "returned": 12
+  },
+  {
+    "id": "S09",
+    "source": "Exa",
+    "date": "2026-11-05",
+    "query": "category:research paper recommendations electrodermal measurements Boucsein Fowles Grimnes 2012 publication reporting electrodermal",
+    "objective": "Consensus measurement recommendations",
+    "requested": 5,
+    "returned": 5
+  },
+  {
+    "id": "E01",
+    "source": "Europe PMC",
+    "date": "2026-11-05",
+    "query": "TITLE_ABS:((EEG OR electroencephalogra*) AND emotion AND (\"stimulus identity\" OR \"subject identity\" OR \"data leakage\" OR \"video-independent\" OR \"stimulus confound\" OR \"trial leakage\")) AND FIRST_PDATE:[1900-01-01 TO 2026-11-05]",
+    "hit_count": 5,
+    "returned": 5,
+    "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+  },
+  {
+    "id": "E02",
+    "source": "Europe PMC",
+    "date": "2026-11-05",
+    "query": "TITLE_ABS:((\"response coherence\" OR \"emotion coherence\" OR \"subjective experience and physiology\" OR \"autonomic-subjective\" OR \"intraindividual variability\") AND (emotion OR affect OR arousal) AND (physiol* OR electrodermal OR autonomic)) AND FIRST_PDATE:[1900-01-01 TO 2026-11-05]",
+    "hit_count": 28,
+    "returned": 28,
+    "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+  },
+  {
+    "id": "E03",
+    "source": "Europe PMC",
+    "date": "2026-11-05",
+    "query": "TITLE_ABS:((\"response style\" OR \"response styles\" OR \"person-mean centering\" OR \"within-person and between-person\") AND (affect OR emotion OR longitudinal)) AND FIRST_PDATE:[1900-01-01 TO 2026-11-05]",
+    "hit_count": 391,
+    "returned": 391,
+    "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+  },
+  {
+    "id": "E04",
+    "source": "Europe PMC",
+    "date": "2026-11-05",
+    "query": "TITLE_ABS:((EEG OR electroencephalogra*) AND emotion AND (\"cross-day\" OR \"cross-session\") AND (personal* OR calibrat*)) AND FIRST_PDATE:[1900-01-01 TO 2026-11-05]",
+    "hit_count": 4,
+    "returned": 4,
+    "endpoint": "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
+  }
+]

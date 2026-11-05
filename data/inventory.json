@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "inputs": {
+    "labels_train.csv": {
+      "sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+      "bytes": 3755327,
+      "rows": 29514,
+      "columns": [
+        "cohort",
+        "participant_id",
+        "gender",
+        "day",
+        "video",
+        "start_marker",
+        "end_marker",
+        "final_emotion_label",
+        "rating_valence",
+        "rating_arousal",
+        "rating_dominance",
+        "self_reported_emotion_1",
+        "self_reported_emotion_2",
+        "self_reported_emotion_3",
+        "default_emotion_label",
+        "expected_emotion_label",
+        "expected_emotion_source",
+        "video_theme",
+        "video_presentation_order",
+        "flagged_outliers"
+      ]
+    },
+    "participants_train.csv": {
+      "sha256": "07377e3eb5e972c6a283c0ec2a38665c561426a24cdcfddf50d54665dd92a9b5",
+      "bytes": 7446,
+      "rows": 383,
+      "columns": [
+        "cohort",
+        "participant_id",
+        "age",
+        "gender"
+      ]
+    },
+    "markers.csv": {
+      "sha256": "2dab8ba14887bd1d2f89ce736f14d12b3b379bbb0ce1d60de9564e91a3b31475",
+      "bytes": 2980,
+      "rows": 118,
+      "columns": [
+        "Emotion or task",
+        "Start Marker",
+        "End Marker",
+        "Repetition"
+      ]
+    }
+  },
+  "cohorts": {
+    "1": {
+      "rows": 8353,
+      "rated_rows": 8345,
+      "rated_participant_ids": 106,
+      "rated_by_day": {
+        "": 259,
+        "1.0": 2682,
+        "2.0": 5404
+      },
+      "matched_rows": 5659,
+      "matched_people": 102,
+      "both_days_people": 34,
+      "at_least_20_each_day_people": 31,
+      "eligible_day1_rows": 856,
+      "eligible_day2_rows": 1725,
+      "matched_videos": 251,
+      "people_per_video": {
+        "n": 251,
+        "min": 2,
+        "max": 68,
+        "median": 20,
+        "mean": 22.53386454183267
+      },
+      "videos_at_least_10_people": 214,
+      "repeated_videos_between_days": {
+        "n": 34,
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "mean": 0
+      },
+      "expected_source": {
+        "default": 618,
+        "emotinder": 5041
+      },
+      "arousal": {
+        "n": 8345,
+        "min": 1,
+        "max": 9,
+        "median": 5,
+        "mean": 5.190772917914919
+      },
+      "integer_arousal_fraction": 1
+    },
+    "2": {
+      "rows": 11034,
+      "rated_rows": 11032,
+      "rated_participant_ids": 115,
+      "rated_by_day": {
+        "1.0": 5725,
+        "2.0": 5307
+      },
+      "matched_rows": 9661,
+      "matched_people": 113,
+      "both_days_people": 75,
+      "at_least_20_each_day_people": 75,
+      "eligible_day1_rows": 3855,
+      "eligible_day2_rows": 3854,
+      "matched_videos": 252,
+      "people_per_video": {
+        "n": 252,
+        "min": 6,
+        "max": 95,
+        "median": 35,
+        "mean": 38.30952380952381
+      },
+      "videos_at_least_10_people": 246,
+      "repeated_videos_between_days": {
+        "n": 75,
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "mean": 0
+      },
+      "expected_source": {
+        "default": 1139,
+        "emotinder": 8522
+      },
+      "arousal": {
+        "n": 11032,
+        "min": 1,
+        "max": 9,
+        "median": 5.736,
+        "mean": 5.254659898477158
+      },
+      "integer_arousal_fraction": 0.06046047860768673
+    },
+    "3": {
+      "rows": 3592,
+      "rated_rows": 2725,
+      "rated_participant_ids": 30,
+      "rated_by_day": {
+        "1.0": 1000,
+        "2.0": 857,
+        "3.0": 868
+      },
+      "matched_rows": 2495,
+      "matched_people": 30,
+      "both_days_people": 18,
+      "at_least_20_each_day_people": 18,
+      "eligible_day1_rows": 620,
+      "eligible_day2_rows": 613,
+      "matched_videos": 252,
+      "people_per_video": {
+        "n": 252,
+        "min": 1,
+        "max": 27,
+        "median": 9,
+        "mean": 9.90079365079365
+      },
+      "videos_at_least_10_people": 114,
+      "repeated_videos_between_days": {
+        "n": 18,
+        "min": 0,
+        "max": 0,
+        "median": 0,
+        "mean": 0
+      },
+      "expected_source": {
+        "default": 284,
+        "emotinder": 2211
+      },
+      "arousal": {
+        "n": 2725,
+        "min": 1,
+        "max": 9,
+        "median": 5.608,
+        "mean": 5.179828256880733
+      },
+      "integer_arousal_fraction": 0.10348623853211009
+    },
+    "4": {
+      "rows": 6093,
+      "rated_rows": 4811,
+      "rated_participant_ids": 52,
+      "rated_by_day": {
+        "1.0": 4811
+      },
+      "matched_rows": 2109,
+      "matched_people": 47,
+      "both_days_people": 0,
+      "at_least_20_each_day_people": 0,
+      "eligible_day1_rows": 0,
+      "eligible_day2_rows": 0,
+      "matched_videos": 248,
+      "people_per_video": {
+        "n": 248,
+        "min": 1,
+        "max": 24,
+        "median": 8,
+        "mean": 8.5
+      },
+      "videos_at_least_10_people": 85,
+      "repeated_videos_between_days": {
+        "n": 0
+      },
+      "expected_source": {
+        "default": 318,
+        "emotinder": 1791
+      },
+      "arousal": {
+        "n": 4811,
+        "min": 1,
+        "max": 9,
+        "median": 5.528,
+        "mean": 4.96427187694866
+      },
+      "integer_arousal_fraction": 0.09582207441280399
+    },
+    "5": {
+      "rows": 442,
+      "rated_rows": 308,
+      "rated_participant_ids": 14,
+      "rated_by_day": {
+        "1.0": 308
+      },
+      "matched_rows": 307,
+      "matched_people": 14,
+      "both_days_people": 0,
+      "at_least_20_each_day_people": 0,
+      "eligible_day1_rows": 0,
+      "eligible_day2_rows": 0,
+      "matched_videos": 73,
+      "people_per_video": {
+        "n": 73,
+        "min": 1,
+        "max": 14,
+        "median": 4,
+        "mean": 4.205479452054795
+      },
+      "videos_at_least_10_people": 5,
+      "repeated_videos_between_days": {
+        "n": 0
+      },
+      "expected_source": {
+        "default": 46,
+        "emotinder": 261
+      },
+      "arousal": {
+        "n": 308,
+        "min": 1,
+        "max": 9,
+        "median": 5.128,
+        "mean": 4.941454545454546
+      },
+      "integer_arousal_fraction": 0.1461038961038961
+    }
+  },
+  "sample_only": false,
+  "all_rows": 29514,
+  "masked_rows": 2266,
+  "arousal_rows": 27221,
+  "arousal_participant_ids": 317,
+  "flags_all": {
+    "0": 27248,
+    "TESTSUBJECT": 2266
+  },
+  "final_label_missing_with_arousal": 0,
+  "duplicate_trial_keys": 0,
+  "metadata": {
+    "sessions": 596,
+    "video_events": 30234
+  },
+  "available_emotion_sessions": 596,
+  "joins": {
+    "matched": 20231,
+    "no_event": 6960,
+    "missing_bdf_or_outside_segment": 30
+  },
+  "video_duration_s": {
+    "n": 20231,
+    "min": 10,
+    "max": 10,
+    "median": 10,
+    "mean": 10
+  },
+  "metadata_rating_tools_matched": {
+    "default": 2405,
+    "emotinder": 17826
+  },
+  "metadata_csv_arousal_abs_difference": {
+    "n": 20231,
+    "min": 0,
+    "max": 4.416,
+    "median": 0,
+    "mean": 0.0024216301715190114
+  },
+  "raw_signals_read": true,
+  "signal_sample": {
+    "participants": 10,
+    "sampling": "first 10 paired cohort-2 IDs; first 3 matched trials/day",
+    "channels": {
+      "GSR": {
+        "windows": 60,
+        "samples": 600000,
+        "rates_hz": {
+          "1000.0": 60
+        },
+        "header_units": {
+          "uV": 60
+        },
+        "finite_fraction": 1,
+        "flat_windows": 9,
+        "range": {
+          "n": 60,
+          "min": 0,
+          "max": 1.0292831667314695,
+          "median": 0.17111612172031365,
+          "mean": 0.20124328668009756
+        },
+        "gsr_endpoint_fraction": 0.20305
+      },
+      "ECG": {
+        "windows": 60,
+        "samples": 600000,
+        "rates_hz": {
+          "1000.0": 60
+        },
+        "header_units": {
+          "mV": 60
+        },
+        "finite_fraction": 1,
+        "flat_windows": 0,
+        "range": {
+          "n": 60,
+          "min": 628.1836231817974,
+          "max": 3525.33864168159,
+          "median": 1149.0876381377957,
+          "mean": 1308.9250651603872
+        },
+        "gsr_endpoint_fraction": null
+      }
+    },
+    "errors": [],
+    "pyedflib_version": "0.1.42"
+  },
+  "provenance": {
+    "run_url": "https://github.com/mathiaschebbah/habs/actions/runs/42034455933",
+    "commit": "979634b",
+    "date": "2026-11-05",
+    "previous_runs": [
+      "https://github.com/mathiaschebbah/habs/actions/runs/42029637910",
+      "https://github.com/mathiaschebbah/habs/actions/runs/42030909882"
+    ]
+  }
+}
