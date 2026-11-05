@@ -115,3 +115,22 @@ def test_video_control_preserves_personal_calibration():
     np.testing.assert_allclose(
         physiological_matrix(X, source, "all"), physiological_matrix(X, source, "video")
     )
+
+
+def test_unused_session_column_cannot_change_predictions():
+    """Session selection happens before fitting; its constant tag is not a feature."""
+    frame = synthetic_trials()
+    grid = select_grid(
+        frame, frame.participant_id.unique(), frame.video.unique(), minimum=3
+    )
+    X = attach_calibration(
+        grid.drop(columns="rating_arousal"), frame, frame.video.unique()
+    )
+    model = CalibratedArousal(mode="all", minimum_sources=1, minimum_trials=3).fit(
+        X, grid.rating_arousal
+    )
+    tagged = X.assign(day=2)
+    alternative = CalibratedArousal(
+        mode="all", minimum_sources=1, minimum_trials=3
+    ).fit(tagged, grid.rating_arousal)
+    np.testing.assert_allclose(model.predict(X), alternative.predict(tagged))

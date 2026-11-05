@@ -1,0 +1,127 @@
+{
+  "stage": "development",
+  "cohorts": {
+    "1": {
+      "annotated_people": 105,
+      "paired_before_support": 32,
+      "status": "development_complete",
+      "parameters": {
+        "base_alpha": 10,
+        "level_penalty": 1,
+        "slope_penalty": 100,
+        "minimum_sources": 10,
+        "minimum_trials": 20
+      },
+      "signal_penalties": {
+        "eda": 1000,
+        "eeg": 1000,
+        "ecg": 1000,
+        "all": 1000,
+        "video": 1000,
+        "missing": 1000
+      },
+      "source_only_people": 73,
+      "development_people": 19,
+      "test_people": 10,
+      "development_trials": 1013,
+      "test_trials": 542,
+      "supported_videos": 195,
+      "smoke_test": {
+        "development_people": 14,
+        "held_development_people": 4,
+        "prediction_rows": 205,
+        "blind_replay_equal": true
+      },
+      "frozen_plan_sha256": "8dd8fb908ab42140e4915ec11e9c328d5d2314edfcb62f24e1b0799c0eaee496"
+    },
+    "2": {
+      "annotated_people": 113,
+      "paired_before_support": 76,
+      "status": "development_complete",
+      "parameters": {
+        "base_alpha": 0.1,
+        "level_penalty": 1,
+        "slope_penalty": 1,
+        "minimum_sources": 10,
+        "minimum_trials": 20
+      },
+      "signal_penalties": {
+        "eda": 1000,
+        "eeg": 1000,
+        "ecg": 1000,
+        "all": 1000,
+        "video": 1000,
+        "missing": 1000
+      },
+      "source_only_people": 37,
+      "development_people": 50,
+      "test_people": 26,
+      "development_trials": 2524,
+      "test_trials": 1306,
+      "supported_videos": 234,
+      "smoke_test": {
+        "development_people": 40,
+        "held_development_people": 10,
+        "prediction_rows": 503,
+        "blind_replay_equal": true
+      },
+      "frozen_plan_sha256": "e6e1e5be471c03eac9faf870097b969f3721ee309d8b0814e399d57f0c27eb4c"
+    },
+    "3": {
+      "annotated_people": 30,
+      "paired_before_support": 25,
+      "status": "insufficient_support",
+      "reason": "Fewer than two development participants after stimulus support"
+    },
+    "4": {
+      "annotated_people": 52,
+      "paired_before_support": 40,
+      "status": "development_complete",
+      "parameters": {
+        "base_alpha": 0.1,
+        "level_penalty": 1,
+        "slope_penalty": 1,
+        "minimum_sources": 10,
+        "minimum_trials": 20
+      },
+      "signal_penalties": {
+        "eda": 1000,
+        "eeg": 100,
+        "ecg": 1000,
+        "all": 1000,
+        "video": 1000,
+        "missing": 1000
+      },
+      "source_only_people": 12,
+      "development_people": 26,
+      "test_people": 14,
+      "development_trials": 1229,
+      "test_trials": 635,
+      "supported_videos": 167,
+      "smoke_test": {
+        "development_people": 20,
+        "held_development_people": 6,
+        "prediction_rows": 205,
+        "blind_replay_equal": true
+      },
+      "frozen_plan_sha256": "0d83fd1f4e0472486ed416f9099bd264239e23422c5c085e64c6132dcb781fa9"
+    }
+  },
+  "python": "3.12.3",
+  "environment": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.1",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1",
+    "skrub": "0.11.0",
+    "skore": "0.29.1",
+    "pyedflib": "0.1.42"
+  },
+  "feature_sha256": "8ea11d4dc5a75d04f6bab046f133fe61842d572b85b7c2018eec8382799c8e24",
+  "minimum_sources": 10,
+  "minimum_trials": 20,
+  "provenance": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42070346635",
+    "commit": "a332226"
+  }
+}

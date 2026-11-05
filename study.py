@@ -5,7 +5,7 @@ from itertools import product
 
 import numpy as np
 import pandas as pd
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, t
 from sklearn.model_selection import GroupKFold
 
 from model import (
@@ -44,7 +44,7 @@ def session_scenario(frame, minimum=20):
     return frame
 
 
-def participant_scores(y, predictions, people):
+def participant_scores(y, predictions, people, include_rank=True):
     """Give each person equal weight and retain uncentered accuracy separately."""
     y, predictions, people = np.asarray(y), np.asarray(predictions), np.asarray(people)
     records = []
@@ -54,7 +54,7 @@ def participant_scores(y, predictions, people):
         errors = truth - pred
         rho = (
             float(spearmanr(truth, pred).statistic)
-            if np.std(truth) and np.std(pred)
+            if include_rank and np.std(truth) and np.std(pred)
             else np.nan
         )
         records.append(
@@ -184,6 +184,7 @@ def tune(
     minimum_sources=10,
     minimum=20,
     modes=("eda", "eeg", "ecg", "all", "video", "missing"),
+    verbose=True,
 ):
     """Select calibration and correction penalties without evaluating final test."""
     contexts = tuning_contexts(frame, split, threshold, minimum_sources, minimum)
@@ -200,7 +201,10 @@ def tune(
             for level, slope in product((1.0, 10.0, 100.0), repeat=2):
                 prediction = calibrated(reference, fold["X_test"], level, slope, True)
                 scores = participant_scores(
-                    fold["y_test"], prediction, fold["X_test"].participant_id
+                    fold["y_test"],
+                    prediction,
+                    fold["X_test"].participant_id,
+                    include_rank=False,
                 )
                 base_scores[(alpha, level, slope)].extend(scores.centered_mse.tolist())
     best = min(
@@ -222,7 +226,8 @@ def tune(
         }
         for key, values in base_scores.items()
     ]
-    print("Calibration penalties selected on development participants", flush=True)
+    if verbose:
+        print("Calibration penalties selected on development participants", flush=True)
     selected = {}
     for mode in modes:
         candidates = {}
@@ -237,7 +242,10 @@ def tune(
                 )
                 prediction = estimator.predict(fold["X_test"])
                 table = participant_scores(
-                    fold["y_test"], prediction, fold["X_test"].participant_id
+                    fold["y_test"],
+                    prediction,
+                    fold["X_test"].participant_id,
+                    include_rank=False,
                 )
                 scores.extend(table.centered_mse.tolist())
             candidates[alpha] = float(np.mean(scores))
@@ -251,7 +259,8 @@ def tune(
                 }
             )
         selected[mode] = min(candidates, key=lambda a: (round(candidates[a], 6), -a))
-        print(f"Correction selected: {mode}", flush=True)
+        if verbose:
+            print(f"Correction selected: {mode}", flush=True)
     return parameters, selected, records
 
 
@@ -284,4 +293,21 @@ def effect_summary(reference, candidate, seed=SEED):
             "positive": int((difference > 0).sum()),
             "quantiles": np.quantile(difference, [0, 0.25, 0.5, 0.75, 1]).tolist(),
         }
+        half_width = (
+            (
+                float(t.ppf(0.975, len(difference) - 1))
+                * float(np.std(difference, ddof=1))
+                / np.sqrt(len(difference))
+            )
+            if len(difference) > 1
+            else None
+        )
+        results[metric]["ci95_student"] = (
+            [
+                float(difference.mean() - half_width),
+                float(difference.mean() + half_width),
+            ]
+            if half_width is not None
+            else [None, None]
+        )
     return results

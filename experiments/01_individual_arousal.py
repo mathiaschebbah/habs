@@ -40,6 +40,7 @@ def run(
     cohorts=(2, 1, 4, 3),
     minimum_sources=10,
     minimum=20,
+    frozen_file=None,
 ):
     """Tune only on development people, then optionally evaluate frozen models.
 
@@ -57,6 +58,8 @@ def run(
         Minimum source participants per known video.
     minimum : int
         Minimum trials in each selected session.
+    frozen_file : pathlib.Path or None
+        Development results whose parameters and allocation must be replayed.
 
     Returns
     -------
@@ -88,6 +91,31 @@ def run(
         "minimum_sources": minimum_sources,
         "minimum_trials": minimum,
     }
+    root = Path(__file__).resolve().parents[1]
+    result["provenance"] = {
+        "source_sha256": {
+            name: hashlib.sha256((root / name).read_bytes()).hexdigest()
+            for name in (
+                "model.py",
+                "study.py",
+                "features.py",
+                "alignment.py",
+                "experiments/01_individual_arousal.py",
+            )
+        },
+        "feature_file": feature_file.name,
+    }
+    frozen_results = json.loads(Path(frozen_file).read_text()) if frozen_file else None
+    if frozen_results is not None:
+        if stage != "final":
+            raise ValueError("Frozen development settings are for final evaluation")
+        if result["feature_sha256"] != frozen_results["feature_sha256"]:
+            raise ValueError("Features differ from the frozen development dataset")
+        if (
+            minimum_sources != frozen_results["minimum_sources"]
+            or minimum != frozen_results["minimum_trials"]
+        ):
+            raise ValueError("Support thresholds differ from the frozen study")
     with threadpool_limits(limits=1):
         for cohort in cohorts:
             case_dir = out_dir / f"cohort_{cohort}"
@@ -98,6 +126,12 @@ def run(
                 "paired_before_support": len(paired_people(data, minimum=minimum)),
             }
             result["cohorts"][str(cohort)] = case
+            previous = (
+                frozen_results["cohorts"][str(cohort)] if frozen_results else None
+            )
+            if previous is not None and previous["status"] != "development_complete":
+                case.update(status=previous["status"], reason=previous["reason"])
+                continue
             try:
                 split = split_study(
                     data, minimum_sources=minimum_sources, minimum=minimum
@@ -116,10 +150,24 @@ def run(
                     minimum_sources=minimum_sources,
                     minimum=minimum,
                 )
-                parameters, signal_penalties, tuning = tune(
-                    data, split, minimum_sources=minimum_sources, minimum=minimum
-                )
+                if previous is None:
+                    parameters, signal_penalties, tuning = tune(
+                        data, split, minimum_sources=minimum_sources, minimum=minimum
+                    )
+                else:
+                    parameters = dict(previous["parameters"])
+                    for name in ("base_alpha", "level_penalty", "slope_penalty"):
+                        parameters[name] = float(parameters[name])
+                    signal_penalties = {
+                        name: float(value)
+                        for name, value in previous["signal_penalties"].items()
+                    }
+                    tuning = []
             except InsufficientSupport as error:
+                if previous is not None:
+                    raise RuntimeError(
+                        "The frozen study allocation cannot be replayed"
+                    ) from error
                 case.update(status="insufficient_support", reason=str(error))
                 print(f"Cohort {cohort}: insufficient prespecified support", flush=True)
                 (out_dir / "results.json").write_text(
@@ -143,9 +191,10 @@ def run(
                 supported_videos=len(split["videos"]),
                 smoke_test=smoke,
             )
-            pd.DataFrame(tuning).to_csv(
-                case_dir / "development_scores.csv", index=False
-            )
+            if tuning:
+                pd.DataFrame(tuning).to_csv(
+                    case_dir / "development_scores.csv", index=False
+                )
             roles = [
                 {"participant_id": person, "role": role}
                 for role, people in (
@@ -174,6 +223,13 @@ def run(
             case["frozen_plan_sha256"] = hashlib.sha256(
                 frozen_text.encode()
             ).hexdigest()
+            if (
+                previous is not None
+                and case["frozen_plan_sha256"] != previous["frozen_plan_sha256"]
+            ):
+                raise ValueError(
+                    "Participant allocation or parameters changed after development"
+                )
             if stage != "final":
                 (out_dir / "results.json").write_text(
                     json.dumps(result, indent=2, allow_nan=False) + "\n"
@@ -194,6 +250,7 @@ def run(
                 "level",
                 "affine",
                 "eda",
+                "raw",
                 "eeg",
                 "ecg",
                 "all",
@@ -203,7 +260,9 @@ def run(
             ):
                 estimator = CalibratedArousal(
                     mode=mode,
-                    signal_alpha=signal_penalties.get(mode, 10.0),
+                    signal_alpha=signal_penalties["eda"]
+                    if mode == "raw"
+                    else signal_penalties.get(mode, 10.0),
                     **parameters,
                 )
                 learner = build_learner(estimator, GroupKFold(5), minimum=minimum)
@@ -225,6 +284,9 @@ def run(
                     metric: finite_mean(scores[mode][metric])
                     for metric in ("centered_mse", "mae", "spearman", "bias")
                 }
+                case["models"][mode]["rank_people"] = int(
+                    scores[mode].spearman.notna().sum()
+                )
                 reports[mode] = report
             case["effects_vs_affine"] = {
                 mode: effect_summary(scores["affine"], scores[mode])
@@ -268,5 +330,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--stage", choices=("development", "final"), default="development"
     )
+    parser.add_argument("--frozen", type=Path)
     arguments = parser.parse_args()
-    run(arguments.feature_file, arguments.out_dir, stage=arguments.stage)
+    run(
+        arguments.feature_file,
+        arguments.out_dir,
+        stage=arguments.stage,
+        frozen_file=arguments.frozen,
+    )

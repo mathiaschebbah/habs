@@ -120,3 +120,31 @@ class PreparationTests(unittest.TestCase):
                 },
             )
             self.assertEqual(result["cohorts"]["2"]["both_days_people"], 0)
+
+
+class InferenceIdentityTests(unittest.TestCase):
+    """Check the exact zero-gain mechanism used to validate the intervals."""
+
+    def test_midpoint_noise_has_the_expected_centered_error_difference(self):
+        """The loss difference equals twice the centered correction/noise product."""
+        baseline = [3.0, 4.0, 5.0, 6.0]
+        candidate = [3.2, 4.8, 4.9, 6.3]
+        correction = [
+            right - left for left, right in zip(baseline, candidate, strict=True)
+        ]
+        average = sum(correction) / len(correction)
+        centered = [value - average for value in correction]
+        noise = [0.1, -0.4, 0.3, 0.7]
+        observed = [
+            value + 0.5 * q + error
+            for value, q, error in zip(baseline, centered, noise, strict=True)
+        ]
+        observed_difference = centered_mse(observed, baseline) - centered_mse(
+            observed, candidate
+        )
+        expected_difference = (
+            2
+            * sum(q * error for q, error in zip(centered, noise, strict=True))
+            / len(noise)
+        )
+        self.assertAlmostEqual(observed_difference, expected_difference)

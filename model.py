@@ -21,7 +21,6 @@ def predictor_frame(frame):
     """Exclude all current-trial ratings and derived emotion labels from X."""
     allowed = [
         "participant_id",
-        "day",
         "order",
         *META,
         *FEATURES,
