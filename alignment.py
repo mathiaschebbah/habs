@@ -89,8 +89,17 @@ def reconcile(data_dir, out_dir):
     data_dir, out_dir = Path(data_dir), Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     labels = pd.read_csv(data_dir / "labels_train.csv", na_values=["TESTSUBJECT"])
+    label_video_counts = (
+        labels.assign(video=labels.video.map(video_name))
+        .groupby(["participant_id", "video"])
+        .size()
+        .to_dict()
+    )
     labels = labels.loc[labels.rating_arousal.between(1, 9)].copy()
     index = event_index(data_dir)
+    by_video = defaultdict(list)
+    for (person, _, video), candidates in index.items():
+        by_video[(person, video)].extend(candidates)
     rows = []
     for row in labels.to_dict("records"):
         original_day = row["day"]
@@ -143,7 +152,11 @@ def reconcile(data_dir, out_dir):
     collision = linked & frame.event_uid.duplicated(keep=False)
     frame.loc[collision, "alignment"] = "duplicate_annotation"
     frame.loc[collision, "event_uid"] = None
-    frame.to_csv(out_dir / "aligned_trials.csv.gz", index=False, compression="gzip")
+    frame.to_csv(
+        out_dir / "aligned_trials.csv.gz",
+        index=False,
+        compression={"method": "gzip", "mtime": 0},
+    )
     accepted = frame.loc[
         frame.alignment.isin(["exact", "day_corrected", "day_recovered"])
     ]
@@ -153,6 +166,28 @@ def reconcile(data_dir, out_dir):
         "alignment": dict(Counter(frame.alignment)),
         "cohorts": {},
     }
+    unresolved = Counter()
+    marker_differences = Counter()
+    for row in frame.loc[frame.alignment == "unmatched"].to_dict("records"):
+        key = (row["participant_id"], video_name(row["video"]))
+        candidates = by_video.get(key, [])
+        if not candidates:
+            unresolved["video_not_in_available_recordings"] += 1
+        elif len(candidates) != 1 or label_video_counts.get(key, 0) != 1:
+            unresolved["repeated_video_or_annotation"] += 1
+        else:
+            candidate = candidates[0]
+            kind = (
+                "unique_video_same_day"
+                if candidate["day"] == row["label_day"]
+                else "unique_video_other_day"
+            )
+            unresolved[kind] += 1
+            marker_differences[
+                str(int(row["start_marker"]) - candidate["start_marker"])
+            ] += 1
+    summary["unresolved_video_audit"] = dict(unresolved)
+    summary["candidate_marker_differences"] = dict(marker_differences)
     for cohort, original in frame.groupby("cohort"):
         retained = accepted.loc[accepted.cohort == cohort]
         sizes = retained.groupby(["participant_id", "day"]).size()

@@ -1,12 +1,12 @@
-"""Run the HABS signal extraction on the mounted dataset."""
+"""Audit the remaining annotation links before fixing the analysis population."""
 
 from pathlib import Path
 
-from features import extract
+from alignment import reconcile
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Extract complementary measurements from all reconciled cohorts.
+    """Audit unlinked videos without changing any uncertain match.
 
     Parameters
     ----------
@@ -15,4 +15,4 @@ def process(data_dir: Path, out_dir: Path) -> None:
     out_dir : pathlib.Path
         Private result directory retained by HABS.
     """
-    extract(data_dir, out_dir)
+    reconcile(data_dir, out_dir)

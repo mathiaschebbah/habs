@@ -1,0 +1,186 @@
+{
+  "rows": 22972,
+  "people": 314,
+  "annotation_verified": 22972,
+  "cohorts": {
+    "1": {
+      "raw_eda": {
+        "trials": 4656,
+        "people": 96,
+        "two_days_20_trials": 21,
+        "one_day_40_trials": 59
+      },
+      "eda": {
+        "trials": 4700,
+        "people": 96,
+        "two_days_20_trials": 21,
+        "one_day_40_trials": 59
+      },
+      "eeg": {
+        "trials": 5819,
+        "people": 105,
+        "two_days_20_trials": 32,
+        "one_day_40_trials": 74
+      },
+      "ecg": {
+        "trials": 4965,
+        "people": 102,
+        "two_days_20_trials": 25,
+        "one_day_40_trials": 63
+      },
+      "any": {
+        "trials": 5819,
+        "people": 105,
+        "two_days_20_trials": 32,
+        "one_day_40_trials": 74
+      }
+    },
+    "2": {
+      "raw_eda": {
+        "trials": 7038,
+        "people": 102,
+        "two_days_20_trials": 45,
+        "one_day_40_trials": 87
+      },
+      "eda": {
+        "trials": 7239,
+        "people": 104,
+        "two_days_20_trials": 47,
+        "one_day_40_trials": 88
+      },
+      "eeg": {
+        "trials": 9726,
+        "people": 113,
+        "two_days_20_trials": 76,
+        "one_day_40_trials": 113
+      },
+      "ecg": {
+        "trials": 7751,
+        "people": 112,
+        "two_days_20_trials": 58,
+        "one_day_40_trials": 92
+      },
+      "any": {
+        "trials": 9726,
+        "people": 113,
+        "two_days_20_trials": 76,
+        "one_day_40_trials": 113
+      }
+    },
+    "3": {
+      "raw_eda": {
+        "trials": 960,
+        "people": 27,
+        "two_days_20_trials": 6,
+        "one_day_40_trials": 0
+      },
+      "eda": {
+        "trials": 1107,
+        "people": 27,
+        "two_days_20_trials": 7,
+        "one_day_40_trials": 0
+      },
+      "eeg": {
+        "trials": 2492,
+        "people": 30,
+        "two_days_20_trials": 25,
+        "one_day_40_trials": 0
+      },
+      "ecg": {
+        "trials": 2144,
+        "people": 29,
+        "two_days_20_trials": 23,
+        "one_day_40_trials": 0
+      },
+      "any": {
+        "trials": 2492,
+        "people": 30,
+        "two_days_20_trials": 25,
+        "one_day_40_trials": 0
+      }
+    },
+    "4": {
+      "raw_eda": {
+        "trials": 4607,
+        "people": 52,
+        "two_days_20_trials": 40,
+        "one_day_40_trials": 51
+      },
+      "eda": {
+        "trials": 4611,
+        "people": 52,
+        "two_days_20_trials": 40,
+        "one_day_40_trials": 51
+      },
+      "eeg": {
+        "trials": 4615,
+        "people": 52,
+        "two_days_20_trials": 40,
+        "one_day_40_trials": 51
+      },
+      "ecg": {
+        "trials": 3691,
+        "people": 50,
+        "two_days_20_trials": 30,
+        "one_day_40_trials": 42
+      },
+      "any": {
+        "trials": 4615,
+        "people": 52,
+        "two_days_20_trials": 40,
+        "one_day_40_trials": 51
+      }
+    },
+    "5": {
+      "raw_eda": {
+        "trials": 303,
+        "people": 14,
+        "two_days_20_trials": 0,
+        "one_day_40_trials": 0
+      },
+      "eda": {
+        "trials": 303,
+        "people": 14,
+        "two_days_20_trials": 0,
+        "one_day_40_trials": 0
+      },
+      "eeg": {
+        "trials": 307,
+        "people": 14,
+        "two_days_20_trials": 0,
+        "one_day_40_trials": 0
+      },
+      "ecg": {
+        "trials": 255,
+        "people": 13,
+        "two_days_20_trials": 0,
+        "one_day_40_trials": 0
+      },
+      "any": {
+        "trials": 307,
+        "people": 14,
+        "two_days_20_trials": 0,
+        "one_day_40_trials": 0
+      }
+    }
+  },
+  "eda_rescued_by_preprocessing": 396,
+  "sources": {
+    "eda": {
+      "CURATED": 22518,
+      "PREPROCESSED": 454
+    },
+    "eeg": {
+      "PREPROCESSED": 22895,
+      "CURATED": 77
+    },
+    "ecg": {
+      "CURATED": 22666,
+      "PREPROCESSED": 306
+    }
+  },
+  "provenance": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42055356368",
+    "commit": "8c2dbc4"
+  }
+}
