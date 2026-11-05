@@ -1,0 +1,8 @@
+{
+  "run": "https://github.com/mathiaschebbah/habs/actions/runs/42099628511",
+  "commit": "fa4f356db4577e96540e0ab54bd52b68c5080afe",
+  "status": "partial_validation_archived_before_research_question_revision",
+  "completed_replications": 879,
+  "target_replications": 4000,
+  "real_reserved_outcomes_evaluated": false
+}

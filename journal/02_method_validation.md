@@ -1,6 +1,6 @@
 # Validation du protocole par simulation
 
-Statut : préparation de la validation prévue au protocole, avant évaluation des notes réservées. Date : 5 novembre 2026.
+Statut : premier lot partiel archivé ; pas de nouveau lot pendant le réexamen de la question centrale. Les notes réelles réservées n'ont pas été évaluées. Date : 5 novembre 2026.
 
 ## Question
 
@@ -43,7 +43,8 @@ les plis, les graines, les modèles candidats et les critères restent identique
 
 Sur un plan artificiel de 113 identifiants, les paramètres retenus, les scores de
 tous les candidats et les prédictions sont exactement égaux avant et après ce
-changement. Le temps mesuré passe de 26,7 à 6,3 secondes. Les répétitions du
-premier lot conservent leur empreinte initiale et sont archivées séparément ;
-la validation complète utilise une nouvelle empreinte. Les résultats communs
-aux mêmes graines seront comparés sur les covariables réelles.
+changement. Le temps mesuré sur le poste local passe de 26,7 à 6,3 secondes.
+Les 879 répétitions du premier lot conservent leur empreinte initiale et sont
+archivées séparément. Une éventuelle nouvelle validation utiliserait une
+nouvelle empreinte ; aucun lot optimisé n'a été lancé pendant le réexamen
+de la question centrale.

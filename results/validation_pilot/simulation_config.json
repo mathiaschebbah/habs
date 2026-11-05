@@ -1,0 +1,20 @@
+{
+  "feature_sha256": "8ea11d4dc5a75d04f6bab046f133fe61842d572b85b7c2018eec8382799c8e24",
+  "algorithm_sha256": "cfcc6a417c860e521c0210414772db502d1d9da701a47fbc48ccca3fa5673710",
+  "cohort": 2,
+  "minimum_sources": 10,
+  "minimum_trials": 20,
+  "scenarios": [
+    "context",
+    "response_style",
+    "shared_stimulus",
+    "individual_signal"
+  ],
+  "target_per_scenario": 1000,
+  "versions": {
+    "numpy": "2.4.6",
+    "pandas": "3.0.1",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1"
+  }
+}

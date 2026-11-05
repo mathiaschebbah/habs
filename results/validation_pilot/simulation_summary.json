@@ -1,0 +1,111 @@
+{
+  "configuration": {
+    "feature_sha256": "8ea11d4dc5a75d04f6bab046f133fe61842d572b85b7c2018eec8382799c8e24",
+    "algorithm_sha256": "cfcc6a417c860e521c0210414772db502d1d9da701a47fbc48ccca3fa5673710",
+    "cohort": 2,
+    "minimum_sources": 10,
+    "minimum_trials": 20,
+    "scenarios": [
+      "context",
+      "response_style",
+      "shared_stimulus",
+      "individual_signal"
+    ],
+    "target_per_scenario": 1000,
+    "versions": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.1",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1"
+    }
+  },
+  "seconds": 2462.5622619299975,
+  "scenarios": {
+    "context": {
+      "replications": 220,
+      "positive_vs_reference": 0,
+      "positive_after_controls": 0,
+      "mean_gains": {
+        "affine": -0.004853001084093115,
+        "video": -0.0024274846434701436,
+        "missing": -0.0032198585065407654
+      },
+      "median_seconds": 66.33741122900028,
+      "positive_vs_reference_fraction": 0.0,
+      "positive_vs_reference_ci95": [
+        0.0,
+        0.017161516195135618
+      ],
+      "positive_after_controls_fraction": 0.0,
+      "positive_after_controls_ci95": [
+        0.0,
+        0.017161516195135618
+      ]
+    },
+    "individual_signal": {
+      "replications": 219,
+      "positive_vs_reference": 212,
+      "positive_after_controls": 211,
+      "mean_gains": {
+        "affine": 0.2291246526294365,
+        "video": 0.23132314835013043,
+        "missing": 0.23180109694350684
+      },
+      "median_seconds": 66.58610603400302,
+      "positive_vs_reference_fraction": 0.9680365296803652,
+      "positive_vs_reference_ci95": [
+        0.9355042531877564,
+        0.9844322841374189
+      ],
+      "positive_after_controls_fraction": 0.9634703196347032,
+      "positive_after_controls_ci95": [
+        0.9295858435850105,
+        0.9813757031321143
+      ]
+    },
+    "response_style": {
+      "replications": 220,
+      "positive_vs_reference": 1,
+      "positive_after_controls": 0,
+      "mean_gains": {
+        "affine": -0.004421195548316767,
+        "video": -0.0033747305724822403,
+        "missing": -0.0024414672252185744
+      },
+      "median_seconds": 66.28504151049856,
+      "positive_vs_reference_fraction": 0.004545454545454545,
+      "positive_vs_reference_ci95": [
+        0.0008028354798775041,
+        0.025293576022575065
+      ],
+      "positive_after_controls_fraction": 0.0,
+      "positive_after_controls_ci95": [
+        0.0,
+        0.017161516195135618
+      ]
+    },
+    "shared_stimulus": {
+      "replications": 220,
+      "positive_vs_reference": 0,
+      "positive_after_controls": 0,
+      "mean_gains": {
+        "affine": -0.00464417970743253,
+        "video": -0.0024826789201143136,
+        "missing": -0.0031071253594920174
+      },
+      "median_seconds": 66.40883994600154,
+      "positive_vs_reference_fraction": 0.0,
+      "positive_vs_reference_ci95": [
+        0.0,
+        0.017161516195135618
+      ],
+      "positive_after_controls_fraction": 0.0,
+      "positive_after_controls_ci95": [
+        0.0,
+        0.017161516195135618
+      ]
+    }
+  },
+  "workers": 24,
+  "complete": false
+}

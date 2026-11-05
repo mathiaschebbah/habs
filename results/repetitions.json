@@ -1,0 +1,171 @@
+{
+  "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+  "identity": "Normalized video filename and participant ID; distinct recorded session numbers",
+  "numeric_rating_identifiers": 317,
+  "aligned_notes": {
+    "trials": 22972,
+    "people": 314,
+    "people_with_multiple_sessions": 176,
+    "people_with_cross_session_repetitions": 6,
+    "person_video_groups_across_sessions": 9,
+    "session_pairs": 9,
+    "pairs_with_one_trial_in_each_session": 9,
+    "person_video_session_groups_with_multiple_trials": 14,
+    "people_with_changed_note_on_unique_pairs": {
+      "0.0": 6,
+      "0.5": 6,
+      "1.0": 5
+    }
+  },
+  "recorded_events_for_numeric_rating_identifiers": {
+    "trials": 27295,
+    "people": 317,
+    "people_with_multiple_sessions": 199,
+    "people_with_cross_session_repetitions": 10,
+    "person_video_groups_across_sessions": 16,
+    "session_pairs": 16,
+    "pairs_with_one_trial_in_each_session": 16,
+    "person_video_session_groups_with_multiple_trials": 40
+  },
+  "cohorts": {
+    "1": {
+      "aligned_notes": {
+        "trials": 5830,
+        "people": 105,
+        "people_with_multiple_sessions": 35,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 3,
+        "people_with_changed_note_on_unique_pairs": {
+          "0.0": 0,
+          "0.5": 0,
+          "1.0": 0
+        }
+      },
+      "recorded_events": {
+        "trials": 7924,
+        "people": 106,
+        "people_with_multiple_sessions": 37,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 23
+      }
+    },
+    "2": {
+      "aligned_notes": {
+        "trials": 9726,
+        "people": 113,
+        "people_with_multiple_sessions": 76,
+        "people_with_cross_session_repetitions": 5,
+        "person_video_groups_across_sessions": 8,
+        "session_pairs": 8,
+        "pairs_with_one_trial_in_each_session": 8,
+        "person_video_session_groups_with_multiple_trials": 7,
+        "people_with_changed_note_on_unique_pairs": {
+          "0.0": 5,
+          "0.5": 5,
+          "1.0": 4
+        }
+      },
+      "recorded_events": {
+        "trials": 10915,
+        "people": 115,
+        "people_with_multiple_sessions": 88,
+        "people_with_cross_session_repetitions": 7,
+        "person_video_groups_across_sessions": 12,
+        "session_pairs": 12,
+        "pairs_with_one_trial_in_each_session": 12,
+        "person_video_session_groups_with_multiple_trials": 12
+      }
+    },
+    "3": {
+      "aligned_notes": {
+        "trials": 2494,
+        "people": 30,
+        "people_with_multiple_sessions": 25,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 0,
+        "people_with_changed_note_on_unique_pairs": {
+          "0.0": 0,
+          "0.5": 0,
+          "1.0": 0
+        }
+      },
+      "recorded_events": {
+        "trials": 2792,
+        "people": 30,
+        "people_with_multiple_sessions": 27,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 0
+      }
+    },
+    "4": {
+      "aligned_notes": {
+        "trials": 4615,
+        "people": 52,
+        "people_with_multiple_sessions": 40,
+        "people_with_cross_session_repetitions": 1,
+        "person_video_groups_across_sessions": 1,
+        "session_pairs": 1,
+        "pairs_with_one_trial_in_each_session": 1,
+        "person_video_session_groups_with_multiple_trials": 4,
+        "people_with_changed_note_on_unique_pairs": {
+          "0.0": 1,
+          "0.5": 1,
+          "1.0": 1
+        }
+      },
+      "recorded_events": {
+        "trials": 5329,
+        "people": 52,
+        "people_with_multiple_sessions": 47,
+        "people_with_cross_session_repetitions": 3,
+        "person_video_groups_across_sessions": 4,
+        "session_pairs": 4,
+        "pairs_with_one_trial_in_each_session": 4,
+        "person_video_session_groups_with_multiple_trials": 5
+      }
+    },
+    "5": {
+      "aligned_notes": {
+        "trials": 307,
+        "people": 14,
+        "people_with_multiple_sessions": 0,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 0,
+        "people_with_changed_note_on_unique_pairs": {
+          "0.0": 0,
+          "0.5": 0,
+          "1.0": 0
+        }
+      },
+      "recorded_events": {
+        "trials": 335,
+        "people": 14,
+        "people_with_multiple_sessions": 0,
+        "people_with_cross_session_repetitions": 0,
+        "person_video_groups_across_sessions": 0,
+        "session_pairs": 0,
+        "pairs_with_one_trial_in_each_session": 0,
+        "person_video_session_groups_with_multiple_trials": 0
+      }
+    }
+  },
+  "provenance": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42108589456",
+    "commit": "1d541642009195e6d93f403cb8f942b06067567a"
+  }
+}

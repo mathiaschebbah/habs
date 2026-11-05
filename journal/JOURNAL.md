@@ -2,7 +2,7 @@
 
 ## État au 5 novembre 2026
 
-La question retenue concerne l'information physiologique sur les variations d'arousal déclaré au-delà de la vidéo et de la notation personnelle. Le [protocole et ses amendements](01_individual_arousal.md) sont fixés. Le développement des modèles est terminé ; les performances des identifiants réservés au test ne sont pas encore évaluées. La [validation par simulation](02_method_validation.md) est en cours. Le dossier de lecture commence dans [la préparation de l'étude](../docs/research/README.md).
+La question centrale est réexaminée après l'[audit des répétitions](../results/repetitions.json). La [comparaison des questions possibles](../docs/research/QUESTION_REASSESSMENT.md) distingue personnalisation des prédictions et valeur des capteurs. Aucune nouvelle orientation n'est encore retenue. Le développement de l'ancien protocole est terminé, mais aucune performance réelle réservée n'a été évaluée. Son premier lot de simulation est archivé comme validation partielle. Le dossier de lecture commence dans [la préparation de l'étude](../docs/research/README.md).
 
 ## Compréhension des données
 
@@ -57,3 +57,16 @@ nouveaux lots. `data/repetition_audit.py` inventorie les événements et les not
 appariables, sans sélectionner les personnes selon le changement de leur note.
 La portée scientifique sera redéfinie à partir de ces observations avant toute
 évaluation des performances réelles réservées.
+
+L'audit CI `1d54164` trouve neuf paires de notes répétées sur six identifiants,
+dont huit paires en cohorte 2 et une en cohorte 4. Même l'inventaire des événements
+sans exigence de deux notes appariables ne trouve que seize paires sur dix
+identifiants. Le changement de réponse à contenu constant n'offre donc pas un
+échantillon adapté à une analyse prédictive indépendante dans cette livraison.
+La question recommandée porte désormais sur l'utilité transférable d'une séance
+de réponses personnelles, avec MAE brute et exclusion des rares stimuli déjà vus.
+Cette recommandation reste à retenir explicitement avant une nouvelle analyse.
+
+Le lot de validation antérieur a terminé 879 répétitions synthétiques sur les
+4 000 visées. Il est conservé dans `results/validation_pilot/`, avec son empreinte
+et son statut incomplet. Il ne constitue pas un résultat sur les réponses réelles.

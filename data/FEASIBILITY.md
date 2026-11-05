@@ -22,6 +22,32 @@ Le seuil de 60 personnes du protocole initial est un repère de prudence, pas l'
 
 Sources : [réconciliation](../results/alignment.json), [qualité des trois signaux](../results/multimodal_quality.json), [partition et paramètres figés](../results/development.json). Les résultats prédictifs réservés ne sont pas contenus dans ces fichiers de préparation.
 
+### Répétitions exactes après correction des sessions
+
+L'[audit exhaustif des répétitions](../results/repetitions.json), exécuté par le
+[job 42108589456](https://github.com/mathiaschebbah/habs/actions/runs/42108589456),
+trouve neuf paires de notes appariables pour une même vidéo et un même identifiant
+à des sessions enregistrées différentes. Elles concernent six identifiants :
+huit paires sur cinq identifiants de cohorte 2, une paire sur un identifiant de
+cohorte 4. Les autres cohortes n'en contiennent aucune.
+
+Les six identifiants ont au moins une variation de note d'au moins 0,5 point,
+dont cinq d'au moins un point. Les notes stables n'ont pas été exclues de
+l'inventaire. Ces comptages ne permettent pas d'estimer une instabilité générale
+des réponses, et ne constituent pas un échantillon suffisant pour entraîner puis
+tester un modèle de changements à contenu constant.
+
+L'identité du stimulus repose sur le nom de fichier fourni et normalisé. Les
+vidéos ne sont pas disponibles pour une comparaison de leur contenu. En comptant
+tous les événements enregistrés des identifiants ayant des notes numériques,
+même sans deux notes appariables, l'audit trouve seize paires sur dix identifiants.
+Les 176 identifiants avec plusieurs sessions alignées quelconques restent
+distincts des 173 ayant deux sessions d'au moins vingt essais exploitables.
+
+Le constat initial de zéro répétition entre J1 et J2 dans la cohorte 2 ne doit
+donc pas être étendu aux données corrigées. Une analyse de transfert à d'autres
+vidéos devra exclure explicitement ces rares répétitions de la cible future.
+
 ## Provenance
 
 - [Inventaire des tables et des événements](https://github.com/mathiaschebbah/habs/actions/runs/42029637910), commit `e1b7b4c`.

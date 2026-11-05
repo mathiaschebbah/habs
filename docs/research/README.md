@@ -1,5 +1,12 @@
 # Préparation de l'étude de l'excitation individuelle
 
+La question centrale est en cours de réexamen. L'audit corrigé ne trouve que
+neuf paires de notes pour une même personne et vidéo à plusieurs séances.
+La [comparaison des questions possibles](QUESTION_REASSESSMENT.md) expose ce
+que permettraient une étude de calibration personnelle ou une étude de
+généralisation des capteurs. Aucun nouveau modèle n'est lancé avant ce choix.
+Les sections suivantes conservent le contexte du premier protocole.
+
 L'étude demande si l'EDA, l'EEG et l'ECG prédisent les variations d'excitation déclarée lors d'une seconde session, au-delà de la vidéo et d'une calibration personnelle. Le critère principal ne récompense pas une simple correction constante du niveau personnel.
 
 La recherche bibliographique a récupéré 529 notices, soit 483 après rapprochement, dont 54 sont retenues et annotées. Elle est documentée, mais sa couverture et la profondeur de lecture restent limitées : 30 références ont été examinées dans leurs sections accessibles et 24 au niveau du résumé ou de la notice. Ce dossier distingue la préparation initiale des analyses exécutées ensuite.
@@ -47,4 +54,7 @@ Ces commandes reproduisent la préparation initiale. `process.py` effectue déso
 
 ## Étape suivante
 
-Achever la [validation par simulation](../../journal/02_method_validation.md), puis évaluer les modèles figés sur les identifiants réservés. Les performances réelles seront distinguées des mécanismes synthétiques et des contrôles de préparation.
+Retenir explicitement la nouvelle question et documenter son protocole avant
+l'évaluation réservée. Le [premier lot de simulation](../../results/validation_pilot/)
+est conservé comme validation partielle de l'ancien protocole ; il ne résout
+pas l'identification du ressenti individuel.
