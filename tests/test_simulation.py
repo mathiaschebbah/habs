@@ -143,5 +143,5 @@ def test_entrypoint_prefers_its_own_checkpoint(tmp_path, monkeypatch):
 
     monkeypatch.setattr(entry, "extract", unexpected_extraction)
     monkeypatch.chdir(tmp_path)
-    entry.process(Path("data"), Path("output"))
+    entry.process(Path("data"), Path("output"), stage="validation")
     assert commands[0][commands[0].index("--resume") + 1] == str(local)

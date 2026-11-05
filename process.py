@@ -6,10 +6,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from data.repetition_audit import run as audit_repetitions
 from features import extract
 
 
-def process(data_dir: Path, out_dir: Path, stage: str = "validation") -> None:
+def process(data_dir: Path, out_dir: Path, stage: str = "repetitions") -> None:
     """Run one study stage with private outputs and aggregate public summaries.
 
     Parameters
@@ -21,9 +22,12 @@ def process(data_dir: Path, out_dir: Path, stage: str = "validation") -> None:
     stage : str
         Extract signals, tune development models, validate, or evaluate final models.
     """
-    if stage not in {"extract", "development", "validation", "final"}:
+    if stage not in {"repetitions", "extract", "development", "validation", "final"}:
         raise ValueError(f"Unknown study stage: {stage}")
     data_dir, out_dir = Path(data_dir).resolve(), Path(out_dir).resolve()
+    if stage == "repetitions":
+        audit_repetitions(data_dir, out_dir)
+        return
     feature_file = out_dir / "trials.csv.gz"
     if not feature_file.exists():
         extract(data_dir, out_dir)
@@ -81,8 +85,8 @@ if __name__ == "__main__":
     parser.add_argument("out_dir", type=Path)
     parser.add_argument(
         "--stage",
-        choices=("extract", "development", "validation", "final"),
-        default="validation",
+        choices=("repetitions", "extract", "development", "validation", "final"),
+        default="repetitions",
     )
     arguments = parser.parse_args()
     process(arguments.data_dir, arguments.out_dir, arguments.stage)

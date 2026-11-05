@@ -23,6 +23,13 @@ synthétiques et le BDF d'exemple ; leurs scores ne sont pas des résultats HABS
 
 ## Préparation et évaluation
 
+Le point d'entrée HABS exécute actuellement l'audit des répétitions, pendant le
+réexamen de la question centrale. Cet inventaire ne lance aucun modèle :
+
+```bash
+.venv/bin/python process.py /data out/repetitions --stage repetitions
+```
+
 Depuis la racine du dépôt, remplacer `/data` par la racine de la livraison :
 
 ```bash

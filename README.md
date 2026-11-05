@@ -11,8 +11,10 @@ La préparation exhaustive conserve 22 972 essais sur 314 identifiants, dont
 173 ont deux séances suffisantes. Les modèles utilisent 267 identifiants au
 total, avec 50 identifiants réservés au test dans trois cohortes analysées
 séparément. Les [paramètres de développement](results/development.json) sont figés.
-`process.py` exécute actuellement la validation par simulation avant l'évaluation
-finale. Les commandes de reproduction seront regroupées avec les résultats.
+`process.py` vérifie actuellement les répétitions exactes de vidéos chez une
+même personne après réconciliation des jours. La question centrale est réexaminée
+avant l'évaluation finale. Les commandes existantes figurent dans
+[REPRODUCIBILITY.md](REPRODUCIBILITY.md).
 
 **Build advanced AI models on real EEG data and contribute to the next generation of neurotechnology.**
 

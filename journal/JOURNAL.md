@@ -42,3 +42,18 @@ L'examen de toutes les cohortes récupère 2 690 annotations par correction ou r
 Le développement des modèles est terminé après des tests de séparation des participants, de masquage des notes futures, de conservation de la grille de prédiction et de comparaison à calibration identique. Les contrôles de prédiction ont également réussi sur les données réelles de développement. L'essai complet sur données synthétiques fonctionne ; il ne constitue pas un résultat HABS. Les performances des personnes réservées au test ne sont pas encore évaluées. Une analyse indépendante par cohorte évite les fuites entre éventuelles réinscriptions.
 
 Les calculs utilisent un environnement pip/venv, pandas, scikit-learn, skrub et des rapports skore locaux. Les versions sont épinglées. Les tables et rapports individuels restent dans le stockage privé HABS ; seuls les agrégats et le code sont versionnés.
+
+## Réexamen de la question avant les résultats réservés
+
+Le protocole actuel porte sur des vidéos différentes entre calibration et test.
+Il ne permet pas de distinguer un état momentané, des préférences stables pour
+certains contenus et un style de réponse résiduel. Une question portant sur le
+changement de réponse au même stimulus demande des répétitions exactes chez
+la même personne. L'absence de telles répétitions dans l'inventaire initial de
+cohorte 2 doit être vérifiée sur toutes les correspondances corrigées.
+
+Le lot de simulation déjà lancé sera conservé, sans lancement automatique de
+nouveaux lots. `data/repetition_audit.py` inventorie les événements et les notes
+appariables, sans sélectionner les personnes selon le changement de leur note.
+La portée scientifique sera redéfinie à partir de ces observations avant toute
+évaluation des performances réelles réservées.
