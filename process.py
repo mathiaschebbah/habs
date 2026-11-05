@@ -2,11 +2,11 @@
 
 from pathlib import Path
 
-from features import extract
+from alignment import reconcile
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Extract trial features and save their quality report.
+    """Reconcile all released arousal notes with their recorded events.
 
     Parameters
     ----------
@@ -15,4 +15,4 @@ def process(data_dir: Path, out_dir: Path) -> None:
     out_dir : pathlib.Path
         Private directory retained by the HABS platform.
     """
-    extract(data_dir, out_dir)
+    reconcile(data_dir, out_dir)

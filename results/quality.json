@@ -1,0 +1,92 @@
+{
+  "cohort": 2,
+  "rows": 11032,
+  "recordings": 214,
+  "joins": {
+    "matched": 9646,
+    "missing_metadata": 1343,
+    "outside_segment": 31,
+    "missing_event": 12
+  },
+  "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+  "quality": {
+    "0.01": {
+      "valid_trials": 6968,
+      "paired_people": 45,
+      "paired_trials": 4506,
+      "day1": 2282,
+      "day2": 2224
+    },
+    "0.05": {
+      "valid_trials": 7022,
+      "paired_people": 45,
+      "paired_trials": 4529,
+      "day1": 2288,
+      "day2": 2241
+    },
+    "0.1": {
+      "valid_trials": 7069,
+      "paired_people": 46,
+      "paired_trials": 4615,
+      "day1": 2343,
+      "day2": 2272
+    },
+    "1.01": {
+      "valid_trials": 9646,
+      "paired_people": 75,
+      "paired_trials": 7697,
+      "day1": 3849,
+      "day2": 3848
+    }
+  },
+  "measurement": {
+    "clamp_fraction": [
+      0,
+      0,
+      0,
+      0.249275,
+      1
+    ],
+    "raw_min": [
+      -2.147483360000036,
+      -2.1474833245931464,
+      -1.9980225587982106,
+      -1.7750520625021347,
+      0.8213526585734462
+    ],
+    "raw_max": [
+      -2.147483360000036,
+      -2.108787746260613,
+      -1.9479796580167505,
+      -1.7212361733183816,
+      0.8522332033016148
+    ],
+    "eda_level": [
+      1,
+      1.0309894112237534,
+      2.0672319543725237,
+      2.8959643620542894,
+      11.294322960641106
+    ],
+    "eda_change": [
+      -1.4764803363569774,
+      -0.015010249213171956,
+      0,
+      0.0024630378059661284,
+      6.583538755057429
+    ],
+    "eda_spread": [
+      0,
+      0.013544247155776512,
+      0.04892657097462205,
+      0.08953603756293549,
+      5.8741991762498795
+    ],
+    "flat_trials": 1953,
+    "raw_flat_trials": 1845
+  },
+  "provenance": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42046322881",
+    "commit": "2d72754"
+  }
+}

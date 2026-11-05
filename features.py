@@ -160,10 +160,14 @@ def extract(data_dir, out_dir, workers=4):
     ]:
         if name not in frame:
             frame[name] = np.nan
-    frame["flat"] = frame.get("flat", pd.Series(True, index=frame.index)).fillna(True)
-    frame["raw_flat"] = frame.get(
-        "raw_flat", pd.Series(True, index=frame.index)
-    ).fillna(True)
+    frame["flat"] = (
+        frame.get("flat", pd.Series(True, index=frame.index)).fillna(True).astype(bool)
+    )
+    frame["raw_flat"] = (
+        frame.get("raw_flat", pd.Series(True, index=frame.index))
+        .fillna(True)
+        .astype(bool)
+    )
     frame.to_csv(out_dir / "trials.csv.gz", index=False, compression="gzip")
     summary = {
         "cohort": 2,
