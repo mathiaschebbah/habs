@@ -1,18 +1,18 @@
-"""Run the current HABS study stage on the mounted dataset."""
+"""Run the HABS signal extraction on the mounted dataset."""
 
 from pathlib import Path
 
-from alignment import reconcile
+from features import extract
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Reconcile all released arousal notes with their recorded events.
+    """Extract complementary measurements from all reconciled cohorts.
 
     Parameters
     ----------
     data_dir : pathlib.Path
-        Read-only dataset supplied by HABS.
+        Read-only HABS release.
     out_dir : pathlib.Path
-        Private directory retained by the HABS platform.
+        Private result directory retained by HABS.
     """
-    reconcile(data_dir, out_dir)
+    extract(data_dir, out_dir)

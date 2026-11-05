@@ -1,0 +1,117 @@
+{
+  "rows": 27221,
+  "people": 317,
+  "alignment": {
+    "exact": 20282,
+    "unmatched": 4213,
+    "day_recovered": 173,
+    "outside_segment": 36,
+    "day_corrected": 2517
+  },
+  "cohorts": {
+    "1": {
+      "people_with_notes": 106,
+      "alignment": {
+        "exact": 5657,
+        "unmatched": 2510,
+        "day_recovered": 173,
+        "outside_segment": 5
+      },
+      "matched_people": 105,
+      "matched_trials": 5830,
+      "at_least_two_days_20_trials": 32,
+      "at_least_one_day_40_trials": 74,
+      "label_day_vs_recorded_day": {
+        "1.0->1.0": 1678,
+        "2.0->2.0": 3979
+      },
+      "sources": {
+        "CURATED": 5826,
+        "PREPROCESSED": 4
+      }
+    },
+    "2": {
+      "people_with_notes": 115,
+      "alignment": {
+        "exact": 9715,
+        "unmatched": 1290,
+        "outside_segment": 16,
+        "day_corrected": 11
+      },
+      "matched_people": 113,
+      "matched_trials": 9726,
+      "at_least_two_days_20_trials": 76,
+      "at_least_one_day_40_trials": 113,
+      "label_day_vs_recorded_day": {
+        "1.0->1.0": 5200,
+        "2.0->1.0": 11,
+        "2.0->2.0": 4515
+      },
+      "sources": {
+        "CURATED": 9672,
+        "PREPROCESSED": 54
+      }
+    },
+    "3": {
+      "people_with_notes": 30,
+      "alignment": {
+        "exact": 2494,
+        "outside_segment": 9,
+        "unmatched": 222
+      },
+      "matched_people": 30,
+      "matched_trials": 2494,
+      "at_least_two_days_20_trials": 25,
+      "at_least_one_day_40_trials": 0,
+      "label_day_vs_recorded_day": {
+        "1.0->1.0": 916,
+        "2.0->2.0": 714,
+        "3.0->3.0": 864
+      },
+      "sources": {
+        "CURATED": 2494
+      }
+    },
+    "4": {
+      "people_with_notes": 52,
+      "alignment": {
+        "day_corrected": 2506,
+        "exact": 2109,
+        "unmatched": 191,
+        "outside_segment": 5
+      },
+      "matched_people": 52,
+      "matched_trials": 4615,
+      "at_least_two_days_20_trials": 40,
+      "at_least_one_day_40_trials": 51,
+      "label_day_vs_recorded_day": {
+        "1.0->1.0": 2109,
+        "1.0->2.0": 2506
+      },
+      "sources": {
+        "CURATED": 4615
+      }
+    },
+    "5": {
+      "people_with_notes": 14,
+      "alignment": {
+        "exact": 307,
+        "outside_segment": 1
+      },
+      "matched_people": 14,
+      "matched_trials": 307,
+      "at_least_two_days_20_trials": 0,
+      "at_least_one_day_40_trials": 0,
+      "label_day_vs_recorded_day": {
+        "1.0->1.0": 307
+      },
+      "sources": {
+        "CURATED": 307
+      }
+    }
+  },
+  "provenance": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/42052070098",
+    "commit": "5af40c9"
+  }
+}
