@@ -12,6 +12,7 @@ from model import (
     physiological_matrix,
     population,
     select_grid,
+    supported_grid,
 )
 
 
@@ -98,6 +99,53 @@ def test_person_only_correction_equals_calibrated_reference():
         X, y
     )
     np.testing.assert_allclose(reference.predict(X), control.predict(X))
+
+
+def test_reusing_residuals_matches_complete_refits():
+    """Penalty selection must preserve every prediction after caching residuals."""
+    frame = synthetic_trials()
+    grid = select_grid(
+        frame, frame.participant_id.unique(), frame.video.unique(), minimum=3
+    )
+    X = attach_calibration(
+        grid.drop(columns="rating_arousal"), frame, frame.video.unique()
+    )
+    for mode in ("all", "video", "missing"):
+        reused = CalibratedArousal(mode=mode, minimum_sources=1, minimum_trials=3).fit(
+            X, grid.rating_arousal
+        )
+        for alpha in (0.1, 10.0, 1000.0):
+            reused.refit_correction(alpha)
+            fresh = CalibratedArousal(
+                mode=mode,
+                signal_alpha=alpha,
+                minimum_sources=1,
+                minimum_trials=3,
+            ).fit(X, grid.rating_arousal)
+            np.testing.assert_array_equal(reused.predict(X), fresh.predict(X))
+
+
+def test_shared_history_filtering_preserves_distinct_tables():
+    """Caching repeated tables must not merge different histories for one ID."""
+    frame = synthetic_trials()
+    grid = select_grid(
+        frame, frame.participant_id.unique(), frame.video.unique(), minimum=3
+    )
+    X = attach_calibration(
+        grid.drop(columns="rating_arousal"), frame, frame.video.unique()
+    )
+    alternative = X.iloc[0].calibration.copy()
+    alternative.loc[:, "rating_arousal"] = 2.0
+    X.at[X.index[0], "calibration"] = alternative
+    videos = sorted(frame.video.unique())[:15]
+    source = frame.loc[frame.video.isin(videos)]
+    actual = supported_grid(X, source, minimum_sources=1, minimum_trials=3)
+    expected = X.loc[X.video.isin(videos)]
+    pd.testing.assert_frame_equal(
+        actual.drop(columns="calibration"), expected.drop(columns="calibration")
+    )
+    for observed, history in zip(actual.calibration, expected.calibration, strict=True):
+        pd.testing.assert_frame_equal(observed, history.loc[history.video.isin(videos)])
 
 
 def test_video_control_preserves_personal_calibration():

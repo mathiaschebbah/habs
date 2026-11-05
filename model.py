@@ -100,9 +100,14 @@ def supported_grid(grid, source, minimum_sources=10, minimum_trials=20):
     counts = source.groupby("video").participant_id.nunique()
     videos = counts.index[counts >= minimum_sources]
     result = grid.loc[grid.video.isin(videos)].copy()
-    histories = [
-        history.loc[history.video.isin(videos)] for history in result.calibration
-    ]
+    filtered = {}
+    histories = []
+    # Several trials share the same calibration table; filter each table once.
+    for history in result.calibration:
+        key = id(history)
+        if key not in filtered:
+            filtered[key] = history.loc[history.video.isin(videos)]
+        histories.append(filtered[key])
     result["calibration"] = histories
     result = result.loc[[len(history) >= minimum_trials for history in histories]]
     counts = result.groupby("participant_id").size()
@@ -309,8 +314,15 @@ class CalibratedArousal(RegressorMixin, BaseEstimator):
         matrix = center(matrix[retained], people[retained])
         residual = center(residual[retained], people[retained])
         self.scaler_ = StandardScaler().fit(matrix)
+        self.correction_X_ = self.scaler_.transform(matrix)
+        self.correction_y_ = residual
+        return self.refit_correction(self.signal_alpha)
+
+    def refit_correction(self, alpha):
+        """Refit the penalty on unchanged cross-fitted residuals and features."""
+        self.signal_alpha = alpha
         self.correction_ = Ridge(alpha=self.signal_alpha, fit_intercept=False)
-        self.correction_.fit(self.scaler_.transform(matrix), residual)
+        self.correction_.fit(self.correction_X_, self.correction_y_)
         return self
 
     def predict(self, X):

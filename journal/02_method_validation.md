@@ -32,3 +32,18 @@ Une validation supplémentaire, peu coûteuse, utilise des réponses placées au
 Les exécutions sont bornées dans le temps et enregistrent chaque répétition terminée. Une reprise vérifie les empreintes des covariables et de l'algorithme ; elle ne mélange pas des variantes différentes. Les tableaux publiables ne contiennent que les statistiques synthétiques, sans signaux ni notes individuelles réelles.
 
 La sélection initiale du jeu livré reste fixe dans ces simulations. Les réponses originales exclues par les organisateurs ne sont pas disponibles ; le mécanisme de sélection correspondant n'est donc pas validé. La puissance observée sous le terme injecté ne garantit pas une puissance identique pour les mécanismes émotionnels réels. Aucun résultat de cette validation n'est encore revendiqué.
+
+## Réduction des calculs répétés
+
+Le profilage avant l'évaluation finale a identifié deux répétitions inutiles :
+filtrer plusieurs fois une table de calibration partagée par les essais, et
+reconstruire les résidus hors pli pour chacune des pénalités de correction.
+Ces calculs sont désormais réutilisés au sein d'un même ajustement. La grille,
+les plis, les graines, les modèles candidats et les critères restent identiques.
+
+Sur un plan artificiel de 113 identifiants, les paramètres retenus, les scores de
+tous les candidats et les prédictions sont exactement égaux avant et après ce
+changement. Le temps mesuré passe de 26,7 à 6,3 secondes. Les répétitions du
+premier lot conservent leur empreinte initiale et sont archivées séparément ;
+la validation complète utilise une nouvelle empreinte. Les résultats communs
+aux mêmes graines seront comparés sur les covariables réelles.

@@ -230,16 +230,16 @@ def tune(
         print("Calibration penalties selected on development participants", flush=True)
     selected = {}
     for mode in modes:
-        candidates = {}
-        for alpha in PENALTIES:
-            scores = []
-            for fold in contexts:
-                estimator = CalibratedArousal(
-                    mode=mode, signal_alpha=alpha, **parameters
-                )
-                estimator.fit(
-                    fold["X_train"], fold["y_train"], background=fold["background"]
-                )
+        candidates = {alpha: [] for alpha in PENALTIES}
+        for fold in contexts:
+            estimator = CalibratedArousal(
+                mode=mode, signal_alpha=PENALTIES[0], **parameters
+            )
+            estimator.fit(
+                fold["X_train"], fold["y_train"], background=fold["background"]
+            )
+            for alpha in PENALTIES:
+                estimator.refit_correction(alpha)
                 prediction = estimator.predict(fold["X_test"])
                 table = participant_scores(
                     fold["y_test"],
@@ -247,7 +247,8 @@ def tune(
                     fold["X_test"].participant_id,
                     include_rank=False,
                 )
-                scores.extend(table.centered_mse.tolist())
+                candidates[alpha].extend(table.centered_mse.tolist())
+        for alpha, scores in candidates.items():
             candidates[alpha] = float(np.mean(scores))
             records.append(
                 {
