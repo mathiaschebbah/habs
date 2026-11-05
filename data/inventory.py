@@ -7,6 +7,7 @@ import json
 import math
 from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import median
 
 
 def number(value):
@@ -32,7 +33,7 @@ def extent(values):
         "n": len(values),
         "min": values[0],
         "max": values[-1],
-        "median": values[len(values) // 2],
+        "median": median(values),
         "mean": sum(values) / len(values),
     }
 
