@@ -17,6 +17,7 @@ La recherche bibliographique a récupéré 529 notices, soit 483 après rapproch
 2. [Faisabilité constatée dans la CI](../../data/FEASIBILITY.md) : données disponibles, jointures, sélection et qualité des signaux.
 3. [Protocole détaillé](../../journal/01_individual_arousal.md) : question, hypothèses, cible, modèles de référence, calibration, test et règles de conclusion.
 4. [Précision et sensibilité à l'effectif](../../data/PRECISION.md) : limites de 25 personnes de test et simulation complète à prévoir.
+5. [Guides méthodologiques complémentaires](METHODS_REFERENCES.md) : rapport d'étude observationnelle, résultats négatifs, équivalence et reproduction.
 
 ## Ce que les données permettent aujourd'hui
 
