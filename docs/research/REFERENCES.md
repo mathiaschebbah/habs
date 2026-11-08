@@ -1,0 +1,18 @@
+# Verified scientific references
+
+Sources checked on 2026-11-08. This is a targeted reading list supporting the
+selected experiment, not a systematic review or a claim that its combination of
+methods has never previously been studied.
+
+| Source | Evidence relevant to this study | Consequence |
+|---|---|---|
+| Gerster M, Sirotina E, Orlovskii A, Hertz A, Champaud J, Guarino D, Tulli S. 2026. [Stimulus identity rather than emotion drives EEG classification on the FACED dataset](https://www.biorxiv.org/content/10.64898/2026.06.12.731889v1). bioRxiv, doi:10.64898/2026.06.12.731889. Preprint posted 16 June 2026. | On FACED, stimulus-assigned labels, few videos per category and temporal splits can make classification reflect stimulus identity. | Use individual ratings, isolate participants and sessions, and include an explicit stimulus baseline. This study does not establish that HABS physiology lacks emotional information. |
+| Siegel EH et al. 2018. [Emotion fingerprints or emotion populations](https://pubmed.ncbi.nlm.nih.gov/29389177/). Psychological Bulletin 144:343–393. doi:10.1037/bul0000128. | A meta-analysis of 202 studies found substantial variability within emotion categories and no simple one-to-one autonomic fingerprint. | Avoid assigning biological names to clusters or assuming a universal stress threshold. Emotion-category findings are not a direct test of stress. |
+| Roy S, Fan Y, Mosayebi-Samani M, Claus M, Mutlu N, Kleinsorge T, Nitsche MA. 2025. [Multimodal assessment of acute stress dynamics using an aversive video paradigm](https://pmc.ncbi.nlm.nih.gov/articles/PMC12271860/). International Journal of Clinical and Health Psychology 25:100607. doi:10.1016/j.ijchp.2025.100607. | The study combines an aversive video paradigm with independent subjective, endocrine and cardiovascular measurements. | Aversive video paradigms can be studied as stressors, but this does not validate the HABS valence–arousal product as a stress measure. |
+| Ernst H, Scherpf M, Pannasch S, Helmert JR, Malberg H, Schmidt M. 2023. [Assessment of the human response to acute mental stress](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0294069). PLOS ONE 18:e0294069. | A multimodal study of 65 participants used explicit stress induction, self-assessment and hormonal measures alongside physiology. | Distinguish measured physiological responses from the subjective construct being predicted. |
+| Ding Y, Liu J, Zhang X, Yang Z. 2022. [Dynamic Tracking of State Anxiety via Multi-Modal Data and Machine Learning](https://www.frontiersin.org/journals/psychiatry/articles/10.3389/fpsyt.2022.757961/full). Frontiers in Psychiatry 13:757961. | The study relates dimensional emotion ratings and physiological measurements to state anxiety under its own induction protocol. | Valence, arousal and dominance are relevant dimensions; coefficients from that experiment are not validated weights for HABS. Anxiety and stress remain distinct constructs. |
+| Pei D et al. 2024. [Identifying neurophysiological correlates of stress](https://www.frontiersin.org/journals/medical-engineering/articles/10.3389/fmede.2024.1434753/full). Frontiers in Medical Engineering. doi:10.3389/fmede.2024.1434753. | EEG and peripheral signals have already been investigated for stress classification. | Multimodality by itself is not the contribution; the incremental comparison and the generalization protocol must carry the claim. |
+
+The proposed composite and the chosen minimum useful gain are operational
+decisions for this experiment. None of these papers validates that exact score,
+its clinical use, or a universal mapping from EEG bands to stress.

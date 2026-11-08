@@ -8,6 +8,11 @@ name: HABS
 #   habs run --data ./sample --out ./out
 on:
   workflow_dispatch:
+    inputs:
+      inspect_job:
+        description: "Existing job suffix to inspect without submitting another run"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -36,7 +41,7 @@ jobs:
   build:
     name: build your image
     # The template itself has no key and no identity of its own.
-    if: github.repository != 'HABS-BRAIN/habs-hackathon-template'
+    if: github.repository != 'HABS-BRAIN/habs-hackathon-template' && inputs.inspect_job == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -106,3 +111,23 @@ jobs:
           path: results/**/data/eda_summary.json
           if-no-files-found: error
           retention-days: 30
+
+  inspect:
+    name: inspect existing HABS job
+    if: inputs.inspect_job != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      JOB_SUFFIX: ${{ inputs.inspect_job }}
+    steps:
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet "$HABS_CLIENT"
+      - run: habs status
+      - run: habs logs "${HABS_KEY}--${JOB_SUFFIX}"

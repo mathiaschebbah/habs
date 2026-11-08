@@ -29,6 +29,21 @@ The present release documentation must take precedence over spoken approximation
 | Demographics and profiling | Kick-off mentions personality questionnaires. | Released participant table is documented as cohort, ID, age and gender. | Do not assume questionnaire scores are supplied. |
 | Schedule | Kick-off initially says 30 November, then 13 November; raw closing dates also contain recognition errors. | README advertises 2–30 November 2026. | Deadline remains a point to verify with organizers; it is not inferred from transcription alone. |
 
+The starting notebooks have been read as demonstrations rather than adopted as
+the study's evaluation protocol. `bdf_exploration.ipynb` illustrates units and
+spectral power. `multimodal_ai.ipynb` standardizes each person's complete data and
+uses each person's complete rating median for its classification target; those
+operations would expose future-session information in the proposed prospective
+study. `real-time_decoding.ipynb` distinguishes watching from rating within one
+recording. That is a different target from aversive reactivity, and its referenced
+emotion-video BDF is absent from the local sample. None of their displayed scores
+is evidence for H1–H6.
+
+The package uses a conventional root `habs/` directory. HABS builds its image from
+requirements alone and delivers the source archive at execution time, so an
+importable package in the archive avoids relying on an editable installation
+inside that image. The local environment still installs it in editable mode.
+
 ## Reproducible checks performed
 
 The unmodified original `process.py` ran successfully against `sample/` in the existing `.venv`. It found one P001 resting-state recording, aligned gaze at an effective 166.358 Hz, and wrote `out/kickoff_sample/alpha.tsv` and `alpha_by_channel.tsv`. Mean absolute alpha power was 88.1 µV², with P9 the strongest channel at 266.7 µV². These values describe a single resting-state demonstration, not an emotion or stress result.
