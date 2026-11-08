@@ -201,11 +201,11 @@ jobs:
       - name: Restore the private output tree
         run: |
           [[ "$JOB_SUFFIX" =~ ^[0-9]{8}T[0-9]{6}-[0-9a-f]{6}$ ]] || exit 1
-          private_dir="$RUNNER_TEMP/habs-audit"
-          habs get "${HABS_KEY}--${JOB_SUFFIX}" --out "$private_dir"
+          export PRIVATE_OUTPUT_DEST="$RUNNER_TEMP/habs-audit"
+          python tools/fetch_saved_reports.py
           test ! -e /out
           sudo install -d -o "$(id -un)" -g "$(id -gn)" /out
-          cp -R "$private_dir/${HABS_KEY}--${JOB_SUFFIX}/." /out/
+          cp -R "$PRIVATE_OUTPUT_DEST/." /out/
       - name: Read-only metric and provenance audit
         run: |
           python -m vendor.run_cells audit/01_aversive_reactivity.py scratch/audit/01_aversive_reactivity/audit.md
