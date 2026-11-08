@@ -44,6 +44,12 @@ requirements alone and delivers the source archive at execution time, so an
 importable package in the archive avoids relying on an editable installation
 inside that image. The local environment still installs it in editable mode.
 
+The installed skrub 0.11.0 API requires a `cv` argument when attaching grouping
+metadata at `mark_as_X`. The prediction graph therefore accepts the explicit
+participant/session splitter from the evaluation module, without importing or
+choosing a splitter in pipeline declaration code. Evaluation also passes that
+splitter explicitly. A unit test caught this API constraint before deployment.
+
 ## Reproducible checks performed
 
 The unmodified original `process.py` ran successfully against `sample/` in the existing `.venv`. It found one P001 resting-state recording, aligned gaze at an effective 166.358 Hz, and wrote `out/kickoff_sample/alpha.tsv` and `alpha_by_channel.tsv`. Mean absolute alpha power was 88.1 µV², with P9 the strongest channel at 266.7 µV². These values describe a single resting-state demonstration, not an emotion or stress result.

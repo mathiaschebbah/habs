@@ -6,7 +6,7 @@
 - **Goal:** Test whether physiology predicts individual aversive emotional reactivity beyond stimulus information and first-session calibration, then deliver verified results and a short research paper.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
 - **Last experiment:** none in the current worktree. Repository reset to initial commit `63b60bf` at the user's request.
-- **Last result:** the original resting-state demonstration runs on P001. This is a loading check, not evidence about emotion prediction.
+- **Last result:** full data audit: 22,974 aligned rated trials, 314 identifiers; cohort 2 has 76 eligible paired people, with 26 reserved before inspecting their response distributions. No predictive result yet.
 - **Workspace decisions** (user answers, 2026-11-08):
   - tabular library: pandas
   - env manager: pip+venv
@@ -17,21 +17,22 @@
   - plotting: matplotlib
   - EDA: run before model design
   - agent feature: IPython 9.18.1 available; pyright absent; no LSP needed for this analysis
-  - CV splitter family: not decided; depends on reconciled participant/session structure
+  - CV splitter family: five grouped participant folds with J2-only validation and J1-only personal calibration; recorded after EDA under autonomous authority
   - optional features: none selected
 - **Execution authority:** on 2026-11-08 the user explicitly requested autonomous completion without further questions. Remaining implementation, dependency, design and run decisions will be made and recorded under that authorization.
 
 ## Data understanding (EDA)
 
-- **Status:** preparation in progress, 2026-11-08.
-- **Observed access:** local sample has resting-state and artefact recordings only, without trial ratings. Hugging Face authentication succeeds but access to `HABSteam/multimodal-eeg-emotion` is denied pending dataset approval. HABS/Azure is the alternative execution route to verify.
+- **Status:** annotation/coverage audit done, 2026-11-08; signal-quality audit next.
+- **Observed access:** local sample has resting-state and artefact recordings only, without trial ratings. Hugging Face access is denied; the HABS/Azure route is verified by a successful full-data audit.
 - **Source audit:** [kick-off and repository](../docs/research/KICKOFF.md).
-- **Report:** not yet available. No new target counts or model performance have been measured.
+- **Report:** [data/eda.md](../data/eda.md), [aggregate evidence](../data/eda_summary.json), [successful cloud run](https://github.com/mathiaschebbah/habs/actions/runs/42522381425). Response concentration near zero supports continuous analysis; both positive and negative responses at high arousal exist in development.
 
 ## History
 
 | Stem | Intent | Status | Headline result | Design note |
 |---|---|---|---|---|
+| 01_aversive_reactivity | Test incremental physiology beyond stimulus and J1 calibration. | approved | Implementing after measured EDA. | [design](01_aversive_reactivity.md) |
 
 ## Backlog
 

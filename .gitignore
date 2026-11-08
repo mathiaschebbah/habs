@@ -8,3 +8,4 @@ scratch/
 .ruff_cache/
 *.egg-info/
 reports/
+.habs_inputs/

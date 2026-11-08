@@ -13,6 +13,10 @@ on:
         description: "Existing job suffix to inspect without submitting another run"
         required: false
         default: ""
+      resume_job:
+        description: "Prior team job containing audited inputs or signal checkpoints"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -75,7 +79,31 @@ jobs:
       # Uploads this commit and waits only for the image. Returns in a minute
       # or two with the pip log, and hands the job id to the next job.
       - id: submit
-        run: habs submit --sha "${{ github.sha }}" --until built
+        env:
+          RESUME_JOB: ${{ inputs.resume_job }}
+        run: |
+          if [ -z "$RESUME_JOB" ]; then
+            habs submit --repo "$GITHUB_REPOSITORY" --sha "$GITHUB_SHA" --until built
+          else
+            [[ "$RESUME_JOB" =~ ^[0-9]{8}T[0-9]{6}-[0-9a-f]{6}$ ]] || exit 1
+            private_dir="$RUNNER_TEMP/habs-inputs"
+            habs get "${HABS_KEY}--${RESUME_JOB}" --out "$private_dir"
+            source_dir="$(mktemp -d)"
+            git archive HEAD | tar -x -C "$source_dir"
+            printf '%s\n' "$GITHUB_SHA" > "$source_dir/source_revision.txt"
+            printf '%s\n' "$RESUME_JOB" > "$source_dir/input_resume_job.txt"
+            mkdir -p "$source_dir/.habs_inputs/data"
+            previous="$private_dir/${HABS_KEY}--${RESUME_JOB}"
+            for name in eda_summary.json aligned_trials.csv.gz allocation.csv recorded_events.csv.gz recordings.csv features.csv.gz feature_manifest.json; do
+              if [ -f "$previous/data/$name" ]; then
+                cp "$previous/data/$name" "$source_dir/.habs_inputs/data/$name"
+              fi
+            done
+            if [ -d "$previous/feature_checkpoints" ]; then
+              cp -R "$previous/feature_checkpoints" "$source_dir/.habs_inputs/feature_checkpoints"
+            fi
+            habs submit --source "$source_dir" --repo "$GITHUB_REPOSITORY" --sha "$GITHUB_SHA" --until built
+          fi
 
   run:
     name: run on a GPU
@@ -101,14 +129,21 @@ jobs:
       # the way your job finished. The summary at the top of this run says what
       # it cost and what it wrote. If this step gives up waiting, your job is
       # still running -- `habs status` picks it back up.
-      - run: habs watch "${{ needs.build.outputs.job }}" --out ./results
+      - run: habs watch "${{ needs.build.outputs.job }}"
+
+      - name: Download publication-safe outputs only
+        env:
+          JOB_SUFFIX: ${{ needs.build.outputs.job }}
+        run: |
+          mkdir -p results
+          az storage blob download-batch --auth-mode login --account-name "$HABS_STORAGE" --source "$HABS_KEY" --pattern "out/${HABS_KEY}--${JOB_SUFFIX}/public/*" --destination results --no-progress
 
       # Only aggregate statistics leave team storage. Aligned trial ratings and
       # individual records remain in the team's Azure results container.
       - uses: actions/upload-artifact@v4
         with:
-          name: feasibility-summary
-          path: results/**/data/eda_summary.json
+          name: research-results
+          path: results/**/public/
           if-no-files-found: error
           retention-days: 30
 

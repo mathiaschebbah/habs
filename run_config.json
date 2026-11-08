@@ -1,0 +1,7 @@
+{
+  "stage": "prepare",
+  "seed": 20261108,
+  "primary_cohort": 2,
+  "exploratory_cohorts": [1, 4],
+  "source_audit_job": "20261108T205355-ade0ef"
+}
