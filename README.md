@@ -4,6 +4,22 @@
 
 Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://hackathon.habs.ai/)
 
+## Research study
+
+This repository now implements the [selected research project](docs/research/PROJECT.md):
+predict individual aversive emotional reactivity beyond video context and personal
+calibration. The [journal](journal/JOURNAL.md) records current evidence and the
+[source audit](docs/research/KICKOFF.md) explains the release and execution constraints.
+The present entry point performs the initial data audit; predictive experiments
+follow after the sample and signal-quality checks.
+
+`Code checks` validates code on pushes. `HABS` remains a manual dataset execution.
+Its downloadable artifact contains aggregate feasibility statistics only; individual
+annotations and detailed reports remain in the team's Azure results container.
+
+Local environment: `python3 -m venv .venv`, then install `requirements.txt`,
+`requirements-dev.txt` and the package with `.venv/bin/pip install -e .`.
+
 You write `process.py`. Run it on your own machine against data you download, or
 send it to one of our H100s when you want one. **The GPU is optional** — a lot of
 good work in this hackathon will never need it.
