@@ -124,8 +124,8 @@ def test_additional_representations_preserve_new_grid(bound_tables, configuratio
     assert np.isfinite(predicted).all()
 
 
-def test_final_freeze_and_portable_report_cache(bound_tables, tmp_path):
-    """Require the freeze and preserve report evidence when raw bindings move."""
+def test_final_freeze_and_saved_report_cache(bound_tables, tmp_path):
+    """Require the freeze and distinguish raw paths from workspace references."""
     import json
 
     paths, future = bound_tables
@@ -158,7 +158,21 @@ def test_final_freeze_and_portable_report_cache(bound_tables, tmp_path):
     report_id = str(normalized.iloc[0][column])
     for path in paths.values():
         path.rename(path.with_name(path.name + ".unavailable"))
-    retrieved = project.get(report_id)
+    relocated = tmp_path / "relocated_reports"
+    (tmp_path / "reports").rename(relocated)
+    reopened = experiment.skore.Project(
+        "habs-aversive-reactivity", mode="local", workspace=str(relocated.resolve())
+    )
+    # Skore 0.29.1 stores absolute dataset references inside the workspace.
+    with pytest.raises(FileNotFoundError):
+        reopened.get(report_id)
+    relocated.rename(tmp_path / "reports")
+    restored_project = experiment.skore.Project(
+        "habs-aversive-reactivity",
+        mode="local",
+        workspace=str((tmp_path / "reports").resolve()),
+    )
+    retrieved = restored_project.get(report_id)
     restored = retrieved.get_predictions(data_source="test")
     assert len(restored) == len(future)
     assert np.max(np.abs(original - restored)) < 1e-12

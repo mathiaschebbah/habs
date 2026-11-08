@@ -17,6 +17,10 @@ on:
         description: "Prior team job containing audited inputs or signal checkpoints"
         required: false
         default: ""
+      audit_job:
+        description: "Completed team job to recover and audit without GPU submission"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -45,7 +49,7 @@ jobs:
   build:
     name: build your image
     # The template itself has no key and no identity of its own.
-    if: github.repository != 'HABS-BRAIN/habs-hackathon-template' && inputs.inspect_job == ''
+    if: github.repository != 'HABS-BRAIN/habs-hackathon-template' && inputs.inspect_job == '' && inputs.audit_job == ''
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -136,7 +140,9 @@ jobs:
           JOB_SUFFIX: ${{ needs.build.outputs.job }}
         run: |
           mkdir -p results
-          az storage blob download-batch --auth-mode login --account-name "$HABS_STORAGE" --source "$HABS_KEY" --pattern "out/${HABS_KEY}--${JOB_SUFFIX}/public/*" --destination results --no-progress
+          for extension in json png; do
+            az storage blob download-batch --auth-mode login --account-name "$HABS_STORAGE" --source "$HABS_KEY" --pattern "out/${HABS_KEY}--${JOB_SUFFIX}/public/*.${extension}" --destination results --no-progress
+          done
 
       # Only aggregate statistics leave team storage. Aligned trial ratings and
       # individual records remain in the team's Azure results container.
@@ -166,3 +172,49 @@ jobs:
       - run: pip install --quiet "$HABS_CLIENT"
       - run: habs status
       - run: habs logs "${HABS_KEY}--${JOB_SUFFIX}"
+
+  audit:
+    name: recover and audit saved reports
+    if: inputs.audit_job != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_SUFFIX: ${{ inputs.audit_job }}
+      HABS_ANALYSIS_OUT: /out
+      MPLBACKEND: Agg
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet "$HABS_CLIENT"
+      - run: pip install -r requirements.txt -r requirements-agent.txt
+      - run: pip install -e .
+      - name: Restore the private output tree
+        run: |
+          [[ "$JOB_SUFFIX" =~ ^[0-9]{8}T[0-9]{6}-[0-9a-f]{6}$ ]] || exit 1
+          private_dir="$RUNNER_TEMP/habs-audit"
+          habs get "${HABS_KEY}--${JOB_SUFFIX}" --out "$private_dir"
+          test ! -e /out
+          sudo install -d -o "$(id -un)" -g "$(id -gn)" /out
+          cp -R "$private_dir/${HABS_KEY}--${JOB_SUFFIX}/." /out/
+      - name: Read-only metric and provenance audit
+        run: |
+          python -m vendor.run_cells audit/01_aversive_reactivity.py scratch/audit/01_aversive_reactivity/audit.md
+          if rg -q '\*\*error:\*\*' scratch/audit/01_aversive_reactivity/audit.md; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audited-research-results
+          path: |
+            /out/public/
+            scratch/audit/01_aversive_reactivity/audit.md
+          if-no-files-found: error
+          retention-days: 30
