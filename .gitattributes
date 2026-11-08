@@ -5,3 +5,6 @@
 #
 # It stays in the repository, and `habs run --data ./sample` still uses it.
 sample/ export-ignore
+
+*.pdf binary
+*.png binary

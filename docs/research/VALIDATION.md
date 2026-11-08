@@ -35,6 +35,19 @@ The manuscript is four A4 pages and the supplement two. Both were rendered with
 Poppler and every final page inspected. All seven empirical figures are included
 across the two PDFs, with no clipped text, overlapping elements or missing glyphs.
 
+The post-scientific delivery review also exited 0 with no actionable findings
+(confidence 0.88). It inspected the saved-report retrieval, read-only audit,
+workflow, relocation test and consistency of the numerical conclusions. No
+review-triggered code fixes were required. Command:
+
+```sh
+/Users/mathias/.codex/skills/autoreview/scripts/autoreview --mode branch --base 29379d8 --prompt-file scratch/review_delivery_context.md --output /tmp/habs-kickoff/delivery-review.md --json-output /tmp/habs-kickoff/delivery-review.json --stream-engine-output
+```
+
+The final local test suite passed 22 tests, with the restricted-data smoke
+intentionally skipped locally; lint passed. The binary PDF/PNG attributes keep
+Git diffs readable without affecting their contents or the scientific source.
+
 ## Reproduction checks
 
 Skore 0.29.1 report workspaces contain absolute references to saved dataset files.
