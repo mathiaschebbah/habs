@@ -9,9 +9,31 @@
 - Structured review command: `/Users/mathias/.codex/skills/autoreview/scripts/autoreview --mode local --prompt-file scratch/review_study_context.md --output /tmp/habs-kickoff/study-review.md --json-output /tmp/habs-kickoff/study-review.json --stream-engine-output`.
 - Review outcome: exit 0, no accepted/actionable findings. The reviewer independently inspected source routing, J1 calibration, five-second eligibility, identical comparison grids, participant-weighted errors and paired bootstrap intervals. No review-triggered source fixes were required.
 
-All these checks precede the real reserved-outcome evaluation. The experiment
-must additionally pass its real-data smoke on the current source and produce
-persisted reports, a read-only audit and verified figures before being marked done.
+These checks preceded the real reserved-outcome evaluation. The scientific source
+`29379d8` subsequently passed its real-data structural smoke (1 passed in 2.26s),
+froze settings at 23:15:36 UTC on 8 November, exported seven figures and finished
+successfully. The backend job `20261108T230726-28480a` succeeded at 23:19:24 UTC.
+
+## Completed report audit and artifact verification
+
+[Audit recovery run 42535323126](https://github.com/mathiaschebbah/habs/actions/runs/42535323126)
+successfully retrieved 11 primary reports and their exact dataset dependencies:
+160 files, 3.22 MB, within the published 25 MB transfer limit. The full job output
+is 71 MB and was not downloaded as an unrestricted bundle. HNS directory metadata
+is filtered; the original AzureCLI folder-as-file failure did not rerun models.
+
+The [executed audit](results/audit.md) confirms source and frozen/data hashes,
+997 finite predictions for every primary model, agreement of registered
+participant-macro MAE with the exported evidence, and independent reconstruction
+of the paired 10,000-resample interval. No `evaluate`, `fit` or `put` is called
+by the audit. Generic skore checks are mostly not applicable to the prefit custom
+wrapper; `default_score` lacks calibration routing, while registered macro-MAE,
+cached predictions and built-in R²/RMSE are readable. Those limitations are not
+presented as successful automated leakage or overfitting tests.
+
+The manuscript is four A4 pages and the supplement two. Both were rendered with
+Poppler and every final page inspected. All seven empirical figures are included
+across the two PDFs, with no clipped text, overlapping elements or missing glyphs.
 
 ## Reproduction checks
 

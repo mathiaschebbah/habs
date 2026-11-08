@@ -1,0 +1,31 @@
+{
+  "status": "complete_verified_artifacts",
+  "scientific_source_commit": "29379d851ff817dcccbeaf371b32c9647ee8a759",
+  "scientific_code_sha256": "b1451cd360ed1824179fefa8fa731aa86f922037ef2b13c6bc363fd3bb0119b1",
+  "frozen_sha256": "0839097862a4fa70675df57fdc25ba77712c5a4bc0ff356147f6832915714d4d",
+  "scientific_run": "https://github.com/mathiaschebbah/habs/actions/runs/42533466083",
+  "read_only_audit_run": "https://github.com/mathiaschebbah/habs/actions/runs/42535323126",
+  "pdf_pages": {
+    "manuscript.pdf": 4,
+    "supplement.pdf": 2
+  },
+  "final_pdf_visual_review": "All six final rendered pages inspected, 2026-11-09.",
+  "scope": "Experimental aversive activation, internal held-out released IDs, fixed stimulus catalogue.",
+  "artifacts": {
+    "docs/research/manuscript.pdf": "bb5e59db71d0d5511dee5f764b5e30b7c9483789c600db4530af7e575fe2e5b3",
+    "docs/research/supplement.pdf": "e09189b76cee3068093e47557d09c8dd5014cc401ecccf6aecd9df92d2d41e3a",
+    "docs/research/RESULTS.md": "32f4c5ef866275fd8877c5f6572cfd817c59a7e078c9e526d0d7dc141935a9c8",
+    "docs/research/figures/figure1_proxy_distribution.png": "2aa54fe43476ecc907296d8021f95e2dec9a5198b36e376fc026f47fdc93759b",
+    "docs/research/figures/figure2_paired_prediction.png": "ae09d8ff4b89bee3ddb06415d6fb60f3e1e5fcef4e4532d920376d1bf2399036",
+    "docs/research/figures/figure3_specificity.png": "9c416a6de0a55fbf00e34fbd0a1a36b7b68268ae960134f1e027e35dda6d45dd",
+    "docs/research/figures/figure4_dose_response.png": "afef95729c6ef7b6e883d103667dd007bf57306c29f851e628f2a60226999fec",
+    "docs/research/figures/figure5_profile_structure.png": "a7f341b9221dae906c129820975cf79b92ec599befebe62ac42964ef1ce80867",
+    "docs/research/figures/figure6_profile_stability.png": "dff10c67fdf397de00501e04fde1dda19fdede4f33e667e8e4a585136449f6a8",
+    "docs/research/figures/figure7_modality_ablation.png": "8ff14dad762916745dee4c3f3069b237e879bd5d61368677b9703ddbc5b145f2",
+    "docs/research/results/eda_summary.json": "0446aa64b40be61c913db4e9d174177b1da3e47e84a8ac28e39485dea75f8a65",
+    "docs/research/results/feature_summary.json": "4f673439fa11317caee92069c8a6d0eeafccf01b7bf397341118a6caf09b9b31",
+    "docs/research/results/frozen.json": "0839097862a4fa70675df57fdc25ba77712c5a4bc0ff356147f6832915714d4d",
+    "docs/research/results/study_summary.json": "2894529b11112f94ea8439bdc033541f050be12e61fa53c66bb3497657857bc2",
+    "docs/research/results/audit.md": "e53c176f53554b275b2e1058e7d95281642c94f9a82247b192116718d26863a0"
+  }
+}

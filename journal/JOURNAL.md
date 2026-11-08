@@ -5,8 +5,8 @@
 - **Project / dataset:** HABS multimodal emotional video recordings.
 - **Goal:** Test whether physiology predicts individual aversive emotional reactivity beyond stimulus information and first-session calibration, then deliver verified results and a short research paper.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
-- **Last experiment:** 01_aversive_reactivity, ready for frozen development selection and reserved evaluation after successful real-data signal preparation.
-- **Last result:** full data audit: 22,974 aligned rated trials, 314 identifiers; cohort 2 has 76 eligible paired people, with 26 reserved before inspecting their response distributions. No predictive result yet.
+- **Last experiment:** 01_aversive_reactivity, done; actual HABS evaluation and read-only audit completed.
+- **Last result:** 22 reserved identifiers / 997 trials; macro-MAE M1=0.112443, M4=0.112826; gain −0.000383, 95% CI [−0.002877, +0.001822]. No demonstrated increment for the tested physiology. [Results](../docs/research/RESULTS.md), [paper](../docs/research/manuscript.pdf), [supplement](../docs/research/supplement.pdf).
 - **Workspace decisions** (user answers, 2026-11-08):
   - tabular library: pandas
   - env manager: pip+venv
@@ -27,20 +27,19 @@
 - **Observed access:** local sample has resting-state and artefact recordings only, without trial ratings. Hugging Face access is denied; the HABS/Azure route is verified by a successful full-data audit.
 - **Source audit:** [kick-off and repository](../docs/research/KICKOFF.md).
 - **Report:** [data/eda.md](../data/eda.md), [aggregate evidence](../data/eda_summary.json), [successful cloud run](https://github.com/mathiaschebbah/habs/actions/runs/42522381425). Response concentration near zero supports continuous analysis; both positive and negative responses at high arousal exist in development.
-- **Signal evidence:** [feature summary](../data/feature_summary.json), [successful preparation run](https://github.com/mathiaschebbah/habs/actions/runs/42526673694). Cohort 2 has 7,795 EEG-usable trials and 3,672 complete multimodal observations. Out-of-calibration EDA is marked missing in 2,742 trials. No predictive result yet.
+- **Signal evidence:** [feature summary](../data/feature_summary.json), [successful preparation run](https://github.com/mathiaschebbah/habs/actions/runs/42526673694). Cohort 2 has 7,795 EEG-usable trials and 3,672 complete multimodal observations. Out-of-calibration EDA is marked missing in 2,742 trials. Final eligibility retains 22 of the original 26 reserved identifiers without reassignment.
 
 ## History
 
 | Stem | Intent | Status | Headline result | Design note |
 |---|---|---|---|---|
-| 01_aversive_reactivity | Test incremental physiology beyond stimulus and J1 calibration. | approved | Implementing after measured EDA. | [design](01_aversive_reactivity.md) |
+| 01_aversive_reactivity | Test incremental physiology beyond stimulus and J1 calibration. | done | Gain −0.000383 [−0.002877, +0.001822], 22 reserved IDs; reports audited and four-page paper delivered. | [design](01_aversive_reactivity.md) |
 
 ## Backlog
 
 | # | Item | Source |
 |---|---|---|
-| B1 | Reconcile video events and ratings, audit the composite distribution and usable two-session sample. | user project, phases 1–2 |
-| B2 | Freeze the participant split and compare M0–M4 on identical target trials using participant-macro MAE. | user project, H1 |
-| B3 | Evaluate specificity at comparable arousal and linear versus nonlinear dose-response on development data. | user project, H2–H3 |
-| B4 | Test continuous versus clustered physiological profiles, their inter-session stability and predictive utility if data quality permits. | user project, H4–H6 |
-| B5 | Run the frozen final evaluation and write a 2–5 page paper with at least two figures. | user request; hackathon guidelines |
+| B1–B5 | Resolved by 01_aversive_reactivity: audit, fixed comparison, specificity/dose controls, profiles, reserved evaluation and paper. | user project |
+| B6 | Obtain independent state-stress and timestamped onset criteria for clinical/onset claims. | limits of 01_aversive_reactivity |
+| B7 | Validate ECG detections and test richer representations on a newly reserved sample; do not tune on the completed test. | limits of 01_aversive_reactivity |
+| B8 | Study entirely population-new stimuli, respiratory forecasting or probabilistic profile families in separately designed experiments. | optional extensions in the selected project |

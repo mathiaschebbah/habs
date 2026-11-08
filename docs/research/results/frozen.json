@@ -1,0 +1,2699 @@
+{
+  "seed": 20261108,
+  "selected": {
+    "M1": {
+      "modality": "context",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "M0": {
+      "modality": "context",
+      "alpha": 1.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": false,
+      "shrinkage": 0.0
+    },
+    "M2": {
+      "modality": "eeg",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "M3": {
+      "modality": "peripheral",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "M4": {
+      "modality": "all",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "missingness": {
+      "modality": "missing",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "no_EDA": {
+      "modality": "no_eda",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "history_only": {
+      "modality": "history",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "nonlinear": {
+      "modality": "all",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0,
+      "nonlinear": true
+    },
+    "M5": {
+      "modality": "all",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0,
+      "profile": "cluster",
+      "n_clusters": 2
+    },
+    "continuous_profile": {
+      "modality": "all",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0,
+      "profile": "pca",
+      "n_clusters": 2
+    }
+  },
+  "development": {
+    "M1": {
+      "selected": {
+        "parameters": {
+          "modality": "context",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.09913955270573967
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": false,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10324864337433454
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10145838721355945
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 10.0
+          },
+          "development_macro_mae": 0.10179591470240242
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 40.0
+          },
+          "development_macro_mae": 0.10228850276346864
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": false,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10225082085514854
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09994673647413611
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 10.0
+          },
+          "development_macro_mae": 0.10037583121424913
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 40.0
+          },
+          "development_macro_mae": 0.10100516441190217
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": false,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10292573551720413
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09913955270573967
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 10.0
+          },
+          "development_macro_mae": 0.09980362637802494
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 40.0
+          },
+          "development_macro_mae": 0.10077035585842531
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": false,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.11611827445695151
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10260708673952397
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 10.0
+          },
+          "development_macro_mae": 0.10357736684328489
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 40.0
+          },
+          "development_macro_mae": 0.10577656818002014
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": false,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1592015487417701
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.12840156239980025
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 10.0
+          },
+          "development_macro_mae": 0.12651658444326533
+        },
+        {
+          "parameters": {
+            "modality": "context",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 40.0
+          },
+          "development_macro_mae": 0.13546801673690925
+        }
+      ]
+    },
+    "M2": {
+      "selected": {
+        "parameters": {
+          "modality": "eeg",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.10140869479566861
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "eeg",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1050114976584159
+        },
+        {
+          "parameters": {
+            "modality": "eeg",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1032488708891627
+        },
+        {
+          "parameters": {
+            "modality": "eeg",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10140869479566861
+        },
+        {
+          "parameters": {
+            "modality": "eeg",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10374383728331737
+        },
+        {
+          "parameters": {
+            "modality": "eeg",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1276115776504342
+        }
+      ]
+    },
+    "M3": {
+      "selected": {
+        "parameters": {
+          "modality": "peripheral",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.09945635248662571
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "peripheral",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1023058408573289
+        },
+        {
+          "parameters": {
+            "modality": "peripheral",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10075973097801423
+        },
+        {
+          "parameters": {
+            "modality": "peripheral",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09945635248662571
+        },
+        {
+          "parameters": {
+            "modality": "peripheral",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10296789261210641
+        },
+        {
+          "parameters": {
+            "modality": "peripheral",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.12845801824021344
+        }
+      ]
+    },
+    "M4": {
+      "selected": {
+        "parameters": {
+          "modality": "all",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.10208267673110366
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10558201501889779
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10383364751357706
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10208267673110366
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10373421030477836
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.1275600789515449
+        }
+      ]
+    },
+    "missingness": {
+      "selected": {
+        "parameters": {
+          "modality": "missing",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.09887107778171099
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "missing",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10123701864005401
+        },
+        {
+          "parameters": {
+            "modality": "missing",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09976405150134071
+        },
+        {
+          "parameters": {
+            "modality": "missing",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09887107778171099
+        },
+        {
+          "parameters": {
+            "modality": "missing",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10273644369326868
+        },
+        {
+          "parameters": {
+            "modality": "missing",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.12861904650428935
+        }
+      ]
+    },
+    "no_EDA": {
+      "selected": {
+        "parameters": {
+          "modality": "no_eda",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.10290140204118474
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "no_eda",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10603313379146119
+        },
+        {
+          "parameters": {
+            "modality": "no_eda",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10463810217307294
+        },
+        {
+          "parameters": {
+            "modality": "no_eda",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10290140204118474
+        },
+        {
+          "parameters": {
+            "modality": "no_eda",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10429657443679945
+        },
+        {
+          "parameters": {
+            "modality": "no_eda",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.12734408044122578
+        }
+      ]
+    },
+    "history_only": {
+      "selected": {
+        "parameters": {
+          "modality": "history",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0
+        },
+        "development_macro_mae": 0.09955303674670761
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "history",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10237658284388418
+        },
+        {
+          "parameters": {
+            "modality": "history",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10086760484130049
+        },
+        {
+          "parameters": {
+            "modality": "history",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.09955303674670761
+        },
+        {
+          "parameters": {
+            "modality": "history",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10284310542633661
+        },
+        {
+          "parameters": {
+            "modality": "history",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.12772382936263815
+        }
+      ]
+    },
+    "nonlinear": {
+      "selected": {
+        "parameters": {
+          "modality": "all",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0,
+          "nonlinear": true
+        },
+        "development_macro_mae": 0.10288790825875223
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "nonlinear": true
+          },
+          "development_macro_mae": 0.11110459250033607
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "nonlinear": true
+          },
+          "development_macro_mae": 0.10772652146001666
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "nonlinear": true
+          },
+          "development_macro_mae": 0.10288790825875223
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "nonlinear": true
+          },
+          "development_macro_mae": 0.10376953924604047
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "nonlinear": true
+          },
+          "development_macro_mae": 0.12753425604414015
+        }
+      ]
+    },
+    "M5": {
+      "selected": {
+        "parameters": {
+          "modality": "all",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0,
+          "profile": "cluster",
+          "n_clusters": 2
+        },
+        "development_macro_mae": 0.10212361628751487
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "cluster",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10571152966685689
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "cluster",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10395170740063486
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "cluster",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10212361628751487
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "cluster",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10371471456265262
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "cluster",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.12756299873396007
+        }
+      ]
+    },
+    "continuous_profile": {
+      "selected": {
+        "parameters": {
+          "modality": "all",
+          "alpha": 10.0,
+          "target": "score",
+          "conditional_arousal": false,
+          "calibrated": true,
+          "shrinkage": 0.0,
+          "profile": "pca",
+          "n_clusters": 2
+        },
+        "development_macro_mae": 0.10216154457225735
+      },
+      "candidates": [
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 0.1,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "pca",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10572012011840036
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "pca",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10396277537032987
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "pca",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.10216154457225735
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 100.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "pca",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.1037113204701715
+        },
+        {
+          "parameters": {
+            "modality": "all",
+            "alpha": 1000.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0,
+            "profile": "pca",
+            "n_clusters": 2
+          },
+          "development_macro_mae": 0.1275454424174388
+        }
+      ]
+    }
+  },
+  "sensitivities": {
+    "valence": {
+      "reference": {
+        "modality": "context",
+        "alpha": 1.0,
+        "target": "valence",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 40.0
+      },
+      "physiology": {
+        "modality": "all",
+        "alpha": 1.0,
+        "target": "valence",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 40.0
+      },
+      "development": {
+        "reference": {
+          "selected": {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "valence",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.13242300787388234
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1344042757509886
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13648589882882942
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.13474008327781872
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.1334760864453526
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13337963435062403
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13542881763241585
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1337381236205627
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.13242300787388234
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13543542063322528
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1371502930865429
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.13554016533790836
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.13439832321833203
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.14965638629578507
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.15355751679388016
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.15062369511586443
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.14887052143980278
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.2127107772755457
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.2169415451821046
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.21358513227837808
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.2117563298581052
+            }
+          ]
+        },
+        "physiology": {
+          "selected": {
+            "parameters": {
+              "modality": "all",
+              "alpha": 1.0,
+              "target": "valence",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.13490873825001506
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 0.1,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.13568921148143778
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.13490873825001506
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 10.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.13690559563332
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 100.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.15105509786106086
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1000.0,
+                "target": "valence",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.212284694486752
+            }
+          ]
+        }
+      }
+    },
+    "arousal": {
+      "reference": {
+        "modality": "context",
+        "alpha": 10.0,
+        "target": "arousal",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 10.0
+      },
+      "physiology": {
+        "modality": "all",
+        "alpha": 10.0,
+        "target": "arousal",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 10.0
+      },
+      "development": {
+        "reference": {
+          "selected": {
+            "parameters": {
+              "modality": "context",
+              "alpha": 10.0,
+              "target": "arousal",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.17773060858750878
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.18919107189056886
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.18664953132510045
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18581972231510824
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.1853958395816495
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.18570141820707584
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.182883939074692
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18194369774755711
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.18156152264182757
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.18304658462164633
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1789681288695253
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.17773060858750878
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.17773231883360716
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.19018264375004237
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.18494198524700747
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18348580529276962
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.1839929176913083
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.2056981096126919
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.19892203411277465
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.19653497031322056
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.19786756976047837
+            }
+          ]
+        },
+        "physiology": {
+          "selected": {
+            "parameters": {
+              "modality": "all",
+              "alpha": 10.0,
+              "target": "arousal",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.1797444652441027
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 0.1,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18746653895220802
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18366312187932046
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 10.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1797444652441027
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 100.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.18414612869877597
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1000.0,
+                "target": "arousal",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.19654418187068887
+            }
+          ]
+        }
+      }
+    },
+    "alternative": {
+      "reference": {
+        "modality": "context",
+        "alpha": 1.0,
+        "target": "alternative",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 0.0
+      },
+      "physiology": {
+        "modality": "all",
+        "alpha": 10.0,
+        "target": "alternative",
+        "conditional_arousal": false,
+        "calibrated": true,
+        "shrinkage": 0.0
+      },
+      "development": {
+        "reference": {
+          "selected": {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "alternative",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10811603661935065
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.11104042836847332
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.109160575249254
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1094788709617574
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.10993516678501321
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.11042248795661047
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.10811603661935065
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.10847854592931494
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.10905315695076283
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.11325007896988636
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1092694420672002
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1099209085928617
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.11084910676623409
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13287241866786725
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.11856939114068381
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1191832322736953
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.12145110118277498
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1892370430537074
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1605501647497382
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.1585414672243519
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.16717068524560474
+            }
+          ]
+        },
+        "physiology": {
+          "selected": {
+            "parameters": {
+              "modality": "all",
+              "alpha": 10.0,
+              "target": "alternative",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.11228023879584322
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 0.1,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1139191642128059
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1124490999066824
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 10.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.11228023879584322
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 100.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.12009869109555049
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1000.0,
+                "target": "alternative",
+                "conditional_arousal": false,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.16013894793684802
+            }
+          ]
+        }
+      }
+    },
+    "negative": {
+      "reference": {
+        "modality": "context",
+        "alpha": 1.0,
+        "target": "negative",
+        "conditional_arousal": true,
+        "calibrated": true,
+        "shrinkage": 0.0
+      },
+      "physiology": {
+        "modality": "all",
+        "alpha": 1.0,
+        "target": "negative",
+        "conditional_arousal": true,
+        "calibrated": true,
+        "shrinkage": 0.0
+      },
+      "development": {
+        "reference": {
+          "selected": {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "negative",
+              "conditional_arousal": true,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.12737092380988677
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.131382195512197
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.12740141609542047
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.12798963098709384
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 0.1,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.12894265221481738
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13197991822931046
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.12737092380988677
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.12800034774976723
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.12904178866246416
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13829668471476111
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13119580277264553
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.13212182286924443
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 10.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.1337773336348458
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.16431478134225838
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1518025853064684
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.15321302648946478
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 100.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.15613282693205624
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": false,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.2362040404379034
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.21221595719283473
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 10.0
+              },
+              "development_macro_mae": 0.21429120903000634
+            },
+            {
+              "parameters": {
+                "modality": "context",
+                "alpha": 1000.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 40.0
+              },
+              "development_macro_mae": 0.22038096161504253
+            }
+          ]
+        },
+        "physiology": {
+          "selected": {
+            "parameters": {
+              "modality": "all",
+              "alpha": 1.0,
+              "target": "negative",
+              "conditional_arousal": true,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.13097693779390351
+          },
+          "candidates": [
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 0.1,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.1315796688027391
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13097693779390351
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 10.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.13473389902422986
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 100.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.15446685053859946
+            },
+            {
+              "parameters": {
+                "modality": "all",
+                "alpha": 1000.0,
+                "target": "negative",
+                "conditional_arousal": true,
+                "calibrated": true,
+                "shrinkage": 0.0
+              },
+              "development_macro_mae": 0.21308166604693554
+            }
+          ]
+        }
+      }
+    }
+  },
+  "early": {
+    "reference": {
+      "modality": "context",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "physiology": {
+      "modality": "all",
+      "alpha": 10.0,
+      "target": "score",
+      "conditional_arousal": false,
+      "calibrated": true,
+      "shrinkage": 0.0
+    },
+    "development": {
+      "reference": {
+        "selected": {
+          "parameters": {
+            "modality": "context",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.0981295057329648
+        },
+        "candidates": [
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 0.1,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": false,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10218551438749272
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 0.1,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.0998610701488566
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 0.1,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.10029058835824085
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 0.1,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.10093191094402605
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": false,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10138664729623355
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.0984032848868757
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.09891995441429395
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.09973730926826074
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 10.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": false,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10268460117052068
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 10.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.0981295057329648
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 10.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.09886660313353417
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 10.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.10001770221342958
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 100.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": false,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.11675217921869498
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 100.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10282811699215971
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 100.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.10387475704635966
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 100.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.10627207240319592
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1000.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": false,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.16004614304706855
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1000.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.128003322121342
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1000.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 10.0
+            },
+            "development_macro_mae": 0.12644255439874394
+          },
+          {
+            "parameters": {
+              "modality": "context",
+              "alpha": 1000.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 40.0
+            },
+            "development_macro_mae": 0.13513451457241377
+          }
+        ]
+      },
+      "physiology": {
+        "selected": {
+          "parameters": {
+            "modality": "all",
+            "alpha": 10.0,
+            "target": "score",
+            "conditional_arousal": false,
+            "calibrated": true,
+            "shrinkage": 0.0
+          },
+          "development_macro_mae": 0.10001808004151262
+        },
+        "candidates": [
+          {
+            "parameters": {
+              "modality": "all",
+              "alpha": 0.1,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.1024664893177694
+          },
+          {
+            "parameters": {
+              "modality": "all",
+              "alpha": 1.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10103426533401799
+          },
+          {
+            "parameters": {
+              "modality": "all",
+              "alpha": 10.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10001808004151262
+          },
+          {
+            "parameters": {
+              "modality": "all",
+              "alpha": 100.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.10451041907915577
+          },
+          {
+            "parameters": {
+              "modality": "all",
+              "alpha": 1000.0,
+              "target": "score",
+              "conditional_arousal": false,
+              "calibrated": true,
+              "shrinkage": 0.0
+            },
+            "development_macro_mae": 0.129084335371301
+          }
+        ]
+      }
+    }
+  },
+  "profiles": {
+    "status": "supported",
+    "selection": {
+      "clusters": 2,
+      "silhouette": 0.174304290859017,
+      "minimum_cluster_fraction": 0.34962406015037595
+    },
+    "candidates": [
+      {
+        "clusters": 2,
+        "silhouette": 0.174304290859017,
+        "minimum_cluster_fraction": 0.34962406015037595
+      },
+      {
+        "clusters": 3,
+        "silhouette": 0.17423020997569075,
+        "minimum_cluster_fraction": 0.0006265664160401002
+      },
+      {
+        "clusters": 4,
+        "silhouette": 0.12129240004164886,
+        "minimum_cluster_fraction": 0.0006265664160401002
+      },
+      {
+        "clusters": 5,
+        "silhouette": 0.12626567688585316,
+        "minimum_cluster_fraction": 0.0006265664160401002
+      }
+    ],
+    "complete_J1_trials": 1596,
+    "complete_J1_people": 48
+  },
+  "test_grid_sha256": "2ddb698938aeaef51ac85f56373e1a51d364738a74b1b00e8233de717bea4dfd",
+  "code_sha256": "b1451cd360ed1824179fefa8fa731aa86f922037ef2b13c6bc363fd3bb0119b1",
+  "minimum_useful_gain": 0.01,
+  "feature_manifest": {
+    "feature_version": "20261108-v1",
+    "algorithm_sha256": "f2bb3c780300b1c94e1534e62baea85d4ae01e3c06747633954f079ea0e8a33a",
+    "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+    "allocation_sha256": "6717f50a5c86658a35f175417c463fca9f2c46ba5b98c3c1bdb11edab52f9027",
+    "signal_input_sha256": "56a0581fb38eab6803eb35d32faf290aa79197c8b0fbcaa5d20ac979894e955e",
+    "trial_ids_sha256": "699a0b1292c46ba52d2f56b2fdc7d1f9f27d3513069056f1491483b65f909c93",
+    "features_sha256": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0",
+    "raw_inventory_sha256": "c8a8bf8fc0c1c52d5539693dcb682461fa9eebb50a60ee17a30616666b22ab8d",
+    "rows": 20173,
+    "source_revision": "29379d851ff817dcccbeaf371b32c9647ee8a759",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.1",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "skrub": "0.11.0",
+      "skore": "0.29.1",
+      "pyedflib": "0.1.42"
+    }
+  },
+  "status": "frozen_before_reserved_scoring",
+  "descriptive_markers": [
+    "eeg_frontal_alpha",
+    "ecg_hr",
+    "eda_log_level"
+  ],
+  "specificity_matching": {
+    "negative_valence_max": 4,
+    "positive_valence_min": 6,
+    "arousal_min": 6,
+    "arousal_caliper": 0.5
+  },
+  "extreme_positive_quantile": 0.75,
+  "extreme_high_threshold": 0.56908,
+  "permutation_control": {
+    "replicates": 100,
+    "within": "participant and session",
+    "joint_vector": true,
+    "minimum_shift_when_possible": 5
+  }
+}

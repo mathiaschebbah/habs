@@ -177,9 +177,16 @@ unidentifiable hypotheses rather than replacing them with simulations.
 
 ## Status
 
-- **State:** approved
+- **State:** done
 - **Approved by user on:** 2026-11-08, research direction supplied and autonomous
   completion authorized; detailed implementation choices recorded by the agent.
-- **Headline result:** no predictive result yet; full-data coverage audit succeeded.
-- **Implication for next iteration:** implement signal-quality checks, the
-  source-bound comparison and structural tests, then execute the frozen evaluation.
+- **Headline result:** on 22 reserved identifiers and 997 novel J2 trials,
+  participant-macro MAE is 0.112443 for M1 and 0.112826 for M4; paired gain
+  −0.000383, 95% CI [−0.002877, +0.001822]. The prespecified 0.01 gain is excluded
+  for this representation/model family. Saved metrics, source/freeze hashes and
+  paired uncertainty verified by the [executed audit](../docs/research/results/audit.md).
+- **Implication for next iteration:** no demonstrated physiological increment or
+  predictive utility of the two-cluster history. Profile similarity is descriptive
+  and not robust to every count-stratified identity control. Further confirmatory
+  research needs independent stress criteria or a new reserved sample, rather
+  than selecting variants retrospectively on these 22 identifiers.

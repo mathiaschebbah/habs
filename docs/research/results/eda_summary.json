@@ -1,0 +1,509 @@
+{
+  "status": "full_annotation_audit",
+  "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+  "seed": 20261108,
+  "label_rows": 29514,
+  "matched_trials": 22974,
+  "matched_people": 314,
+  "recordings": 598,
+  "header_errors": [],
+  "exclusions": {
+    "no_matching_recorded_event": 4213,
+    "missing_or_invalid_valence_arousal": 2293,
+    "outside_or_short_segment": 34
+  },
+  "cohort_trials": {
+    "1": 5832,
+    "2": 9726,
+    "3": 2494,
+    "4": 4615,
+    "5": 307
+  },
+  "cohort_people": {
+    "1": 105,
+    "2": 113,
+    "3": 30,
+    "4": 52,
+    "5": 14
+  },
+  "day_corrections": 2690,
+  "cross_session_person_video_repetitions": 9,
+  "cohort2_paired_people": 76,
+  "heldout_people": 26,
+  "allocation_sha256": "6717f50a5c86658a35f175417c463fca9f2c46ba5b98c3c1bdb11edab52f9027",
+  "native_unit_counts": {
+    "ecg": {
+      "mV": 598
+    },
+    "eda": {
+      "uV": 598
+    },
+    "resp": {
+      "AU": 598
+    }
+  },
+  "development_overview": {
+    "n_rows": 20332,
+    "n_columns": 46,
+    "columns": [
+      {
+        "name": "cohort",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 5,
+        "value_is_constant": false
+      },
+      {
+        "name": "participant_id",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 288,
+        "value_is_constant": false
+      },
+      {
+        "name": "gender",
+        "dtype": "StringDtype",
+        "null_proportion": 0.004377336218768444,
+        "n_unique": 2,
+        "value_is_constant": false
+      },
+      {
+        "name": "day",
+        "dtype": "Float64DType",
+        "null_proportion": 0.008508754672437537,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "video",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 252,
+        "value_is_constant": false
+      },
+      {
+        "name": "start_marker",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 108,
+        "value_is_constant": false
+      },
+      {
+        "name": "end_marker",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 108,
+        "value_is_constant": false
+      },
+      {
+        "name": "final_emotion_label",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "rating_valence",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 505,
+        "value_is_constant": false
+      },
+      {
+        "name": "rating_arousal",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 505,
+        "value_is_constant": false
+      },
+      {
+        "name": "rating_dominance",
+        "dtype": "Float64DType",
+        "null_proportion": 0.6352547708046429,
+        "n_unique": 499,
+        "value_is_constant": false
+      },
+      {
+        "name": "self_reported_emotion_1",
+        "dtype": "StringDtype",
+        "null_proportion": 0.28683848121188277,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "self_reported_emotion_2",
+        "dtype": "StringDtype",
+        "null_proportion": 0.5824808184143222,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "self_reported_emotion_3",
+        "dtype": "StringDtype",
+        "null_proportion": 0.8313987802478852,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "default_emotion_label",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "expected_emotion_label",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 12,
+        "value_is_constant": false
+      },
+      {
+        "name": "expected_emotion_source",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 2,
+        "value_is_constant": false
+      },
+      {
+        "name": "video_theme",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 84,
+        "value_is_constant": false
+      },
+      {
+        "name": "video_presentation_order",
+        "dtype": "Float64DType",
+        "null_proportion": 0.28683848121188277,
+        "n_unique": 108,
+        "value_is_constant": false
+      },
+      {
+        "name": "flagged_outliers",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "recorded_day",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "source",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 2,
+        "value_is_constant": false
+      },
+      {
+        "name": "recording",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 456,
+        "value_is_constant": false
+      },
+      {
+        "name": "duration_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 456,
+        "value_is_constant": false
+      },
+      {
+        "name": "n_channels",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "eeg_selected_count",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "ecg_unit",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "ecg_rate_hz",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "ecg_physical_min",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 453,
+        "value_is_constant": false
+      },
+      {
+        "name": "ecg_physical_max",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 455,
+        "value_is_constant": false
+      },
+      {
+        "name": "eda_unit",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "eda_rate_hz",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "eda_physical_min",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 295,
+        "value_is_constant": false
+      },
+      {
+        "name": "eda_physical_max",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 413,
+        "value_is_constant": false
+      },
+      {
+        "name": "resp_unit",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "resp_rate_hz",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "resp_physical_min",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 455,
+        "value_is_constant": false
+      },
+      {
+        "name": "resp_physical_max",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 454,
+        "value_is_constant": false
+      },
+      {
+        "name": "event_order",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 72,
+        "value_is_constant": false
+      },
+      {
+        "name": "onset_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 19891,
+        "value_is_constant": false
+      },
+      {
+        "name": "event_duration_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "inside_segment",
+        "dtype": "BoolDType",
+        "null_proportion": 0.0,
+        "n_unique": 1,
+        "value_is_constant": true
+      },
+      {
+        "name": "annotation_error_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 260,
+        "value_is_constant": false
+      },
+      {
+        "name": "label_day",
+        "dtype": "Float64DType",
+        "null_proportion": 0.008508754672437537,
+        "n_unique": 3,
+        "value_is_constant": false
+      },
+      {
+        "name": "aversive_score",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 5625,
+        "value_is_constant": false
+      },
+      {
+        "name": "day_corrected",
+        "dtype": "BoolDType",
+        "null_proportion": 0.0,
+        "n_unique": 2,
+        "value_is_constant": false
+      }
+    ]
+  },
+  "participant_overview": {
+    "n_rows": 357,
+    "n_columns": 4,
+    "columns": [
+      {
+        "name": "cohort",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 5,
+        "value_is_constant": false
+      },
+      {
+        "name": "participant_id",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 357,
+        "value_is_constant": false
+      },
+      {
+        "name": "age",
+        "dtype": "Float64DType",
+        "null_proportion": 0.08403361344537816,
+        "n_unique": 48,
+        "value_is_constant": false
+      },
+      {
+        "name": "gender",
+        "dtype": "StringDtype",
+        "null_proportion": 0.08403361344537816,
+        "n_unique": 2,
+        "value_is_constant": false
+      }
+    ]
+  },
+  "cohort2_development_proxy_histogram": {
+    "1": {
+      "0": 2199,
+      "4": 107,
+      "2": 139,
+      "8": 107,
+      "6": 116,
+      "10": 90,
+      "15": 53,
+      "17": 32,
+      "18": 36,
+      "16": 40,
+      "5": 108,
+      "12": 86,
+      "19": 75,
+      "14": 63,
+      "1": 132,
+      "3": 120,
+      "7": 106,
+      "11": 106,
+      "13": 66,
+      "9": 103
+    },
+    "2": {
+      "0": 1926,
+      "9": 61,
+      "4": 112,
+      "3": 109,
+      "2": 146,
+      "1": 120,
+      "19": 58,
+      "15": 33,
+      "11": 76,
+      "13": 65,
+      "8": 70,
+      "6": 68,
+      "5": 67,
+      "18": 17,
+      "12": 49,
+      "7": 72,
+      "10": 63,
+      "14": 44,
+      "17": 26,
+      "16": 18
+    }
+  },
+  "cohort2_development_emotions": {
+    "anger": {
+      "trials": 583,
+      "positive_proxy": 574
+    },
+    "curiosity": {
+      "trials": 710,
+      "positive_proxy": 160
+    },
+    "sadness": {
+      "trials": 604,
+      "positive_proxy": 579
+    },
+    "disgust": {
+      "trials": 799,
+      "positive_proxy": 771
+    },
+    "neutral": {
+      "trials": 939,
+      "positive_proxy": 453
+    },
+    "joy": {
+      "trials": 817,
+      "positive_proxy": 2
+    },
+    "sensuality": {
+      "trials": 357,
+      "positive_proxy": 16
+    },
+    "relaxation": {
+      "trials": 690,
+      "positive_proxy": 12
+    },
+    "surprise": {
+      "trials": 513,
+      "positive_proxy": 172
+    },
+    "excitement": {
+      "trials": 452,
+      "positive_proxy": 31
+    },
+    "guilt": {
+      "trials": 73,
+      "positive_proxy": 68
+    },
+    "fear": {
+      "trials": 547,
+      "positive_proxy": 494
+    }
+  },
+  "cohort2_development_high_arousal_valence": {
+    "positive": 1341,
+    "negative": 1666,
+    "middle": 198
+  },
+  "warning": "Held-out response distributions and final model scores have not been inspected."
+}

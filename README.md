@@ -6,6 +6,14 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
+**Completed results:** [four-page paper](docs/research/manuscript.pdf),
+[two-page supplement](docs/research/supplement.pdf),
+[French summary](docs/research/RESULTS.md), and
+[verified numeric evidence](docs/research/results/study_summary.json).
+On 997 future trials from 22 reserved identifiers, multimodal physiology did not
+establish an improvement over stimulus/context and personal calibration:
+gain −0.000383, 95% paired interval [−0.002877, +0.001822] on the experimental 0–1 proxy.
+
 This repository now implements the [selected research project](docs/research/PROJECT.md):
 predict individual aversive emotional reactivity beyond video context and personal
 calibration. The [journal](journal/JOURNAL.md) records current evidence and the
@@ -16,8 +24,12 @@ their settings, evaluates reserved J2 and exports aggregate evidence and figures
 The local sample lacks video ratings and stops after its loading audit.
 
 `Code checks` validates code on pushes. `HABS` remains a manual dataset execution.
-Its downloadable artifact contains aggregate feasibility statistics only; individual
-annotations and detailed reports remain in the team's Azure results container.
+Its downloadable artifact contains aggregate evidence and figures; individual
+annotations and report datasets remain in the team's Azure results container.
+The manual `audit_job` option recovers a completed job and checks saved reports on
+a CPU runner, without another GPU submission. It selects the primary report
+dependencies within the published transfer limit and preserves their original
+absolute workspace path. See [validation and recovery](docs/research/VALIDATION.md).
 
 Local environment: `python3 -m venv .venv`, then install `requirements.txt`,
 `requirements-dev.txt` and the package with `.venv/bin/pip install -e .`.
