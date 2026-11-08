@@ -9,3 +9,5 @@ scratch/
 *.egg-info/
 reports/
 .habs_inputs/
+.venv-agent/
+.venv-lsp/

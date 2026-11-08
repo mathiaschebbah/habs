@@ -1,10 +1,12 @@
 """Unit fixtures test binding and leakage behavior, not scientific performance."""
 
+import importlib
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from habs.evaluate import SessionGroupedSplit
+from habs.evaluate import SessionGroupedSplit, participant_macro_mae
 from habs.features import PHYSIOLOGY
 from habs.pipeline import build_learner
 
@@ -87,3 +89,84 @@ def test_missingness_control_does_not_read_observed_signal_values(bound_tables):
     future.loc[:, list(PHYSIOLOGY)] *= 1000
     future.to_csv(paths["future"], index=False)
     assert np.max(np.abs(original - learner.predict(bindings))) < 1e-12
+
+
+def test_grouped_report_routes_independent_history(bound_tables):
+    """Exercise skore through the experiment's producer on unit data only."""
+    paths, _ = bound_tables
+    experiment = importlib.import_module("experiments.01_aversive_reactivity")
+    splitter = SessionGroupedSplit([f"unit{i}" for i in range(6)], 3)
+    report = experiment._evaluate_report(
+        paths["train"], paths["history"], splitter, {"modality": "all"}
+    )
+    assert len(report.reports_) == 3
+    assert all(
+        len(fold.get_predictions(data_source="test")) == 12 for fold in report.reports_
+    )
+
+
+@pytest.mark.parametrize(
+    "configuration", [{"nonlinear": True}, {"profile": "cluster"}, {"profile": "pca"}]
+)
+def test_additional_representations_preserve_new_grid(bound_tables, configuration):
+    """Check the spline and low-support profile paths before remote execution."""
+    paths, future = bound_tables
+    learner = build_learner(
+        modality="all",
+        splitter=SessionGroupedSplit([f"unit{i}" for i in range(6)], 3),
+        **configuration,
+    )
+    learner.fit({"trials_path": paths["train"], "calibration_path": paths["history"]})
+    predicted = learner.predict(
+        {"trials_path": paths["future"], "calibration_path": paths["history"]}
+    )
+    assert len(predicted) == len(future)
+    assert np.isfinite(predicted).all()
+
+
+def test_final_freeze_and_portable_report_cache(bound_tables, tmp_path):
+    """Require the freeze and preserve report evidence when raw bindings move."""
+    import json
+
+    paths, future = bound_tables
+    future = future.iloc[:-3].copy()
+    future.to_csv(paths["future"], index=False)
+    experiment = importlib.import_module("experiments.01_aversive_reactivity")
+    folder = tmp_path / "analysis" / "cohort_2" / "full"
+    folder.mkdir(parents=True)
+    population = {
+        "folder": folder,
+        "train_path": paths["train"],
+        "reserved_path": paths["future"],
+        "history_path": paths["history"],
+        "splitter": SessionGroupedSplit([f"unit{i}" for i in range(6)], 3),
+    }
+    with pytest.raises(RuntimeError, match="settings freeze"):
+        experiment._final_report(population, {"modality": "all"})
+    (folder.parents[1] / "frozen.json").write_text(
+        json.dumps({"status": "frozen_before_reserved_scoring"})
+    )
+    report = experiment._final_report(population, {"modality": "all"})
+    original = report.get_predictions(data_source="test")
+    expected = float(experiment._person_errors(future, original).mean())
+    assert float(report.metrics.get("participant_macro_mae")) == pytest.approx(expected)
+    project = experiment._persist_report(tmp_path / "reports", "unit_only", report)
+    frame = project.summarize().frame()
+    print("SKORE_SUMMARY_SCHEMA", frame.index.names, list(frame.columns))
+    normalized = frame.reset_index()
+    column = "id" if "id" in normalized else "report_id"
+    report_id = str(normalized.iloc[0][column])
+    for path in paths.values():
+        path.rename(path.with_name(path.name + ".unavailable"))
+    retrieved = project.get(report_id)
+    restored = retrieved.get_predictions(data_source="test")
+    assert len(restored) == len(future)
+    assert np.max(np.abs(original - restored)) < 1e-12
+    assert float(retrieved.metrics.get("participant_macro_mae")) == pytest.approx(
+        expected
+    )
+
+
+def test_participant_metric_is_not_trial_weighted():
+    """A participant with two trials does not receive twice the influence."""
+    assert participant_macro_mae([0, 0, 1], [1, 1, 1], groups=["a", "a", "b"]) == 0.5

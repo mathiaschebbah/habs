@@ -1,0 +1,14 @@
+{
+  "include": ["habs", "tests", "experiments", "audit"],
+  "exclude": [
+    "**/__pycache__",
+    "**/.pixi",
+    "**/scratch",
+    "**/reports"
+  ],
+  "pythonPath": ".venv-lsp/bin/python",
+  "typeCheckingMode": "basic",
+  "reportMissingImports": "warning",
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.13"
+}

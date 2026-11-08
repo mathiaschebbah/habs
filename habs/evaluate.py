@@ -4,6 +4,46 @@ import numpy as np
 from sklearn.model_selection import BaseCrossValidator, GroupKFold
 
 
+def participant_macro_mae(y_true, y_pred, *, groups):
+    """Give each participant equal weight regardless of their trial count.
+
+    Parameters
+    ----------
+    y_true, y_pred : array-like of shape (n_samples,)
+        Observed and predicted response on the identical trial grid.
+    groups : array-like of shape (n_samples,)
+        Participant identifier for each observation.
+
+    Returns
+    -------
+    float
+        Mean of the participants' mean absolute errors.
+
+    Raises
+    ------
+    ValueError
+        If shapes disagree, the grid is empty or any error is non-finite.
+    """
+    truth, prediction, people = (
+        np.asarray(y_true),
+        np.asarray(y_pred),
+        np.asarray(groups),
+    )
+    if (
+        truth.ndim != 1
+        or prediction.shape != truth.shape
+        or people.shape != truth.shape
+        or len(truth) == 0
+    ):
+        raise ValueError("Participant weighting requires aligned, nonempty vectors.")
+    errors = np.abs(truth - prediction)
+    if not np.isfinite(errors).all():
+        raise ValueError("Participant errors must be finite.")
+    return float(
+        np.mean([errors[people == person].mean() for person in np.unique(people)])
+    )
+
+
 class SessionGroupedSplit(BaseCrossValidator):
     """Hold out participants entirely and score only their eligible J2 trials.
 

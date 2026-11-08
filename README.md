@@ -10,8 +10,10 @@ This repository now implements the [selected research project](docs/research/PRO
 predict individual aversive emotional reactivity beyond video context and personal
 calibration. The [journal](journal/JOURNAL.md) records current evidence and the
 [source audit](docs/research/KICKOFF.md) explains the release and execution constraints.
-The present entry point performs the initial data audit; predictive experiments
-follow after the sample and signal-quality checks.
+The entry point audits annotations, materializes native signal representations,
+runs the real-data structural smoke test, selects models on development, freezes
+their settings, evaluates reserved J2 and exports aggregate evidence and figures.
+The local sample lacks video ratings and stops after its loading audit.
 
 `Code checks` validates code on pushes. `HABS` remains a manual dataset execution.
 Its downloadable artifact contains aggregate feasibility statistics only; individual

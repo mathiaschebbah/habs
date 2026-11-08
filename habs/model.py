@@ -85,12 +85,17 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
 
     def _numeric(self, table, history):
         columns = self._columns()
-        values = [table["event_order"].to_numpy(dtype=float)[:, None]]
+        order = table["event_order"].to_numpy(dtype=float)
+        values = [
+            order[:, None],
+            (order**2)[:, None],
+            table["recorded_day"].to_numpy(dtype=float)[:, None],
+        ]
         if self.conditional_arousal:
             values.append(table["observed_arousal"].to_numpy(dtype=float)[:, None])
         if columns:
             observed = table[list(columns)].to_numpy(dtype=float)
-            medians, coverage = {}, {}
+            medians, coverage, available = {}, {}, {}
             for pid, group in history.groupby("participant_id"):
                 matrix = group[list(columns)].to_numpy(dtype=float)
                 medians[str(pid)] = np.asarray(
@@ -101,9 +106,9 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
                         for column in matrix.T
                     ]
                 )
-                coverage[str(pid)] = float(
-                    np.isfinite(group[list(PHYSIOLOGY)]).all(axis=1).mean()
-                )
+                complete = np.isfinite(matrix).all(axis=1)
+                coverage[str(pid)] = float(complete.mean())
+                available[str(pid)] = float(complete.sum() >= 5)
             personal = np.vstack(
                 [
                     medians.get(str(pid), np.full(len(columns), np.nan))
@@ -112,14 +117,28 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
             )
             missing = ~np.isfinite(observed)
             if self.modality == "missing":
-                values.append(missing.astype(float))
+                values.extend(
+                    [missing.astype(float), (~np.isfinite(personal)).astype(float)]
+                )
             elif self.modality == "history":
                 values.extend([personal, (~np.isfinite(personal)).astype(float)])
             else:
-                values.extend([observed, observed - personal, missing.astype(float)])
+                values.extend(
+                    [
+                        observed,
+                        observed - personal,
+                        missing.astype(float),
+                        (~np.isfinite(personal)).astype(float),
+                    ]
+                )
             values.append(
                 np.asarray(
                     [coverage.get(str(pid), 0.0) for pid in table["participant_id"]]
+                )[:, None]
+            )
+            values.append(
+                np.asarray(
+                    [available.get(str(pid), 0.0) for pid in table["participant_id"]]
                 )[:, None]
             )
         if self.profile is not None:
@@ -135,7 +154,11 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
         return np.column_stack(values)
 
     def _categorical(self, table):
-        return table[list(CATEGORICAL)].fillna("missing").astype(str)
+        context = table[list(CATEGORICAL)].fillna("missing").astype(str)
+        context["video_expected"] = (
+            context["video"] + "|" + context["expected_emotion_label"]
+        )
+        return context
 
     def _matrix(self, table, history, *, fit=False):
         numeric = self._numeric(table, history)
@@ -147,15 +170,18 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
             self.encoder_ = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
             encoded = self.encoder_.fit_transform(categorical)
             if self.nonlinear:
+                start = 3 + int(self.conditional_arousal)
+                width = len(self._columns()) * (1 if self.modality == "history" else 2)
+                self.spline_columns_ = np.arange(start, start + width)
                 self.splines_ = SplineTransformer(
                     n_knots=3, degree=3, include_bias=False, extrapolation="constant"
-                ).fit(numeric)
+                ).fit(numeric[:, self.spline_columns_])
         else:
             numeric = self.imputer_.transform(numeric)
             encoded = self.encoder_.transform(categorical)
         matrices = [encoded, self.scaler_.transform(numeric)]
         if self.nonlinear:
-            matrices.append(self.splines_.transform(numeric))
+            matrices.append(self.splines_.transform(numeric[:, self.spline_columns_]))
         return np.column_stack(matrices)
 
     def fit(self, X, y, *, calibration=None):
@@ -209,20 +235,24 @@ class CalibratedRegressor(RegressorMixin, BaseEstimator):
         self._check_history(calibration)
         prediction = self.regressor_.predict(self._matrix(X, calibration))
         if self.calibrated:
-            for person in set(X.loc[X["recorded_day"] > 1, "participant_id"]):
-                history = calibration.loc[calibration["participant_id"] == person]
-                if len(history) < 5:
-                    continue
+            people = set(X.loc[X["recorded_day"] > 1, "participant_id"])
+            history = calibration.loc[calibration["participant_id"].isin(people)]
+            if len(history):
                 historical_X = history.loc[:, list(INPUT_COLUMNS)].copy()
                 if self.conditional_arousal:
                     historical_X["observed_arousal"] = (
                         history["rating_arousal"] - 1
                     ) / 8
                 base = self.regressor_.predict(self._matrix(historical_X, calibration))
-                offset = np.median(
-                    target_values(history, self.target).to_numpy() - base
-                )
-                offset *= len(history) / (len(history) + self.shrinkage)
-                mask = (X["participant_id"] == person) & (X["recorded_day"] > 1)
-                prediction[mask.to_numpy()] += offset
+                residual = target_values(history, self.target).to_numpy() - base
+                history_people = history["participant_id"].to_numpy()
+                for person in people:
+                    historical_mask = history_people == person
+                    count = int(historical_mask.sum())
+                    if count < 5:
+                        continue
+                    offset = np.median(residual[historical_mask])
+                    offset *= count / (count + self.shrinkage)
+                    mask = (X["participant_id"] == person) & (X["recorded_day"] > 1)
+                    prediction[mask.to_numpy()] += offset
         return np.clip(prediction, 0, 1)

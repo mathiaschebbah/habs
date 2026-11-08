@@ -15,7 +15,7 @@ def build_feature_graph():
     skrub.DataOp
         Graph bound by aligned_path, raw_dir and cache_dir identifiers.
     """
-    trials = skrub.var("aligned_path").skb.apply_func(load_table)
+    trials = skrub.var("aligned_path").skb.apply_func(load_table, no_cache=True)
     return trials.skb.apply_func(
         extract_signals, skrub.var("raw_dir"), skrub.var("cache_dir")
     )
@@ -43,8 +43,8 @@ def build_learner(data_dir_preview=None, *, splitter, **parameters):
         if data_dir_preview is not None
         else skrub.var("trials_path")
     )
-    data = source.skb.apply_func(load_table)
-    history = skrub.var("calibration_path").skb.apply_func(load_table)
+    data = source.skb.apply_func(load_table, no_cache=True)
+    history = skrub.var("calibration_path").skb.apply_func(load_table, no_cache=True)
     target = parameters.get("target", "score")
     columns = list(INPUT_COLUMNS)
     if parameters.get("conditional_arousal", False):

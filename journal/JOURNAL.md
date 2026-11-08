@@ -5,7 +5,7 @@
 - **Project / dataset:** HABS multimodal emotional video recordings.
 - **Goal:** Test whether physiology predicts individual aversive emotional reactivity beyond stimulus information and first-session calibration, then deliver verified results and a short research paper.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
-- **Last experiment:** none in the current worktree. Repository reset to initial commit `63b60bf` at the user's request.
+- **Last experiment:** 01_aversive_reactivity, ready for frozen development selection and reserved evaluation after successful real-data signal preparation.
 - **Last result:** full data audit: 22,974 aligned rated trials, 314 identifiers; cohort 2 has 76 eligible paired people, with 26 reserved before inspecting their response distributions. No predictive result yet.
 - **Workspace decisions** (user answers, 2026-11-08):
   - tabular library: pandas
@@ -16,17 +16,18 @@
   - skore mlflow tracking uri: n/a
   - plotting: matplotlib
   - EDA: run before model design
-  - agent feature: IPython 9.18.1 available; pyright absent; no LSP needed for this analysis
+  - agent feature: installed in .venv-agent and .venv-lsp; IPython and pyright verified by the bundled installer, 2026-11-09
   - CV splitter family: five grouped participant folds with J2-only validation and J1-only personal calibration; recorded after EDA under autonomous authority
   - optional features: none selected
 - **Execution authority:** on 2026-11-08 the user explicitly requested autonomous completion without further questions. Remaining implementation, dependency, design and run decisions will be made and recorded under that authorization.
 
 ## Data understanding (EDA)
 
-- **Status:** annotation/coverage audit done, 2026-11-08; signal-quality audit next.
+- **Status:** annotation/coverage and native signal audit done, 2026-11-08; real-data structural smoke passed.
 - **Observed access:** local sample has resting-state and artefact recordings only, without trial ratings. Hugging Face access is denied; the HABS/Azure route is verified by a successful full-data audit.
 - **Source audit:** [kick-off and repository](../docs/research/KICKOFF.md).
 - **Report:** [data/eda.md](../data/eda.md), [aggregate evidence](../data/eda_summary.json), [successful cloud run](https://github.com/mathiaschebbah/habs/actions/runs/42522381425). Response concentration near zero supports continuous analysis; both positive and negative responses at high arousal exist in development.
+- **Signal evidence:** [feature summary](../data/feature_summary.json), [successful preparation run](https://github.com/mathiaschebbah/habs/actions/runs/42526673694). Cohort 2 has 7,795 EEG-usable trials and 3,672 complete multimodal observations. Out-of-calibration EDA is marked missing in 2,742 trials. No predictive result yet.
 
 ## History
 

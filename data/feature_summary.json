@@ -1,0 +1,71 @@
+{
+  "status": "signal_preparation_complete",
+  "manifest": {
+    "feature_version": "20261108-v1",
+    "algorithm_sha256": "f2bb3c780300b1c94e1534e62baea85d4ae01e3c06747633954f079ea0e8a33a",
+    "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+    "allocation_sha256": "6717f50a5c86658a35f175417c463fca9f2c46ba5b98c3c1bdb11edab52f9027",
+    "signal_input_sha256": "d2b89bc0fee597d703016e7162a8e3552f88ff6046b926da092507f1376b8af8",
+    "trial_ids_sha256": "699a0b1292c46ba52d2f56b2fdc7d1f9f27d3513069056f1491483b65f909c93",
+    "features_sha256": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0",
+    "raw_inventory_sha256": "c8a8bf8fc0c1c52d5539693dcb682461fa9eebb50a60ee17a30616666b22ab8d",
+    "rows": 20173,
+    "source_revision": "0f4c41047cfb1db17ea70b610f926e24e6e3ddc5",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.1",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "skrub": "0.11.0",
+      "skore": "0.29.1",
+      "pyedflib": "0.1.42"
+    }
+  },
+  "elapsed_seconds": 140.5307395720156,
+  "cohorts": [
+    {
+      "cohort": 1,
+      "trials": 5832,
+      "people": 105,
+      "eeg_usable": 4134,
+      "ecg_usable": 3791,
+      "eda_usable": 4644,
+      "all_usable": 2094,
+      "early_eeg_usable": 4366,
+      "eda_reasons": {
+        "ok": 4644,
+        "outside_calibration": 1188
+      }
+    },
+    {
+      "cohort": 2,
+      "trials": 9726,
+      "people": 113,
+      "eeg_usable": 7795,
+      "ecg_usable": 6458,
+      "eda_usable": 6984,
+      "all_usable": 3672,
+      "early_eeg_usable": 8231,
+      "eda_reasons": {
+        "ok": 6984,
+        "outside_calibration": 2742
+      }
+    },
+    {
+      "cohort": 4,
+      "trials": 4615,
+      "people": 52,
+      "eeg_usable": 3277,
+      "ecg_usable": 3215,
+      "eda_usable": 4606,
+      "all_usable": 2364,
+      "early_eeg_usable": 3621,
+      "eda_reasons": {
+        "ok": 4606,
+        "outside_calibration": 9
+      }
+    }
+  ],
+  "reserved_response_values_inspected": false
+}

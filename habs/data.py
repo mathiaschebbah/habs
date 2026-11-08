@@ -29,7 +29,8 @@ def target_values(table, target="score"):
         Trial table containing valence and arousal ratings.
     target : str, default="score"
         Primary score, normalized valence/arousal, negative valence, or the
-        prespecified square-root-arousal sensitivity score.
+        prespecified square-root-arousal sensitivity score. The diagnostic
+        ``extreme:<threshold>`` response contrasts zero versus high scores.
 
     Returns
     -------
@@ -47,6 +48,11 @@ def target_values(table, target="score"):
         raise ValueError("Targets require valid, observed valence and arousal.")
     negative = ((5 - valence) / 4).clip(lower=0)
     activation = (arousal - 1) / 8
+    if str(target).startswith("extreme:"):
+        threshold = float(str(target).split(":", 1)[1])
+        return (
+            ((negative * activation) >= threshold).astype(float).rename("extreme_score")
+        )
     options = {
         "score": negative * activation,
         "valence": (valence - 1) / 8,

@@ -84,6 +84,15 @@ in {0,10,40}; choose lambda for M1 on development and hold it across the modalit
 comparisons. Prediction bounds are clipped to [0,1] consistently. Train-person
 weights give each person equal total weight.
 
+Before any real development performance is inspected, the context representation
+also includes the video-by-expected-emotion interaction, and calibration selection
+includes its disabled limit. This prevents making the primary reference weaker
+than its uncalibrated counterpart by construction. The selected calibration
+strategy is shared across modality comparisons.
+Session number and linear/quadratic recorded order are shared context covariates.
+The nonlinear physiological variant adds splines only to continuous physiological
+values and J1-centered differences, retaining the same context and quality controls.
+
 Cross-validation geometry is selected at the evaluation implementation step,
 from the measured participant/session structure. Every validation fold must
 exclude its people entirely from population fitting and score only their novel
@@ -135,6 +144,18 @@ Report within-person rank associations only where the response varies.
 6. A five-second feature window and respiration/cross-modal forecasting are
    extensions contingent on usable timing and signal support. No physiological
    coupling is interpreted as causal.
+
+The five-second comparison uses five-second EEG quality eligibility, never the
+future ten-second quality mask. Its reference and physiological model are selected
+on development and compared on the identical early-window trial grid. Consequently
+its population may differ from the full-window analysis and its absolute errors
+are not a paired five-versus-ten-second contrast. Conditional matching uses
+arousal >=6, valence <=4 versus >=6, and a fixed 0.5-point arousal caliper within
+participant without trial reuse. Dose plots use the prespecified frontal alpha,
+heart-rate and log-conductance markers, development video means/scales, J1
+centering, and participant-level intervals. The extreme-score threshold is the
+development 75th percentile among positive scores; only the supervised extreme
+rows fit that diagnostic score, with no personal response offset.
 
 Deliver a compact main paper and supporting evidence. Retain measured exclusions,
 uncertainty, positive and negative findings, and the selected project's figure

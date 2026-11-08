@@ -108,6 +108,26 @@ separately labelled conditional explanation analysis.
 - Learn imputation, scaling and model choices on development data only.
 - Preserve cohort separation; no cross-cohort identity linkage is available.
 
+## Signal-quality follow-up
+
+The [native-signal preparation](https://github.com/mathiaschebbah/habs/actions/runs/42526673694)
+completed successfully and passed the real-data disjoint-grid smoke test. Its
+[aggregate output](feature_summary.json) covers 20,173 trials in cohorts 1, 2
+and 4. Preparation took 140.5 seconds after reusing the audited annotations.
+
+| Cohort | EEG usable | ECG usable | EDA usable | All three usable |
+|---|---:|---:|---:|---:|
+| 1 | 4,134 / 5,832 | 3,791 | 4,644 | 2,094 |
+| 2 | 7,795 / 9,726 | 6,458 | 6,984 | 3,672 |
+| 4 | 3,277 / 4,615 | 3,215 | 4,606 | 2,364 |
+
+EDA is outside the supplied calibration domain in 1,188, 2,742 and 9 trials,
+respectively. Those values are unavailable rather than clamped to a plausible
+endpoint. Availability differences require the planned missingness-only control,
+no-EDA sensitivity and complete-observation subgroup. This quality table precedes
+the final restriction to CURATED, prior-calibration support and novel J2 videos;
+it is not the final test population or evidence of predictive performance.
+
 ## Open questions
 
 The release does not establish a direct stress criterion, biological identity
