@@ -7,6 +7,7 @@
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
 - **Last experiment:** 01_aversive_reactivity, done; actual HABS evaluation and read-only audit completed.
 - **Last result:** 22 reserved identifiers / 997 trials; macro-MAE M1=0.112443, M4=0.112826; gain −0.000383, 95% CI [−0.002877, +0.001822]. No demonstrated increment for the tested physiology. [Results](../docs/research/RESULTS.md), [paper](../docs/research/manuscript.pdf), [supplement](../docs/research/supplement.pdf).
+- **Literature follow-up, 2026-11-09:** [systematized scoping review](../docs/research/literature/2026-11-09/REVIEW.md), 21 Exa searches and five complete Europe PMC queries; 28 core publications plus 29 contextual publications extracted. [Proposed question](../docs/research/literature/2026-11-09/QUESTION.md): cross-session reproducibility of the difference between subjective and EEG sequential effects. No new association or model has been run; novelty is conditional on the searched corpus, and usable transition support remains to be audited.
 - **Workspace decisions** (user answers, 2026-11-08):
   - tabular library: pandas
   - env manager: pip+venv
@@ -43,3 +44,4 @@
 | B6 | Obtain independent state-stress and timestamped onset criteria for clinical/onset claims. | limits of 01_aversive_reactivity |
 | B7 | Validate ECG detections and test richer representations on a newly reserved sample; do not tune on the completed test. | limits of 01_aversive_reactivity |
 | B8 | Study entirely population-new stimuli, respiratory forecasting or probabilistic profile families in separately designed experiments. | optional extensions in the selected project |
+| B9 | Audit consecutive-trial support and identifiability, then assess whether the subjective–EEG effect of recent emotional history is individually reproducible across J1/J2. Treat the opened data as exploratory; do not reuse the old reserved sample as a pristine confirmation. | [literature review and question](../docs/research/literature/2026-11-09/QUESTION.md), user request 2026-11-09 |

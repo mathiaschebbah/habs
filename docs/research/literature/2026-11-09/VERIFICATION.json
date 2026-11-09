@@ -1,0 +1,13 @@
+{
+  "date": "2026-11-09",
+  "status": "verified",
+  "formal_occurrences": 931,
+  "unique_notices": 758,
+  "extracted_publications": 57,
+  "exclusions_with_reasons": 676,
+  "local_links": "all resolved",
+  "raw_response_hashes": 38,
+  "scientific_source_sha256": "b1451cd360ed1824179fefa8fa731aa86f922037ef2b13c6bc363fd3bb0119b1",
+  "scientific_source_matches_frozen": true,
+  "scope": "Literature review and research proposal; no new HABS association or training run performed."
+}

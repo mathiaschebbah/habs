@@ -14,6 +14,12 @@ On 997 future trials from 22 reserved identifiers, multimodal physiology did not
 establish an improvement over stimulus/context and personal calibration:
 gain −0.000383, 95% paired interval [−0.002877, +0.001822] on the experimental 0–1 proxy.
 
+The [literature review](docs/research/literature/2026-11-09/REVIEW.md), completed
+on 9 November, documents 21 Exa searches plus five Europe PMC queries. Its
+[next-question proposal](docs/research/literature/2026-11-09/QUESTION.md) concerns
+cross-session reproducibility of subjective–EEG sequential effects; no new
+experiment has been run for that proposal.
+
 This repository now implements the [selected research project](docs/research/PROJECT.md):
 predict individual aversive emotional reactivity beyond video context and personal
 calibration. The [journal](journal/JOURNAL.md) records current evidence and the

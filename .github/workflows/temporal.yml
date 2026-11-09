@@ -1,0 +1,56 @@
+name: Temporal study
+
+on:
+  workflow_dispatch:
+    inputs:
+      phase:
+        type: choice
+        options: [feasibility]
+        default: feasibility
+        description: Read-only structural analysis, without fitting associations
+      source_job:
+        required: true
+        default: "20261108T230726-28480a"
+        description: Completed HABS job containing audited features and events
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  HABS_KEY: "1f4d7f20-8ba2-4697-91cc-b898558a458c"
+  HABS_STORAGE: sthabshackweu
+  HABS_TENANT_ID: 6fc0e479-449c-4700-b89c-7c4848058e30
+  JOB_SUFFIX: ${{ inputs.source_job }}
+  PRIVATE_INPUT_DEST: /tmp/habs-temporal/data
+  HABS_ANALYSIS_OUT: /tmp/habs-temporal
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MPLBACKEND: Agg
+
+jobs:
+  feasibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
+      - run: pip install -r requirements.txt
+      - run: pip install -e .
+      - run: python tools/fetch_temporal_inputs.py
+      - run: python tools/temporal_feasibility.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: temporal-feasibility
+          path: /tmp/habs-temporal/public/
+          if-no-files-found: error
+          retention-days: 30

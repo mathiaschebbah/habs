@@ -1,0 +1,24 @@
+{
+  "aliases": {
+    "R003": "R093",
+    "R009": "R021",
+    "R011": "R458",
+    "R016": "R406",
+    "R034": "R038",
+    "R036": "R038",
+    "R039": "R038",
+    "R050": "R090",
+    "R059": "R061",
+    "R065": "R099",
+    "R080": "R077",
+    "R081": "R077",
+    "R114": "R683",
+    "R126": "R026",
+    "R127": "R026",
+    "R129": "R026",
+    "R767": "R128",
+    "R769": "R772",
+    "R776": "R017"
+  },
+  "description": "Fusion explicite des versions/pages liées et des DOI ajoutés après vérification; les identifiants initiaux sont conservés dans SCREENING.csv."
+}
