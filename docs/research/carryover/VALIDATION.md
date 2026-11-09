@@ -50,3 +50,9 @@ Lint passes on `process.py habs experiments audit tests tools`.
 
 Final exact-source precision, frozen real-data fits, cached-report audit and PDF
 visual verification will be recorded here after their actual completion.
+
+The [exact-source precision refresh](https://github.com/mathiaschebbah/habs/actions/runs/42617738546)
+has completed on source `0e9bd01`. The downloaded geometry fingerprint matches
+the reviewed implementation, with 53 people / 4,554 transitions and full rank.
+The [Code checks for that source](https://github.com/mathiaschebbah/habs/actions/runs/42617710024)
+also pass on Python 3.12. Scientific effect fits are still pending at this point.

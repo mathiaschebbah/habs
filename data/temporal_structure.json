@@ -32,7 +32,7 @@
   "empirical_current_effects_fitted": false,
   "person_selection_sha256": "0ce53006da1a285cf5f51817e0e332ebde88229e22af81fa5a8ccf665fb95a18",
   "pair_grid_sha256": "46ad9219f42b5c6eecfd04e71731dac466749e124910909f6c0da323489ec734",
-  "geometry_inference_code_sha256": "af1905b0bbf2b8068d9657e45dfe28098338ab22fd121cc1ebd3363afbafa292",
+  "geometry_inference_code_sha256": "533e1a82446092ec2c41aa1f8358d7014ea3e1566e2c4f65ce56c9b18484f5cd",
   "geometry": [
     {
       "rows": 2294,
@@ -41,7 +41,7 @@
       "nuisance_rank": 579,
       "personal_history_rank": 106,
       "personal_history_columns": 106,
-      "history_condition_number": 5.171516124159397,
+      "history_condition_number": 5.171516124159443,
       "high_leverage_rows": 8
     },
     {
@@ -51,7 +51,7 @@
       "nuisance_rank": 584,
       "personal_history_rank": 106,
       "personal_history_columns": 106,
-      "history_condition_number": 19.129045900497594,
+      "history_condition_number": 19.129045900497466,
       "high_leverage_rows": 14
     }
   ],
