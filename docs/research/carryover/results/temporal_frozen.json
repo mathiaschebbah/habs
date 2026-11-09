@@ -1,0 +1,87 @@
+{
+  "status": "frozen_before_empirical_carryover_fits",
+  "frozen_at_utc": "2026-11-09T12:37:36.537708+00:00",
+  "source_revision": "5b079a836da54652240c00c43555a1624400ae0e",
+  "scientific_code_sha256": "6031e4f9ecfa7d491352b3f7651f6f20ad8655fd8ab9ecb9eb1ac7cf12b8a5cb",
+  "geometry_inference_code_sha256": "533e1a82446092ec2c41aa1f8358d7014ea3e1566e2c4f65ce56c9b18484f5cd",
+  "feature_manifest": {
+    "feature_version": "20261108-v1",
+    "algorithm_sha256": "f2bb3c780300b1c94e1534e62baea85d4ae01e3c06747633954f079ea0e8a33a",
+    "labels_sha256": "c981a6836dfcd6af2b4c68ca3fab0283453f934522217b7b5c66e03119430fcd",
+    "allocation_sha256": "6717f50a5c86658a35f175417c463fca9f2c46ba5b98c3c1bdb11edab52f9027",
+    "signal_input_sha256": "56a0581fb38eab6803eb35d32faf290aa79197c8b0fbcaa5d20ac979894e955e",
+    "trial_ids_sha256": "699a0b1292c46ba52d2f56b2fdc7d1f9f27d3513069056f1491483b65f909c93",
+    "features_sha256": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0",
+    "raw_inventory_sha256": "c8a8bf8fc0c1c52d5539693dcb682461fa9eebb50a60ee17a30616666b22ab8d",
+    "rows": 20173,
+    "source_revision": "29379d851ff817dcccbeaf371b32c9647ee8a759",
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "packages": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.1",
+      "scipy": "1.17.1",
+      "scikit-learn": "1.9.1",
+      "skrub": "0.11.0",
+      "skore": "0.29.1",
+      "pyedflib": "0.1.42"
+    }
+  },
+  "settings": {
+    "seed": 20261109,
+    "primary_cohort": 2,
+    "minimum_pairs_per_day": 20,
+    "precision_replicates": 100,
+    "variance_bootstrap_draws": 999,
+    "predictive_bootstrap_draws": 10000,
+    "prediction_folds": 5,
+    "population_alpha": 10.0,
+    "personal_penalty": 20.0,
+    "source_job_suffix": "20261108T230726-28480a",
+    "reference_gap_s": 15.956999999999994
+  },
+  "structure": {
+    "people": 53,
+    "transitions": 4554,
+    "by_day": {
+      "1": 2294,
+      "2": 2260
+    },
+    "minimum_pairs": 20,
+    "population_scales": false,
+    "reference_gap_s": 15.956999999999994,
+    "j1_gap_iqr": [
+      13.144249999999829,
+      19.63600000000008
+    ],
+    "j1_scale_ranges": {
+      "sd_a": [
+        0.9904138262210453,
+        1.6661063479996414,
+        2.0750939692516313,
+        2.378856427036421,
+        3.5086615549338336
+      ],
+      "sd_p": [
+        0.13691476535044217,
+        0.21853521274383345,
+        0.2572572843373988,
+        0.30883250002814555,
+        0.507295758996839
+      ]
+    },
+    "scope": "Exploratory cohort-2 identifiers, fixed video catalogue; novel current videos for each person."
+  },
+  "input_hashes": {
+    "person_selection_sha256": "0ce53006da1a285cf5f51817e0e332ebde88229e22af81fa5a8ccf665fb95a18",
+    "pair_grid_sha256": "46ad9219f42b5c6eecfd04e71731dac466749e124910909f6c0da323489ec734",
+    "input_features_sha256": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0"
+  },
+  "source_files_sha256": {
+    "eda_summary.json": "0446aa64b40be61c913db4e9d174177b1da3e47e84a8ac28e39485dea75f8a65",
+    "recorded_events.csv.gz": "fdab24a4d736d934015ec32a6fac05c7ea04f559ae20ba806ccb312f4927ae30",
+    "features.csv.gz": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0",
+    "feature_manifest.json": "4d6d9681fb4445d28f635ccc44b9c0c93ca5145246ff6ccd902449f9b8925d27"
+  },
+  "precision_status": "simulated_design_precision_complete",
+  "interpretation": "Exploratory study after experiment-01 outcomes were opened; no independent confirmatory holdout is claimed."
+}

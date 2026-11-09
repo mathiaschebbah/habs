@@ -78,9 +78,17 @@ This resolution uses structural counts only; empirical associations remain unfit
 
 ## Status
 
-- **State:** approved
+- **State:** done
 - **Approved by user on:** 2026-11-09 — “Vas-y, vérifie la faisabilité sur nos données,
   puis mène l’étude du décalage ressenti–EEG entre J1 et J2 jusqu’aux résultats et au
   papier, en autonomie sans plus rien me demander :)”.
-- **Headline result:** pending real-data transition audit.
-- **Implication for next iteration:** pending.
+- **Headline result:** 53 paired IDs / 4,554 transitions. Adjusted cross-day delta
+  covariance +0.003496, model-based 95% CI [−0.010277, +0.015055], null-bootstrap
+  p=0.253; latent correlation is weakly identified. Personal-slope J2 MAE gain
+  −0.005539 [−0.012251, +0.000938]. No established repeatable personal contrast or
+  predictive increment. [Results](../docs/research/carryover/RESULTS.md), five-page
+  paper and three-page supplement delivered after saved-report audit.
+- **Implication for next iteration:** small personal variation remains hard to
+  separate from noisy slope estimation. Independent repeated measurements and
+  better precision are needed for a personal-stability claim; do not retune this
+  completed study or treat its opened outcomes as new confirmation.

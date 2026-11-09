@@ -46,8 +46,6 @@ retrieval. No review-triggered fixes were needed. Its independent parallel test
 process passed 37 tests, with the two restricted-data smoke tests skipped locally.
 Lint passes on `process.py habs experiments audit tests tools`.
 
-## Remaining execution evidence
-
 ## PDF authoring environment
 
 The PDF builder uses a separate publication environment, not the HABS numerical
@@ -68,11 +66,54 @@ files whose exact hashes are not covered by the successful executed audit.
 
 ## Execution closeout
 
-Final exact-source precision, frozen real-data fits, cached-report audit and PDF
-visual verification will be recorded here after their actual completion.
-
 The [exact-source precision refresh](https://github.com/mathiaschebbah/habs/actions/runs/42617738546)
 has completed on source `0e9bd01`. The downloaded geometry fingerprint matches
 the reviewed implementation, with 53 people / 4,554 transitions and full rank.
 The [Code checks for that source](https://github.com/mathiaschebbah/habs/actions/runs/42617710024)
-also pass on Python 3.12. Scientific effect fits are still pending at this point.
+also pass on Python 3.12.
+
+[Scientific run 42618363214](https://github.com/mathiaschebbah/habs/actions/runs/42618363214)
+succeeded on source `5b079a836da54652240c00c43555a1624400ae0e`, backend
+`20261109T123726-87e44e`. The freeze was written at 12:37:36 UTC before fitting
+the scientific effects. Both real-data smoke tests passed in 15.59 s. All
+prespecified statistical and forecast comparisons were completed without tuning
+their settings on the new outcomes.
+
+[Read-only audit 42657666606](https://github.com/mathiaschebbah/habs/actions/runs/42657666606)
+passed source/input/freeze hashes, saved-likelihood reconstruction, three cached
+cross-validation reports and fifteen folds, finite predictions, registered
+participant errors and both paired intervals. Its structured completion record
+binds the exact result and freeze hashes to four completed verification stages.
+
+The first recovery selection exceeded 25 MB before downloading. Metadata-only
+inspection found `latest__` directory mirrors and duplicate `estimator_.pickle`
+files unused by the installed reader. Their omission recovers 309 necessary
+files, 21.62 MB, within the published limit. Canonical learners, original private
+bindings and dataset dependencies remain intact. The focused restore-without-fit
+test passes after removing the same duplicates.
+
+Generic skore checks are unavailable here: constant-input warnings and an
+array-dimensionality error arise on the query metadata. They are not described
+as passed leakage/overfitting tests. Cached metrics and targeted source/grid
+invariants are verified separately. Default score and R² are readable; MAPE is
+not interpreted for the signed difference target.
+
+The delivery review accepted fixes for exact audit/input binding, a separate
+publication dependency declaration and structured executed completion rather
+than an echoed-source marker. Matching completion is accepted; stale results,
+stale freeze, echoed source and incomplete stages are rejected by focused checks.
+Final helper run exited 0 with no actionable findings, confidence 0.88:
+
+```sh
+/Users/mathias/.codex/skills/autoreview/scripts/autoreview --mode local --engine codex --prompt-file scratch/review_carryover_delivery_context.md --output /tmp/habs-kickoff/carryover-delivery-review.md --json-output /tmp/habs-kickoff/carryover-delivery-review.json --stream-engine-output
+```
+
+## Final artifact inspection
+
+The final manuscript has five A4 pages, the supplement three. Both PDFs were
+rendered with Poppler at 125 dpi and all eight final pages inspected. A figure
+annotation was moved clear of its reference line, and figures were regenerated
+only from saved audited numbers. No model or statistical fit was rerun for layout.
+Final pages have no clipped text, overlapping annotations, missing glyphs or
+broken tables. The five figures distinguish actual observations from simulated
+precision. [Results](RESULTS.md) give the interpretation and limitations in French.

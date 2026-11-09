@@ -1,0 +1,34 @@
+{
+  "status": "complete_verified_artifacts",
+  "scientific_source_commit": "5b079a836da54652240c00c43555a1624400ae0e",
+  "scientific_code_sha256": "6031e4f9ecfa7d491352b3f7651f6f20ad8655fd8ab9ecb9eb1ac7cf12b8a5cb",
+  "original_study01_code_preserved": true,
+  "scientific_run": "https://github.com/mathiaschebbah/habs/actions/runs/42618363214",
+  "read_only_audit_run": "https://github.com/mathiaschebbah/habs/actions/runs/42657666606",
+  "recovery_files": 309,
+  "recovery_mb": 21.62,
+  "pdf_pages": {
+    "manuscript.pdf": 5,
+    "supplement.pdf": 3
+  },
+  "final_pdf_visual_inspection": "All eight final 125-dpi rendered pages inspected, 2026-11-09; no overlap or clipping.",
+  "scope": "Exploratory conditional repeatability of a specified arousal-minus-alpha history effect; no clinical or qualia inference.",
+  "artifacts": {
+    "docs/research/carryover/PROTOCOL.md": "1238eafbbcd2522bc9a0070ca046376d4bf01c3a9473897a30fec70e14f25241",
+    "docs/research/carryover/RESULTS.md": "c0d36c6414ccc934d7cbfd6c607953ee0c0652b2ccfb4fd65b8c19aad0a82fd1",
+    "docs/research/carryover/VALIDATION.md": "785ead68c63a6c3a1e36287becff6861d75be7ed7d33b3f13392799046c98538",
+    "docs/research/carryover/build_paper.py": "2ceadba96266245c3e4fb2bd009391cac17debca31cf533d5fdc221f45129c72",
+    "docs/research/carryover/figures/figure1_transition_support.png": "e3496917a1eee2cdba03d173eb28e935971b1d429afe96a721907fa00f0bb33f",
+    "docs/research/carryover/figures/figure2_simulated_precision.png": "2346e80934958105c3753178334ff80261bb583c7077c20bca5e13f6067c8cca",
+    "docs/research/carryover/figures/figure3_personal_contrasts.png": "973bd524df0852087b6ec096e8fd0fcedf28ff611341ee25b6bc21f7dba098fd",
+    "docs/research/carryover/figures/figure4_reproducibility_uncertainty.png": "27432b049011aa531a560a14942adc2c75a654884e0b4376f8d82007bfe24efc",
+    "docs/research/carryover/figures/figure5_personal_prediction_gain.png": "bb56c7d2931f2310b52c23eaa37f6c0e0830d143f504b78c74715a723a12fc57",
+    "docs/research/carryover/manuscript.pdf": "63f2316712d600069052ad3d7f206aaf08c9abcb38c80622c8e502828abddd67",
+    "docs/research/carryover/paper_text.json": "1713a24299121aa1e99b8129e14eb45085c695891eb248ee51f90e68fbdf08a5",
+    "docs/research/carryover/results/audit.md": "6d31b473e2b979388eb56996c3ac07110c45088384912a6842d8323adac37dcf",
+    "docs/research/carryover/results/audit_completion.json": "c7f19d6bd9bdb51836ebf2d9d5c29eb0cb953ba607be7f42ce8ea4073a67e653",
+    "docs/research/carryover/results/temporal_frozen.json": "7f9054aa4b4d7a2dd652ea837ecdcd54cc5aa967e9965bc90cd8b6d7357b640f",
+    "docs/research/carryover/results/temporal_results.json": "32d84ed0de2a4487a6cb6f1896ed0f4926b890250496962adbf00cf662f90c6c",
+    "docs/research/carryover/supplement.pdf": "444ad458d036db644de9e72bfd55976f04a349f8e8b5720e9a4a5b5ef6cb623b"
+  }
+}

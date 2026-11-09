@@ -494,7 +494,10 @@ def _supplement(result, frozen, precision, feasibility, styles):
         ),
         _table(
             [["Frozen setting", "Value"]]
-            + [[escape(k), escape(str(v))] for k, v in frozen["settings"].items()],
+            + [
+                [escape(k), escape(f"{v:g}" if isinstance(v, float) else str(v))]
+                for k, v in frozen["settings"].items()
+            ],
             styles,
         ),
         Spacer(1, 8),

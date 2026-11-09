@@ -164,7 +164,7 @@ def export_figures(result, precision, feasibility, directory):
     if component["correlation_weakly_identified"]:
         axes[0].text(
             0.03,
-            0.97,
+            0.84,
             "Weakly identified correlation",
             transform=axes[0].transAxes,
             va="top",

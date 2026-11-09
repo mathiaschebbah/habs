@@ -1,0 +1,12 @@
+{
+  "status": "complete_verified",
+  "primary_verified": true,
+  "verification_stages": {
+    "source": true,
+    "likelihood": true,
+    "predictions": true,
+    "paired": true
+  },
+  "audited_result_sha256": "32d84ed0de2a4487a6cb6f1896ed0f4926b890250496962adbf00cf662f90c6c",
+  "audited_frozen_sha256": "7f9054aa4b4d7a2dd652ea837ecdcd54cc5aa967e9965bc90cd8b6d7357b640f"
+}

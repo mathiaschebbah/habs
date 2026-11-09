@@ -6,6 +6,14 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
+**Latest completed study:** [subjective–EEG carryover results](docs/research/carryover/RESULTS.md),
+[five-page paper](docs/research/carryover/manuscript.pdf), and
+[three-page supplement](docs/research/carryover/supplement.pdf).
+On 53 paired identifiers / 4,554 transitions, adjusted personal contrast
+repeatability was not established: covariance +0.003496, 95% model-based interval
+[−0.010277, +0.015055], p=0.253. The frozen personal J1 correction did not establish
+a J2 predictive gain. See [verification](docs/research/carryover/VALIDATION.md).
+
 **Completed results:** [four-page paper](docs/research/manuscript.pdf),
 [two-page supplement](docs/research/supplement.pdf),
 [French summary](docs/research/RESULTS.md), and
@@ -17,8 +25,8 @@ gain −0.000383, 95% paired interval [−0.002877, +0.001822] on the experiment
 The [literature review](docs/research/literature/2026-11-09/REVIEW.md), completed
 on 9 November, documents 21 Exa searches plus five Europe PMC queries. Its
 [next-question proposal](docs/research/literature/2026-11-09/QUESTION.md) concerns
-cross-session reproducibility of subjective–EEG sequential effects; no new
-experiment has been run for that proposal.
+cross-session reproducibility of subjective–EEG sequential effects; it was
+subsequently executed and audited as study 02.
 
 This repository now implements the [selected research project](docs/research/PROJECT.md):
 predict individual aversive emotional reactivity beyond video context and personal
