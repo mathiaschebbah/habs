@@ -5,7 +5,7 @@ on:
     inputs:
       phase:
         type: choice
-        options: [feasibility, precision, study, audit]
+        options: [feasibility, precision, study, audit, inspect]
         default: feasibility
         description: Structural audit, simulated precision, frozen study, or saved-report audit
       source_job:
@@ -117,13 +117,14 @@ jobs:
           retention-days: 30
 
   audit:
-    if: inputs.phase == 'audit'
+    if: inputs.phase == 'audit' || inputs.phase == 'inspect'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       PRIVATE_OUTPUT_DEST: /tmp/habs-temporal-audit
       FETCH_TEMPORAL_REPORTS: "true"
       HABS_ANALYSIS_OUT: /out
+      INSPECT_TEMPORAL_OUTPUTS: ${{ inputs.phase == 'inspect' && 'true' || 'false' }}
     steps:
       - uses: actions/checkout@v5
       - uses: azure/login@v2
@@ -140,15 +141,18 @@ jobs:
       - run: pip install -e .
       - run: python tools/fetch_temporal_outputs.py
       - name: Restore original private dataset references
+        if: inputs.phase == 'audit'
         run: |
           test ! -e /out
           sudo install -d -o "$(id -un)" -g "$(id -gn)" /out
           cp -R "$PRIVATE_OUTPUT_DEST/." /out/
       - name: Read-only report and likelihood audit
+        if: inputs.phase == 'audit'
         run: |
           python -m vendor.run_cells audit/02_emotional_carryover.py scratch/audit/02_emotional_carryover/audit.md
           if rg -q '\*\*error:\*\*' scratch/audit/02_emotional_carryover/audit.md; then exit 1; fi
       - uses: actions/upload-artifact@v4
+        if: inputs.phase == 'audit'
         with:
           name: audited-temporal-results
           path: |

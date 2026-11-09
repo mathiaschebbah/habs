@@ -1,5 +1,6 @@
 """Recover aggregate carryover outputs and optionally their private report evidence."""
 
+import json
 import os
 import re
 from pathlib import Path, PurePosixPath
@@ -33,6 +34,28 @@ def main():
         for b in container.list_blobs(name_starts_with=prefix, include=["metadata"])
         if not (getattr(b, "metadata", None) or {}).get("hdi_isfolder")
     }
+    if os.environ.get("INSPECT_TEMPORAL_OUTPUTS", "false") == "true":
+        categories = {}
+        for name, size in files.items():
+            parts = PurePosixPath(name).parts
+            category = (
+                "/".join(parts[:4])
+                if name.startswith("temporal/reports/")
+                else parts[0]
+            )
+            item = categories.setdefault(category, {"files": 0, "bytes": 0})
+            item["files"] += 1
+            item["bytes"] += size
+        print(
+            json.dumps(
+                {
+                    "categories": categories,
+                    "largest": sorted(files.items(), key=lambda x: -x[1])[:35],
+                },
+                indent=2,
+            )
+        )
+        return
     selected = {
         name
         for name in files
