@@ -48,6 +48,26 @@ Lint passes on `process.py habs experiments audit tests tools`.
 
 ## Remaining execution evidence
 
+## PDF authoring environment
+
+The PDF builder uses a separate publication environment, not the HABS numerical
+virtual environment. In this desktop session it runs with the bundled Python
+runtime, where ReportLab 4.4.9 was inspected and the audit-binding rejection
+checks passed. A portable setup from the repository root is:
+
+```sh
+python3 -m venv .venv-publication
+.venv-publication/bin/pip install -r requirements-publication.txt
+.venv-publication/bin/python docs/research/carryover/build_paper.py --font-dir /path/to/liberation-fonts
+```
+
+The font directory must contain LiberationSans-Regular.ttf, LiberationSans-Bold.ttf
+and LiberationSans-Italic.ttf. The builder also detects the bundled desktop fonts
+and common Linux Liberation font locations. It refuses to publish result/freeze
+files whose exact hashes are not covered by the successful executed audit.
+
+## Execution closeout
+
 Final exact-source precision, frozen real-data fits, cached-report audit and PDF
 visual verification will be recorded here after their actual completion.
 

@@ -20,6 +20,12 @@ from habs.temporal.data import verify_inputs
 from habs.temporal.inference import _marginal, _mean_design
 
 ROOT = Path(os.environ.get("HABS_ANALYSIS_OUT", "/out"))
+audit_state = {
+    "source": False,
+    "likelihood": False,
+    "predictions": False,
+    "paired": False,
+}
 PUBLIC = ROOT / "public"
 PRIVATE = ROOT / "temporal"
 result = json.loads((PUBLIC / "temporal_results.json").read_text())
@@ -43,10 +49,17 @@ assert (
     == frozen["scientific_code_sha256"]
     == producer._code_hash()
 )
+audit_state["source"] = True
 {
     "source_revision": frozen["source_revision"],
     "frozen_at_utc": frozen["frozen_at_utc"],
     "source_and_freeze_verified": True,
+    "audited_result_sha256": hashlib.sha256(
+        (PUBLIC / "temporal_results.json").read_bytes()
+    ).hexdigest(),
+    "audited_frozen_sha256": hashlib.sha256(
+        (PUBLIC / "temporal_frozen.json").read_bytes()
+    ).hexdigest(),
     "structure": result["structure"],
     "real_data_smoke": result["real_data_smoke"],
 }
@@ -80,6 +93,7 @@ assert (
     < 1e-12
 )
 assert np.linalg.eigvalsh(sampling).min() > 0
+audit_state["likelihood"] = True
 {
     "saved_likelihood_verified": True,
     "covariance": covariance,
@@ -144,6 +158,7 @@ for mode in ("ablation", "full", "refit"):
         checks[mode] = report.checks.summarize().frame()
     except (ValueError, TypeError, AttributeError, FileNotFoundError) as error:
         checks[mode] = {"status": "generic_checks_unavailable", "reason": str(error)}
+audit_state["predictions"] = set(verified) == {"ablation", "full", "refit"}
 verified
 
 # %% [markdown]
@@ -177,8 +192,24 @@ for name, reference in (
     expected = result["prediction"][name]
     assert abs(actual["gain"] - expected["gain"]) < 1e-12
     assert np.max(np.abs(np.asarray(actual["ci95"]) - expected["ci95"])) < 1e-12
+audit_state["paired"] = True
+assert all(audit_state.values())
+completion = {
+    "status": "complete_verified",
+    "primary_verified": all(audit_state.values()),
+    "verification_stages": audit_state,
+    "audited_result_sha256": hashlib.sha256(
+        (PUBLIC / "temporal_results.json").read_bytes()
+    ).hexdigest(),
+    "audited_frozen_sha256": hashlib.sha256(
+        (PUBLIC / "temporal_frozen.json").read_bytes()
+    ).hexdigest(),
+}
+completion_path = Path("scratch/audit/02_emotional_carryover/completion.json")
+completion_path.parent.mkdir(parents=True, exist_ok=True)
+completion_path.write_text(json.dumps(completion, indent=2))
 {
-    "primary_verified": True,
+    **completion,
     "prediction": result["prediction"],
     "sensitivities": result["sensitivities"],
     "figure_count": len(list((PUBLIC / "figures").glob("figure*.png"))),

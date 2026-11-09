@@ -149,8 +149,11 @@ jobs:
       - name: Read-only report and likelihood audit
         if: inputs.phase == 'audit'
         run: |
+          mkdir -p scratch/audit/02_emotional_carryover
+          rm -f scratch/audit/02_emotional_carryover/completion.json
           python -m vendor.run_cells audit/02_emotional_carryover.py scratch/audit/02_emotional_carryover/audit.md
           if rg -q '\*\*error:\*\*' scratch/audit/02_emotional_carryover/audit.md; then exit 1; fi
+          test -f scratch/audit/02_emotional_carryover/completion.json
       - uses: actions/upload-artifact@v4
         if: inputs.phase == 'audit'
         with:
@@ -158,5 +161,6 @@ jobs:
           path: |
             /out/public/
             scratch/audit/02_emotional_carryover/audit.md
+            scratch/audit/02_emotional_carryover/completion.json
           if-no-files-found: error
           retention-days: 30

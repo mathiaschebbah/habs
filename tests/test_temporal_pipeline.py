@@ -134,6 +134,13 @@ def test_saved_cv_requires_bindings_but_never_refits(
         project.get(report_id)
     for path in paths.values():
         path.with_name(path.name + ".unavailable").rename(path)
+    # The skore reader uses estimator.pickle and learner_.pickle, not the
+    # duplicate fitted estimator_.pickle. HABS output upload copies latest aliases.
+    for duplicate in (tmp_path / "reports").rglob("estimator_.pickle"):
+        duplicate.unlink()
+    for alias in (tmp_path / "reports").rglob("latest__*"):
+        if alias.is_symlink():
+            alias.unlink()
 
     def forbid_fit(*args, **kwargs):
         raise AssertionError("Opening cached predictions must not fit a forecaster.")

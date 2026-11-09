@@ -64,6 +64,10 @@ def main():
             private
             and (
                 name.startswith("temporal/reports/")
+                and not any(
+                    part.startswith("latest__") for part in PurePosixPath(name).parts
+                )
+                and PurePosixPath(name).name != "estimator_.pickle"
                 or name
                 in {
                     "temporal/frozen.json",
