@@ -28,6 +28,7 @@ NUMERIC = (
     "eeg_gap",
     "scale_ratio",
     "arousal_scale_ratio",
+    "session",
 )
 
 
@@ -174,6 +175,7 @@ def _numeric(row, stats, reference_gap):
         p * g,
         ratio,
         a * ratio,
+        float(row["recorded_day"]),
     )
 
 

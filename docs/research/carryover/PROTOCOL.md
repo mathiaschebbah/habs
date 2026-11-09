@@ -116,12 +116,21 @@ P, ridge penalty 20 on slopes and an unpenalized intercept. Compare two otherwis
 identical predictors: personal lagged-A correction enabled versus set to zero,
 retaining the same fitted intercept and lagged-P correction. This isolates the
 personal delta increment. No hyperparameter selection on J2.
+As a secondary check against a weak ablation reference, also refit the restricted
+J1 calibration with only its intercept and lagged EEG; this baseline is not
+selected in place of the primary comparison after observing results.
 
 Evaluate through skore, preserve its default metrics and additionally register
 participant-macro MAE to avoid weighting people by their trial count. Estimate
 the paired MAE gain and a 95% interval from 10,000 participant bootstrap samples.
 Store the reports privately and audit cached predictions read-only. Require the
 real-data cold-grid smoke test, not only cross-validation.
+
+Skore 0.29.1 cross-validation deserialization requires the original private source
+bindings as well as the saved workspace datasets. Restore features, recorded
+events and J2 query grid at their original absolute paths for the audit. A unit
+test forbids estimator fitting during this restoration and verifies cached
+predictions/metrics. None of these private source files is a public artifact.
 
 ## Prespecified sensitivities and interpretation
 

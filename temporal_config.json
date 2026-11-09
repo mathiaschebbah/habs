@@ -1,0 +1,12 @@
+{
+  "seed": 20261109,
+  "primary_cohort": 2,
+  "minimum_pairs_per_day": 20,
+  "precision_replicates": 100,
+  "variance_bootstrap_draws": 999,
+  "predictive_bootstrap_draws": 10000,
+  "prediction_folds": 5,
+  "population_alpha": 10.0,
+  "personal_penalty": 20.0,
+  "source_job_suffix": "20261108T230726-28480a"
+}

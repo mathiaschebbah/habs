@@ -5,9 +5,9 @@ on:
     inputs:
       phase:
         type: choice
-        options: [feasibility, precision]
+        options: [feasibility, precision, study, audit]
         default: feasibility
-        description: Read-only structural analysis, without fitting associations
+        description: Structural audit, simulated precision, frozen study, or saved-report audit
       source_job:
         required: true
         default: "20261108T230726-28480a"
@@ -30,6 +30,7 @@ env:
 
 jobs:
   feasibility:
+    if: inputs.phase == 'feasibility' || inputs.phase == 'precision'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -55,5 +56,103 @@ jobs:
         with:
           name: temporal-${{ inputs.phase }}
           path: /tmp/habs-temporal/public/
+          if-no-files-found: error
+          retention-days: 30
+
+  build:
+    if: inputs.phase == 'study'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      job: ${{ steps.submit.outputs.job }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
+      - run: python tools/fetch_temporal_inputs.py
+      - id: submit
+        run: |
+          source_dir="$(mktemp -d)"
+          git archive HEAD | tar -x -C "$source_dir"
+          printf '%s\n' "$GITHUB_SHA" > "$source_dir/source_revision.txt"
+          printf '%s\n' '{"study":"02_emotional_carryover"}' > "$source_dir/temporal_run.json"
+          mkdir -p "$source_dir/.habs_inputs/data"
+          cp -R "$PRIVATE_INPUT_DEST/." "$source_dir/.habs_inputs/data/"
+          habs submit --source "$source_dir" --repo "$GITHUB_REPOSITORY" --sha "$GITHUB_SHA" --until built
+
+  run:
+    if: inputs.phase == 'study'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      JOB_SUFFIX: ${{ needs.build.outputs.job }}
+      PRIVATE_OUTPUT_DEST: /tmp/habs-temporal-result
+      FETCH_TEMPORAL_REPORTS: "false"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
+      - run: habs watch "${HABS_KEY}--${JOB_SUFFIX}"
+      - run: python tools/fetch_temporal_outputs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: temporal-scientific-outputs
+          path: /tmp/habs-temporal-result/public/
+          if-no-files-found: error
+          retention-days: 30
+
+  audit:
+    if: inputs.phase == 'audit'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PRIVATE_OUTPUT_DEST: /tmp/habs-temporal-audit
+      FETCH_TEMPORAL_REPORTS: "true"
+      HABS_ANALYSIS_OUT: /out
+    steps:
+      - uses: actions/checkout@v5
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
+      - run: pip install -r requirements.txt -r requirements-agent.txt
+      - run: pip install -e .
+      - run: python tools/fetch_temporal_outputs.py
+      - name: Restore original private dataset references
+        run: |
+          test ! -e /out
+          sudo install -d -o "$(id -un)" -g "$(id -gn)" /out
+          cp -R "$PRIVATE_OUTPUT_DEST/." /out/
+      - name: Read-only report and likelihood audit
+        run: |
+          python -m vendor.run_cells audit/02_emotional_carryover.py scratch/audit/02_emotional_carryover/audit.md
+          if rg -q '\*\*error:\*\*' scratch/audit/02_emotional_carryover/audit.md; then exit 1; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: audited-temporal-results
+          path: |
+            /out/public/
+            scratch/audit/02_emotional_carryover/audit.md
           if-no-files-found: error
           retention-days: 30

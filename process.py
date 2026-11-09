@@ -42,6 +42,11 @@ def process(data_dir: Path, out_dir: Path) -> None:
         "MKL_NUM_THREADS": "1",
     }
     cached = root / ".habs_inputs" / "data"
+    temporal = (root / "temporal_run.json").is_file()
+    if temporal and not cached.is_dir():
+        raise RuntimeError(
+            "The temporal study requires the audited native feature cache."
+        )
     if cached.is_dir():
         evidence = json.loads((cached / "eda_summary.json").read_text())
         label_hash = hashlib.sha256(
@@ -84,7 +89,14 @@ def process(data_dir: Path, out_dir: Path) -> None:
         print("Sample audit complete; no labelled study is possible on this sample.")
         return
     subprocess.run(
-        [sys.executable, "-u", "-m", "experiments.01_aversive_reactivity"],
+        [
+            sys.executable,
+            "-u",
+            "-m",
+            "experiments.02_emotional_carryover"
+            if temporal
+            else "experiments.01_aversive_reactivity",
+        ],
         cwd=root,
         env=environment,
         check=True,

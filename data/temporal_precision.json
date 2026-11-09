@@ -1,0 +1,232 @@
+{
+  "status": "simulated_design_precision_complete",
+  "empirical_current_effects_fitted": false,
+  "people": 53,
+  "geometry": [
+    {
+      "rows": 2294,
+      "people": 53,
+      "nuisance_columns": 585,
+      "nuisance_rank": 579,
+      "personal_history_rank": 106,
+      "personal_history_columns": 106,
+      "history_condition_number": 5.171516124159397,
+      "high_leverage_rows": 8
+    },
+    {
+      "rows": 2260,
+      "people": 53,
+      "nuisance_columns": 590,
+      "nuisance_rank": 584,
+      "personal_history_rank": 106,
+      "personal_history_columns": 106,
+      "history_condition_number": 19.129045900497594,
+      "high_leverage_rows": 14
+    }
+  ],
+  "assumed_difference_noise_variance": 2.0,
+  "assumed_serial_correlation": 0.3,
+  "sampling_standard_error_quantiles": [
+    [
+      0.2127245234665172,
+      0.24266971482902366,
+      0.25187332979884947,
+      0.2798535232009613,
+      0.34552709299569945
+    ],
+    [
+      0.1800138035018731,
+      0.24287937181170013,
+      0.2674354685585437,
+      0.30996215223206697,
+      0.47810362437202264
+    ]
+  ],
+  "scenarios": [
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.0,
+      "true_correlation": null,
+      "true_covariance": 0.0,
+      "estimated_covariance_quantiles": [
+        -0.010514924967691765,
+        8.358068165496936e-08,
+        0.012733472789427809
+      ],
+      "estimated_correlation_quantiles": [
+        -0.9950547536867305,
+        0.5028214180630597,
+        0.9950547536867305
+      ],
+      "near_zero_variance_fraction": 0.14,
+      "raw_correlation_quantiles": [
+        -0.2753705096709201,
+        0.017236159889333136,
+        0.28890381145992206
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.15,
+      "true_correlation": 0.0,
+      "true_covariance": 0.0,
+      "estimated_covariance_quantiles": [
+        -0.024917057352980634,
+        -0.00035549936725320333,
+        0.019115375532052465
+      ],
+      "estimated_correlation_quantiles": [
+        -0.9950547536867305,
+        -0.11373004658105632,
+        0.9950547536867305
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        -0.27106503706965307,
+        -0.04386090071824221,
+        0.26441408185166765
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.15,
+      "true_correlation": 0.6,
+      "true_covariance": 0.0135,
+      "estimated_covariance_quantiles": [
+        -0.013626159047310108,
+        0.010314514047712182,
+        0.029693110771066497
+      ],
+      "estimated_correlation_quantiles": [
+        -0.9950547536867305,
+        0.7059015354432004,
+        0.9950547536867305
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        -0.16977737565080694,
+        0.15567007563950191,
+        0.3586297735515165
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.3,
+      "true_correlation": 0.0,
+      "true_covariance": 0.0,
+      "estimated_covariance_quantiles": [
+        -0.04723671223426559,
+        0.0010930513235636833,
+        0.03642253189951328
+      ],
+      "estimated_correlation_quantiles": [
+        -0.5067625854249624,
+        0.012788385064589654,
+        0.455400574780434
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        -0.2815098664546457,
+        0.010176952321978301,
+        0.24910446843057477
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.3,
+      "true_correlation": 0.6,
+      "true_covariance": 0.054,
+      "estimated_covariance_quantiles": [
+        0.009031752848233595,
+        0.04925611415295566,
+        0.10839418910093825
+      ],
+      "estimated_correlation_quantiles": [
+        0.10903865833263879,
+        0.6211151566718525,
+        0.9950547536867305
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        -0.014516949139102946,
+        0.3286536114827315,
+        0.5356348568352073
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.5,
+      "true_correlation": 0.0,
+      "true_covariance": 0.0,
+      "estimated_covariance_quantiles": [
+        -0.08118191210713302,
+        0.0028308459024984607,
+        0.09089218137007456
+      ],
+      "estimated_correlation_quantiles": [
+        -0.34864115209590957,
+        0.014659080352504095,
+        0.3298367121986908
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        -0.23249112341369177,
+        0.008445168419750702,
+        0.2716778393594676
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "random_effect",
+      "true_random_sd": 0.5,
+      "true_correlation": 0.6,
+      "true_covariance": 0.15,
+      "estimated_covariance_quantiles": [
+        0.05164641167348397,
+        0.1406271140668674,
+        0.23301472421857758
+      ],
+      "estimated_correlation_quantiles": [
+        0.25123547142532304,
+        0.6045386474611576,
+        0.806193880680731
+      ],
+      "near_zero_variance_fraction": 0.0,
+      "raw_correlation_quantiles": [
+        0.18906013161075247,
+        0.46142804321504693,
+        0.648336570500098
+      ],
+      "replicates": 100
+    },
+    {
+      "scenario": "shared_scale_only",
+      "true_random_sd": 0.0,
+      "true_correlation": null,
+      "true_covariance": 0.0,
+      "estimated_covariance_quantiles": [
+        -0.008296022814943302,
+        -1.4316707026273912e-09,
+        0.009341722859139947
+      ],
+      "estimated_correlation_quantiles": [
+        -0.9950547536867305,
+        -0.246098158011032,
+        0.9950547536867305
+      ],
+      "near_zero_variance_fraction": 0.17,
+      "raw_correlation_quantiles": [
+        0.4273360688040289,
+        0.5615745206112635,
+        0.6826473198455243
+      ],
+      "replicates": 100
+    }
+  ],
+  "warning": "Synthetic design diagnostic, not empirical evidence or a calibrated power guarantee."
+}

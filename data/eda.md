@@ -128,7 +128,26 @@ no-EDA sensitivity and complete-observation subgroup. This quality table precede
 the final restriction to CURATED, prior-calibration support and novel J2 videos;
 it is not the final test population or evidence of predictive performance.
 
-## Open questions
+## Consecutive-trial feasibility, study 02
+
+The read-only [transition audit](https://github.com/mathiaschebbah/habs/actions/runs/42594747849)
+reconstructs predecessors on the complete video inventory before filtering.
+It finds 6,759 CURATED-EEG/rating pairs in cohort 2. Fifty-four IDs have twenty
+pairs in both sessions before novelty/normalization restrictions. After requiring
+novel current videos and paired support, 53 IDs remain with 4,554 transitions:
+2,294 J1 and 2,260 J2. See [structural evidence](temporal_structure.json).
+
+The [pre-effect precision run](https://github.com/mathiaschebbah/habs/actions/runs/42598671314)
+finds full rank of all 106 personal-history columns in each day, conditional on
+video, person and timing nuisance terms. Condition numbers are 5.17 and 19.13.
+The J1 reference gap is 15.957 s. [Simulated precision](temporal_precision.json)
+shows broad correlation estimates for small random-effect variation. A
+shared-scale-only simulation gives a median raw slope correlation about 0.56
+despite zero generating personal covariance; the scale-adjusted covariance is
+centered near zero. This is a synthetic estimator diagnostic, not an empirical
+association or a power guarantee. No real carryover effect was fitted in these runs.
+
+## Remaining limitations
 
 The release does not establish a direct stress criterion, biological identity
 across cohort IDs, or independent validation of GSR calibration. The acquisition

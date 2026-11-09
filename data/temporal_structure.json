@@ -1,0 +1,59 @@
+{
+  "people": 53,
+  "transitions": 4554,
+  "by_day": {
+    "1": 2294,
+    "2": 2260
+  },
+  "minimum_pairs": 20,
+  "population_scales": false,
+  "reference_gap_s": 15.956999999999994,
+  "j1_gap_iqr": [
+    13.144249999999829,
+    19.63600000000008
+  ],
+  "j1_scale_ranges": {
+    "sd_a": [
+      0.9904138262210453,
+      1.6661063479996414,
+      2.0750939692516313,
+      2.378856427036421,
+      3.5086615549338336
+    ],
+    "sd_p": [
+      0.13691476535044217,
+      0.21853521274383345,
+      0.2572572843373988,
+      0.30883250002814555,
+      0.507295758996839
+    ]
+  },
+  "scope": "Exploratory cohort-2 identifiers, fixed video catalogue; novel current videos for each person.",
+  "empirical_current_effects_fitted": false,
+  "person_selection_sha256": "0ce53006da1a285cf5f51817e0e332ebde88229e22af81fa5a8ccf665fb95a18",
+  "pair_grid_sha256": "46ad9219f42b5c6eecfd04e71731dac466749e124910909f6c0da323489ec734",
+  "geometry_inference_code_sha256": "af1905b0bbf2b8068d9657e45dfe28098338ab22fd121cc1ebd3363afbafa292",
+  "geometry": [
+    {
+      "rows": 2294,
+      "people": 53,
+      "nuisance_columns": 585,
+      "nuisance_rank": 579,
+      "personal_history_rank": 106,
+      "personal_history_columns": 106,
+      "history_condition_number": 5.171516124159397,
+      "high_leverage_rows": 8
+    },
+    {
+      "rows": 2260,
+      "people": 53,
+      "nuisance_columns": 590,
+      "nuisance_rank": 584,
+      "personal_history_rank": 106,
+      "personal_history_columns": 106,
+      "history_condition_number": 19.129045900497594,
+      "high_leverage_rows": 14
+    }
+  ],
+  "input_features_sha256": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0"
+}

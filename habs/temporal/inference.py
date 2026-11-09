@@ -143,6 +143,8 @@ def _score_covariance(scores, records, weights):
             result += weight * (cross + cross.T)
     result = (result + result.T) / 2
     values, vectors = np.linalg.eigh(result)
+    if values[0] < -1e-7 * max(1.0, values[-1]):
+        raise ValueError("Sampling covariance is indefinite beyond numerical roundoff.")
     floor = max(1e-12, values[-1] * 1e-10)
     adjusted = (vectors * np.maximum(values, floor)) @ vectors.T
     return adjusted, float(max(0, floor - values[0]))
@@ -199,6 +201,9 @@ def estimate_day(geometry, *, hac_lags=2, hc3=True):
     difference_error = residual[:, 0] - residual[:, 1]
     if hc3:
         difference_error = difference_error / np.maximum(1 - geometry.leverage, 0.05)
+    else:
+        residual_df = len(geometry.records) - geometry.q.shape[1] - geometry.rank
+        difference_error *= math.sqrt(len(geometry.records) / max(1, residual_df))
     scores = geometry.influence[: len(geometry.people)] * difference_error
     covariance, adjustment = _score_covariance(
         scores,
@@ -320,7 +325,10 @@ def fit_variance_components(
                 + 0.5 * residual @ cho_solve(factor, residual, check_finite=False)
             )
             if details:
-                return objective, mean, matrix, sd, rho, covariance
+                mean_covariance = cho_solve(
+                    mean_factor, np.eye(h.shape[1]), check_finite=False
+                )
+                return objective, mean, matrix, sd, rho, covariance, mean_covariance
             return objective
         except np.linalg.LinAlgError:
             return 1e30
@@ -375,12 +383,15 @@ def fit_variance_components(
     if not valid:
         raise RuntimeError("REML variance components did not converge.")
     best = min(valid, key=lambda s: s.fun)
-    objective, mean, matrix, sd, rho, covariance = evaluate(best.x, details=True)
+    objective, mean, matrix, sd, rho, covariance, mean_covariance = evaluate(
+        best.x, details=True
+    )
     return {
         "reml_objective": objective,
         "parameters": best.x,
         "mean_parameters": mean,
         "mean_design": h,
+        "mean_covariance": mean_covariance,
         "marginal_covariance": matrix,
         "sd": sd,
         "rho": rho,
@@ -427,7 +438,7 @@ def covariance_profile(values, sampling, counts, *, moderator=True, scale_ratio=
     grid = sorted(
         set([-0.995, 0.995, 0.0, fitted["rho"], *[-0.99 + 0.05 * i for i in range(40)]])
     )
-    profile = []
+    profile_models = []
     for rho in grid:
         model = fit_variance_components(
             values,
@@ -438,12 +449,27 @@ def covariance_profile(values, sampling, counts, *, moderator=True, scale_ratio=
             warm_start=fitted["parameters"],
             scale_ratio=scale_ratio,
         )
-        profile.append(
-            (
-                float(rho),
-                max(0.0, 2 * (model["reml_objective"] - fitted["reml_objective"])),
-            )
+        profile_models.append((float(rho), model))
+    best_rho, best_profile = min(
+        profile_models, key=lambda item: item[1]["reml_objective"]
+    )
+    if best_profile["reml_objective"] < fitted["reml_objective"] - 1e-7:
+        fitted = fit_variance_components(
+            values,
+            sampling,
+            counts,
+            moderator=moderator,
+            scale_ratio=scale_ratio,
+            warm_start=np.r_[best_profile["parameters"], np.arctanh(best_rho)],
         )
+    if best_profile["reml_objective"] < fitted["reml_objective"] - 1e-5:
+        raise RuntimeError("A fixed-correlation fit improved the joint REML optimum.")
+    profile = [
+        (rho, max(0.0, 2 * (model["reml_objective"] - fitted["reml_objective"])))
+        for rho, model in profile_models
+    ]
+    profile.append((float(fitted["rho"]), 0.0))
+    profile.sort()
     accepted = [rho for rho, distance in profile if distance <= 3.841458820694124]
     return {
         "model": fitted,
@@ -536,6 +562,8 @@ def bootstrap_components(
         "bootstrap_draws": draws,
         "reml_objective": model["reml_objective"],
         "mean_parameters": model["mean_parameters"].tolist(),
+        "mean_parameter_covariance": model["mean_covariance"].tolist(),
+        "reml_parameters": model["parameters"].tolist(),
         "conditioning": (
             "Normal random effects and fixed estimated sampling covariance, "
             "conditional on the video catalogue."

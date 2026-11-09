@@ -5,7 +5,8 @@
 - **Project / dataset:** HABS multimodal emotional video recordings.
 - **Goal:** Test whether physiology predicts individual aversive emotional reactivity beyond stimulus information and first-session calibration, then deliver verified results and a short research paper.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
-- **Last experiment:** 01_aversive_reactivity, done; actual HABS evaluation and read-only audit completed.
+- **Active experiment:** 02_emotional_carryover, approved for autonomous execution; real transition feasibility and synthetic precision completed, scientific effects not yet fitted.
+- **Last completed experiment:** 01_aversive_reactivity; actual HABS evaluation and read-only audit completed.
 - **Last result:** 22 reserved identifiers / 997 trials; macro-MAE M1=0.112443, M4=0.112826; gain −0.000383, 95% CI [−0.002877, +0.001822]. No demonstrated increment for the tested physiology. [Results](../docs/research/RESULTS.md), [paper](../docs/research/manuscript.pdf), [supplement](../docs/research/supplement.pdf).
 - **Literature follow-up, 2026-11-09:** [systematized scoping review](../docs/research/literature/2026-11-09/REVIEW.md), 21 Exa searches and five complete Europe PMC queries; 28 core publications plus 29 contextual publications extracted. [Proposed question](../docs/research/literature/2026-11-09/QUESTION.md): cross-session reproducibility of the difference between subjective and EEG sequential effects. No new association or model has been run; novelty is conditional on the searched corpus, and usable transition support remains to be audited.
 - **Workspace decisions** (user answers, 2026-11-08):
@@ -35,6 +36,7 @@
 | Stem | Intent | Status | Headline result | Design note |
 |---|---|---|---|---|
 | 01_aversive_reactivity | Test incremental physiology beyond stimulus and J1 calibration. | done | Gain −0.000383 [−0.002877, +0.001822], 22 reserved IDs; reports audited and four-page paper delivered. | [design](01_aversive_reactivity.md) |
+| 02_emotional_carryover | Test cross-session repeatability of the subjective–EEG history-effect contrast. | approved | Feasibility: 53 paired IDs / 4,554 transitions; scientific effects pending. | [design](02_emotional_carryover.md) |
 
 ## Backlog
 
