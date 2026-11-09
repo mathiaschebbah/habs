@@ -51,6 +51,16 @@ without additional questions on 2026-11-09. Proceed in two recorded phases.
   PDF paper and supporting evidence. Unsupported personal-stability claims are
   reported as unidentifiable rather than forced into a positive finding.
 
+### Structural findings and method resolution, 2026-11-09
+
+[Read-only feasibility run 42594747849](https://github.com/mathiaschebbah/habs/actions/runs/42594747849)
+finds 6,759 valid consecutive transitions. Fifty-four people have twenty pairs
+per day, before novelty/scale restrictions; 252 videos have diverse predecessors.
+The [resolved analysis plan](../docs/research/carryover/PROTOCOL.md) defines the
+full sampling covariance, REML variance components, pre-effect precision
+simulation, five participant-grouped J2 folds and fixed personal-slope ablation.
+This resolution uses structural counts only; empirical associations remain unfitted.
+
 ## Risks / things that could invalidate the result
 
 - The old reserved outcomes are already open. This is an exploratory new study,

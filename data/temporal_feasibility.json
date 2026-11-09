@@ -1,0 +1,227 @@
+{
+  "status": "structural_feasibility_complete",
+  "cohort": 2,
+  "query_trials": 9726,
+  "pair_reasons": {
+    "ok": 6759,
+    "previous_rating_or_curated_eeg_unusable": 2252,
+    "current_rating_or_curated_eeg_unusable": 541,
+    "first_video_in_session": 174
+  },
+  "eligible_transitions": 6759,
+  "eligible_by_day": {
+    "1": 3694,
+    "2": 3065
+  },
+  "paired_people_by_minimum_transitions": {
+    "10": 60,
+    "15": 55,
+    "20": 54,
+    "25": 52,
+    "30": 46
+  },
+  "paired_transitions_by_minimum": {
+    "10": 4883,
+    "15": 4666,
+    "20": 4627,
+    "25": 4513,
+    "30": 4115
+  },
+  "novel_day2_transitions": 3053,
+  "gap_quantiles_seconds": {
+    "min": 4.671999999999912,
+    "q10": 10.15079999999998,
+    "q25": 12.048000000000002,
+    "median": 14.749000000000024,
+    "q75": 18.28700000000009,
+    "q90": 22.603000000000065,
+    "max": 87.76700000000002
+  },
+  "current_videos": 252,
+  "distinct_video_transitions": 6222,
+  "videos_by_predecessor_diversity": {
+    "58": 2,
+    "29": 12,
+    "12": 6,
+    "54": 2,
+    "38": 2,
+    "37": 3,
+    "19": 14,
+    "24": 8,
+    "17": 4,
+    "33": 7,
+    "36": 3,
+    "40": 9,
+    "32": 2,
+    "25": 11,
+    "26": 7,
+    "31": 6,
+    "22": 12,
+    "18": 12,
+    "43": 6,
+    "16": 7,
+    "48": 2,
+    "28": 12,
+    "27": 7,
+    "47": 1,
+    "52": 2,
+    "57": 2,
+    "53": 1,
+    "21": 10,
+    "44": 3,
+    "23": 12,
+    "42": 1,
+    "56": 1,
+    "55": 1,
+    "20": 5,
+    "15": 5,
+    "39": 1,
+    "30": 2,
+    "35": 1,
+    "60": 1,
+    "13": 11,
+    "10": 3,
+    "34": 1,
+    "14": 7,
+    "11": 5,
+    "6": 6,
+    "41": 1,
+    "9": 5,
+    "8": 3,
+    "7": 2,
+    "4": 1,
+    "3": 2
+  },
+  "videos_seen_by_at_least_people": {
+    "2": 252,
+    "5": 249,
+    "10": 234
+  },
+  "input_sha256": {
+    "eda_summary.json": "0446aa64b40be61c913db4e9d174177b1da3e47e84a8ac28e39485dea75f8a65",
+    "recorded_events.csv.gz": "fdab24a4d736d934015ec32a6fac05c7ea04f559ae20ba806ccb312f4927ae30",
+    "features.csv.gz": "9d2f80a572e9ddd14f4ccc1af262c6b37fcde507075ea842bdf4a1b60aaffcc0",
+    "feature_manifest.json": "4d6d9681fb4445d28f635ccc44b9c0c93ca5145246ff6ccd902449f9b8925d27"
+  },
+  "target_associations_fitted": false,
+  "note": "Counts concern actual consecutive recorded videos; no clinical or causal interpretation.",
+  "overview": {
+    "rows": 9726,
+    "columns": [
+      {
+        "name": "trial_id",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 9726
+      },
+      {
+        "name": "participant_id",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 113
+      },
+      {
+        "name": "recorded_day",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 2
+      },
+      {
+        "name": "video",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 252
+      },
+      {
+        "name": "event_order",
+        "dtype": "Int64DType",
+        "null_proportion": 0.0,
+        "n_unique": 54
+      },
+      {
+        "name": "onset_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 9533
+      },
+      {
+        "name": "recording",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 189
+      },
+      {
+        "name": "novel_to_person",
+        "dtype": "BoolDType",
+        "null_proportion": 0.0,
+        "n_unique": 2
+      },
+      {
+        "name": "previous_id",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 9553
+      },
+      {
+        "name": "previous_video",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 253
+      },
+      {
+        "name": "gap_s",
+        "dtype": "Float64DType",
+        "null_proportion": 0.017890191239975324,
+        "n_unique": 8515
+      },
+      {
+        "name": "lag_arousal",
+        "dtype": "Float64DType",
+        "null_proportion": 0.24943450544931112,
+        "n_unique": 501
+      },
+      {
+        "name": "lag_eeg",
+        "dtype": "Float64DType",
+        "null_proportion": 0.24943450544931112,
+        "n_unique": 7300
+      },
+      {
+        "name": "expected_emotion_source",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 2
+      },
+      {
+        "name": "pair_reason",
+        "dtype": "StringDtype",
+        "null_proportion": 0.0,
+        "n_unique": 4
+      },
+      {
+        "name": "pair_eligible",
+        "dtype": "BoolDType",
+        "null_proportion": 0.0,
+        "n_unique": 2
+      },
+      {
+        "name": "rating_arousal",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 501
+      },
+      {
+        "name": "rating_valence",
+        "dtype": "Float64DType",
+        "null_proportion": 0.0,
+        "n_unique": 501
+      },
+      {
+        "name": "eeg_posterior_alpha",
+        "dtype": "Float64DType",
+        "null_proportion": 0.05192268147234218,
+        "n_unique": 9221
+      }
+    ]
+  }
+}

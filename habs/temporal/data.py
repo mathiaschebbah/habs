@@ -140,6 +140,10 @@ def attach_history(grid, features, events):
             "expected_emotion_source": str(
                 (current or {}).get("expected_emotion_source", "missing")
             ),
+            "expected_emotion": str(
+                (current or {}).get("expected_emotion_label", "missing")
+            ),
+            "previous_expected_emotion": "missing",
         }
         reason = "ok"
         if before is None:
@@ -154,6 +158,9 @@ def attach_history(grid, features, events):
                 previous_id=previous_id,
                 previous_video=str(before["video"]),
                 gap_s=gap,
+                previous_expected_emotion=str(
+                    (prior or {}).get("expected_emotion_label", "missing")
+                ),
             )
             if _valid(prior):
                 row.update(

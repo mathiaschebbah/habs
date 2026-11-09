@@ -5,7 +5,7 @@ on:
     inputs:
       phase:
         type: choice
-        options: [feasibility]
+        options: [feasibility, precision]
         default: feasibility
         description: Read-only structural analysis, without fitting associations
       source_job:
@@ -31,7 +31,7 @@ env:
 jobs:
   feasibility:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
       - uses: azure/login@v2
@@ -47,10 +47,13 @@ jobs:
       - run: pip install -r requirements.txt
       - run: pip install -e .
       - run: python tools/fetch_temporal_inputs.py
-      - run: python tools/temporal_feasibility.py
+      - if: inputs.phase == 'feasibility'
+        run: python tools/temporal_feasibility.py
+      - if: inputs.phase == 'precision'
+        run: python tools/temporal_precision.py
       - uses: actions/upload-artifact@v4
         with:
-          name: temporal-feasibility
+          name: temporal-${{ inputs.phase }}
           path: /tmp/habs-temporal/public/
           if-no-files-found: error
           retention-days: 30
