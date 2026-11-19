@@ -1,12 +1,16 @@
 """The one file the autoresearch loop edits. Rules: autoresearch/program.md."""
 
+import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import RidgeCV
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("ecg_", "eda_", "resp_")
+PREFIXES = ()
 
 REGIONS = {
     "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
@@ -41,20 +45,16 @@ def features(frame):
 
 def fit_predict(train, test):
     """Fit on labelled ``train`` rows and predict both ratings for ``test``."""
-    x_train = features(train).dropna(axis=1, how="all")
-    x_test = features(test)[x_train.columns]
+    x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        model = HistGradientBoostingRegressor(
-            max_iter=200,
-            learning_rate=0.03,
-            max_leaf_nodes=15,
-            min_samples_leaf=50,
-            l2_regularization=1.0,
-            random_state=0,
+        model = make_pipeline(
+            SimpleImputer(strategy="median"),
+            StandardScaler(),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
