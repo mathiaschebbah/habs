@@ -46,7 +46,12 @@ def features(frame):
     return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
-def ridge(x_train, y, x_test, alphas=np.array([1e3])):
+def channels(frame):
+    """Channel-level video band power plus peripheral summaries."""
+    return frame[[c for c in frame if c.startswith(("bp_vid_",) + PREFIXES)]]
+
+
+def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
         SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
@@ -61,14 +66,17 @@ def centred(frame, target):
     )
 
 
+VIEWS = (
+    features,
+    channels,
+)
+
+
 def fit_predict(train, test):
-    """Valence from EEG only; arousal from EEG and peripheral signals."""
-    x_train, x_test = features(train), features(test)
-    eeg = [c for c in x_train if not c.startswith(PREFIXES)]
-    out = {
-        "rating_valence": ridge(
-            x_train[eeg], centred(train, "rating_valence"), x_test[eeg]
-        ),
-        "rating_arousal": ridge(x_train, centred(train, "rating_arousal"), x_test),
-    }
+    """Average standardised ridge predictions over several feature views."""
+    out = {}
+    for target in TARGETS:
+        y = centred(train, target)
+        preds = [ridge(view(train), y, view(test)) for view in VIEWS]
+        out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
