@@ -21,7 +21,7 @@ def regional_view(frame):
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
     x = pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
-    return x.drop(columns=[c for c in x if c.endswith("_gamma")])  # ablation
+    return x[[c for c in x if c.endswith("_gamma")]]  # ablation
 
 
 def channel_view(frame):
