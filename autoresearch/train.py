@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -40,8 +40,7 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    erp = regional(frame, "erp", bands=range(5))
-    return pd.concat([x, regional(frame), erp], axis=1)
+    return pd.concat([x, regional(frame)], axis=1)
 
 
 def fit_predict(train, test):
@@ -55,7 +54,8 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
+            PolynomialFeatures(2, include_bias=False),
+            RidgeCV(alphas=np.logspace(1, 5, 9)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
