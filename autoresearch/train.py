@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -54,8 +54,7 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            PolynomialFeatures(2, include_bias=False),
-            RidgeCV(alphas=np.logspace(1, 5, 9)),
+            RidgeCV(alphas=np.logspace(0, 6, 13)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
