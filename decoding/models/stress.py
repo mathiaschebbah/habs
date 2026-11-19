@@ -3,9 +3,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.svm import LinearSVC
+from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -29,13 +28,21 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (regional_view, channel_view)
+VIEWS = (regional_view,)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, ridge with GCV-chosen penalty."""
+    """Median-impute, standardise, then extremely randomised trees."""
     model = make_pipeline(
-        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=ALPHAS)
+        SimpleImputer(strategy="median"),
+        StandardScaler(),
+        ExtraTreesRegressor(
+            n_estimators=200,
+            min_samples_leaf=20,
+            max_features=0.3,
+            n_jobs=-1,
+            random_state=0,
+        ),
     )
     return model.fit(x_train, y).predict(x_test)
 
@@ -56,20 +63,9 @@ def target(train):
     return centred(label(train).astype(float), train["participant_id"])
 
 
-def CLASSIFIER():  # noqa: N802
-    """Linear SVM with balanced classes."""
-    return LinearSVC(C=0.001, class_weight="balanced", max_iter=5000)
-
-
 def fit_predict(train, test):
-    """Classify stressed trials directly; average the views' decision scores."""
-    y = label(train)
-    preds = []
-    for view in VIEWS:
-        model = make_pipeline(
-            SimpleImputer(strategy="median"), StandardScaler(), CLASSIFIER()
-        )
-        model.fit(view(train), y)
-        p = model.decision_function(view(test))
-        preds.append(p / p.std())
-    return pd.DataFrame({"stress": sum(preds) / len(preds)}, index=test.index)
+    """Predict valence and arousal, then score distress as arousal minus valence."""
+    people = train["participant_id"]
+    valence = ensemble(train, centred(train["rating_valence"], people), test)
+    arousal = ensemble(train, centred(train["rating_arousal"], people), test)
+    return pd.DataFrame({"stress": arousal - valence}, index=test.index)
