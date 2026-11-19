@@ -16,7 +16,7 @@ def person_z(x, people):
     return (x - groups.transform("mean")) / groups.transform("std").replace(0, np.nan)
 
 
-PREFIXES = ("ecg_", "eda_", "resp_")
+PREFIXES = ("bp_vid_",)
 
 
 def features(frame):
