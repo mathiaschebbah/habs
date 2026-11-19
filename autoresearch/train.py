@@ -46,7 +46,7 @@ def features(frame):
     return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
-def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
+def ridge(x_train, y, x_test, alphas=np.array([1e3])):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
         SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
@@ -62,22 +62,13 @@ def centred(frame, target):
 
 
 def fit_predict(train, test):
-    """Average 20 ridges, each fitted on a bootstrap sample of people."""
+    """Valence from EEG only; arousal from EEG and peripheral signals."""
     x_train, x_test = features(train), features(test)
-    people = train["participant_id"].unique()
-    rng = np.random.default_rng(0)
-    out = {}
-    for target in TARGETS:
-        y = centred(train, target)
-        preds = []
-        for _ in range(20):
-            chosen = rng.choice(people, len(people))
-            rows = np.concatenate(
-                [
-                    np.flatnonzero(train["participant_id"].to_numpy() == p)
-                    for p in chosen
-                ]
-            )
-            preds.append(ridge(x_train.iloc[rows], y.iloc[rows], x_test))
-        out[target] = np.mean(preds, axis=0)
+    eeg = [c for c in x_train if not c.startswith(PREFIXES)]
+    out = {
+        "rating_valence": ridge(
+            x_train[eeg], centred(train, "rating_valence"), x_test[eeg]
+        ),
+        "rating_arousal": ridge(x_train, centred(train, "rating_arousal"), x_test),
+    }
     return pd.DataFrame(out, index=test.index)
