@@ -15,9 +15,8 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
 def features(frame):
     """Selected feature groups."""
-    x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    # label-free: each feature as its within-person percentile
-    return x.groupby(frame["participant_id"].to_numpy()).rank(pct=True) - 0.5
+    # non-physiological reference: position in the session only
+    return frame[["event_order", "recorded_day"]].astype(float)
 
 
 def fit_predict(train, test):
