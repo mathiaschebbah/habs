@@ -88,15 +88,15 @@ def process(data_dir: Path, out_dir: Path) -> None:
     if summary["status"] == "sample_without_ratings":
         print("Sample audit complete; no labelled study is possible on this sample.")
         return
+    stage = json.loads((root / "run_config.json").read_text())["stage"]
+    if stage == "autoresearch_features":
+        module = "autoresearch.extract"
+    elif temporal:
+        module = "experiments.02_emotional_carryover"
+    else:
+        module = "experiments.01_aversive_reactivity"
     subprocess.run(
-        [
-            sys.executable,
-            "-u",
-            "-m",
-            "experiments.02_emotional_carryover"
-            if temporal
-            else "experiments.01_aversive_reactivity",
-        ],
+        [sys.executable, "-u", "-m", module],
         cwd=root,
         env=environment,
         check=True,
