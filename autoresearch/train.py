@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ()
+PREFIXES = ("ecg_", "eda_", "resp_")
 
 REGIONS = {
     "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
@@ -40,7 +40,8 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return pd.concat([x, regional(frame)], axis=1)
+    erp = regional(frame, "erp", bands=range(5))
+    return pd.concat([x, regional(frame), erp], axis=1)
 
 
 def fit_predict(train, test):
