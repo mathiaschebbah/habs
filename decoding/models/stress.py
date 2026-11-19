@@ -20,7 +20,8 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
+    x = pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
+    return x.drop(columns=[c for c in x if c.endswith("_gamma")])  # ablation
 
 
 def channel_view(frame):
@@ -33,14 +34,12 @@ def person_centred(view):
 
     def transformed(frame):
         x = view(frame)
-        session = [frame["participant_id"].to_numpy(), frame["recorded_day"].to_numpy()]
-        groups = x.groupby(session)
-        return (x - groups.transform("mean")) / groups.transform("std")
+        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
     return transformed
 
 
-VIEWS = (person_centred(regional_view), person_centred(channel_view))
+VIEWS = (person_centred(regional_view),)
 
 
 def ridge(x_train, y, x_test):
