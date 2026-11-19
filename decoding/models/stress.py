@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,15 +32,16 @@ VIEWS = (regional_view,)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then a random forest."""
+    """Median-impute, standardise, then gradient boosting."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        RandomForestRegressor(
-            n_estimators=200,
-            min_samples_leaf=20,
-            max_features=0.3,
-            n_jobs=-1,
+        HistGradientBoostingRegressor(
+            max_iter=300,
+            learning_rate=0.03,
+            max_leaf_nodes=15,
+            min_samples_leaf=50,
+            l2_regularization=1.0,
             random_state=0,
         ),
     )
