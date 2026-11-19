@@ -7,11 +7,10 @@ from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from decoding.common import regional
-from decoding.stress import label
+from decoding.common import PERIPHERAL, regional
+from decoding.stress import SYMPATHETIC, label
 
-# changes from the seconds before the video, not absolute levels
-BODY = ("hrv_hr_delta", "breath_rate_delta", "scr_", "eda_slope", "ecg_change")
+BODY = PERIPHERAL + SYMPATHETIC
 ALPHAS = np.logspace(0, 4, 9)
 
 
@@ -29,7 +28,18 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (regional_view, channel_view)
+def person_centred(view):
+    """The same view minus each person's own feature means (label-free)."""
+
+    def transformed(frame):
+        x = view(frame)
+        session = [frame["participant_id"].to_numpy(), frame["recorded_day"].to_numpy()]
+        return x - x.groupby(session).transform("mean")
+
+    return transformed
+
+
+VIEWS = (person_centred(regional_view), person_centred(channel_view))
 
 
 def ridge(x_train, y, x_test):
