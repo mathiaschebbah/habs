@@ -66,20 +66,21 @@ def centred(frame, target):
     )
 
 
-def channel_relative(frame):
-    """Channel-level relative band power plus peripheral summaries."""
-    bp = frame.filter(like="bp_vid_")
-    channel = bp.columns.str.rsplit("_", n=1).str[0]
-    total = np.log10((10**bp).T.groupby(channel).transform("sum").T)
-    return pd.concat(
-        [frame[[c for c in frame if c.startswith(PREFIXES)]], bp - total], axis=1
-    )
+def centred_view(view):
+    """The same view with each person's own feature means removed."""
+
+    def transformed(frame):
+        x = view(frame)
+        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+
+    return transformed
 
 
 VIEWS = (
     features,
     channels,
-    channel_relative,
+    centred_view(features),
+    centred_view(channels),
 )
 
 
