@@ -1,21 +1,39 @@
 """The one file the autoresearch loop edits. Rules: autoresearch/program.md."""
 
+import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
+PREFIXES = ("ecg_", "eda_", "resp_")
+
+REGIONS = {
+    "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
+    "left_temporal": ("F7", "FT7", "T7", "TP7", "F9", "T9", "P9"),
+    "right_temporal": ("F8", "FT8", "T8", "TP8", "F10", "T10", "P10"),
+    "central": ("FC1", "FC2", "FCz", "C1", "C2", "C3", "C4", "CP1", "CP2"),
+    "parietal": ("P1", "P2", "P3", "P4", "Pz", "P5", "P6", "P7", "P8", "CP3", "CP4"),
+    "occipital": ("O1", "O2", "PO3", "PO4", "PO7", "PO8", "POz", "PO5", "PO6"),
+}
+BANDS = ("delta", "theta", "alpha", "beta", "gamma")
 
 
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return x
+    regional = {
+        f"reg_{region}_{band}": frame[
+            [f"bp_vid_{ch}_{band}" for ch in channels if f"bp_vid_{ch}_{band}" in frame]
+        ].mean(axis=1)
+        for region, channels in REGIONS.items()
+        for band in BANDS
+    }
+    return pd.concat([x, pd.DataFrame(regional, index=frame.index)], axis=1)
 
 
 def fit_predict(train, test):
@@ -29,8 +47,8 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            PLSRegression(n_components=10),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
-        out[target] = model.predict(x_test).ravel()
+        out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
