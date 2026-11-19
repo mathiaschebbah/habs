@@ -89,3 +89,29 @@ def test_sympathetic_only_matches_full_extraction(tmp_path):
     assert np.allclose(
         fast[columns].to_numpy(), full[columns].to_numpy(), equal_nan=True
     )
+
+
+def test_timecourse_on_sample(tmp_path):
+    """Second-by-second bins are finite inside the recording, NaN outside."""
+    from decoding.timecourse_extract import BINS, _recording
+
+    _as_video_segment(tmp_path)
+    recording = f"CURATED/P001/{STEM.format('emotion-video')}.bdf"
+    trials = [
+        {
+            "participant_id": "P001",
+            "recorded_day": 1,
+            "start_marker": k,
+            "onset_s": onset,
+            "recording": recording,
+        }
+        for k, onset in enumerate((20.0, 50.0, 93.0))
+    ]
+    table, windows = _recording((str(tmp_path), trials))
+    inside = table.iloc[:2]
+    for signal in ("hr", "sc", "resp_amp", "eeg_frontal_alpha"):
+        values = inside[[f"tc_{signal}_{k}" for k in range(BINS)]]
+        assert np.isfinite(values.to_numpy()).all(), signal
+    assert inside.filter(like="tc_hr_").stack().between(40, 150).all()
+    assert table.iloc[2].filter(like="tc_eeg_").isna().any()  # runs past the end
+    assert {"rmssd_10", "rmssd_60", "hr_5"} <= set(windows.columns)

@@ -91,6 +91,8 @@ def process(data_dir: Path, out_dir: Path) -> None:
     stage = json.loads((root / "run_config.json").read_text())["stage"]
     if stage in ("features", "body_features"):
         module = "decoding.extract"
+    elif stage == "timecourse_features":
+        module = "decoding.timecourse_extract"
     elif temporal:
         module = "experiments.02_emotional_carryover"
     else:
