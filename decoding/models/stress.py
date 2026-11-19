@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -11,7 +11,7 @@ from decoding.common import PERIPHERAL, regional
 from decoding.stress import SYMPATHETIC, label
 
 BODY = PERIPHERAL + SYMPATHETIC
-ALPHAS = np.array([1e3])
+ALPHAS = np.logspace(0, 4, 9)
 
 
 def regional_view(frame):
@@ -44,9 +44,11 @@ VIEWS = (person_centred(regional_view),)
 def ridge(x_train, y, x_test):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
-        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=ALPHAS)
+        SimpleImputer(strategy="median"),
+        StandardScaler(),
+        PLSRegression(n_components=8),
     )
-    return model.fit(x_train, y).predict(x_test)
+    return model.fit(x_train, y).predict(x_test).ravel()
 
 
 def centred(values, people):
