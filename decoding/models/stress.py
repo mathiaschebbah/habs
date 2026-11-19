@@ -11,7 +11,7 @@ from decoding.common import PERIPHERAL, regional
 from decoding.stress import SYMPATHETIC, label
 
 BODY = PERIPHERAL + SYMPATHETIC
-ALPHAS = np.logspace(0, 4, 9)
+ALPHAS = np.array([1e3])
 
 
 def regional_view(frame):
@@ -20,8 +20,7 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    erp = regional(frame, "erp", bands=range(5))
-    return pd.concat([body, power, (power - total).add_prefix("rel_"), erp], axis=1)
+    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
 
 
 def channel_view(frame):
