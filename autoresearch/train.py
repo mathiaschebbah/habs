@@ -46,6 +46,11 @@ def features(frame):
     return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
+def channels(frame):
+    """Channel-level video band power plus peripheral summaries."""
+    return frame[[c for c in frame if c.startswith(("bp_vid_",) + PREFIXES)]]
+
+
 def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
@@ -62,13 +67,11 @@ def centred(frame, target):
 
 
 def fit_predict(train, test):
-    """Valence from EEG only; arousal from EEG and peripheral signals."""
-    x_train, x_test = features(train), features(test)
-    eeg = [c for c in x_train if not c.startswith(PREFIXES)]
-    out = {
-        "rating_valence": ridge(
-            x_train[eeg], centred(train, "rating_valence"), x_test[eeg]
-        ),
-        "rating_arousal": ridge(x_train, centred(train, "rating_arousal"), x_test),
-    }
+    """Average a regional and a channel-level ridge."""
+    out = {}
+    for target in TARGETS:
+        y = centred(train, target)
+        a = ridge(features(train), y, features(test))
+        b = ridge(channels(train), y, channels(test))
+        out[target] = (a / a.std() + b / b.std()) / 2
     return pd.DataFrame(out, index=test.index)
