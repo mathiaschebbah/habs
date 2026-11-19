@@ -8,12 +8,14 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL
-from decoding.stress import label
+from decoding.stress import SYMPATHETIC, label
 
 
 def features(frame):
     """Channel-level video band power plus peripheral summaries."""
-    return frame[[c for c in frame if c.startswith(("bp_vid_",) + PERIPHERAL)]]
+    return frame[
+        [c for c in frame if c.startswith(("bp_vid_",) + PERIPHERAL + SYMPATHETIC)]
+    ]
 
 
 def fit_predict(train, test):
