@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import ElasticNetCV
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -43,7 +43,8 @@ def features(frame):
     power = regional(frame)
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
-    return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
+    x = pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
+    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
 
 def fit_predict(train, test):
@@ -51,13 +52,14 @@ def fit_predict(train, test):
     x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
-        y = train[target] - train[target].groupby(train["participant_id"]).transform(
-            "mean"
-        )
+        groups = train[target].groupby(train["participant_id"])
+        y = (train[target] - groups.transform("mean")) / groups.transform(
+            "std"
+        ).replace(0, np.inf)
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            ElasticNetCV(l1_ratio=0.5, alphas=20, cv=3, random_state=0),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
