@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import HuberRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,13 +32,13 @@ VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then partial least squares."""
+    """Median-impute, standardise, then a Huber regression."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        PLSRegression(n_components=8),
+        HuberRegressor(alpha=10.0, max_iter=500),
     )
-    return model.fit(x_train, y).predict(x_test).ravel()
+    return model.fit(x_train, y).predict(x_test)
 
 
 def centred(values, people):
