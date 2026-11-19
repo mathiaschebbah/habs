@@ -66,15 +66,15 @@ def centred(frame, target):
     )
 
 
-def evoked_and_covariance(frame):
-    """Evoked bins and 20-channel covariance, plus peripheral."""
-    return frame[[c for c in frame if c.startswith(("erp_", "cov_") + PREFIXES)]]
+def pre_onset(frame):
+    """Pre-onset channel band power, plus peripheral."""
+    return frame[[c for c in frame if c.startswith(("bp_pre_",) + PREFIXES)]]
 
 
 VIEWS = (
     features,
     channels,
-    evoked_and_covariance,
+    pre_onset,
 )
 
 
