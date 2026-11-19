@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,16 +32,15 @@ VIEWS = (regional_view,)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then gradient boosting."""
+    """Median-impute, standardise, then a small MLP."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        HistGradientBoostingRegressor(
+        MLPRegressor(
+            hidden_layer_sizes=(32,),
+            alpha=1.0,
+            early_stopping=True,
             max_iter=300,
-            learning_rate=0.03,
-            max_leaf_nodes=15,
-            min_samples_leaf=50,
-            l2_regularization=1.0,
             random_state=0,
         ),
     )
