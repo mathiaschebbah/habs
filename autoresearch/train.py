@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("bp_vid_", "erp_", "ecg_", "eda_", "resp_")
+PREFIXES = ("bp_vid_", "bp_pre_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
