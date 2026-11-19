@@ -66,21 +66,41 @@ def centred(frame, target):
     )
 
 
-def centred_view(view):
-    """The same view with each person's own feature means removed."""
+PAIRS = [
+    ("Fp1", "Fp2"),
+    ("AF3", "AF4"),
+    ("F3", "F4"),
+    ("F7", "F8"),
+    ("FC5", "FC6"),
+    ("C3", "C4"),
+    ("T7", "T8"),
+    ("CP5", "CP6"),
+    ("P3", "P4"),
+    ("P7", "P8"),
+    ("O1", "O2"),
+    ("F1", "F2"),
+    ("F5", "F6"),
+    ("PO3", "PO4"),
+]
 
-    def transformed(frame):
-        x = view(frame)
-        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
-    return transformed
+def asymmetry(frame):
+    """Right-minus-left log power for 14 homologous pairs, plus peripheral."""
+    asym = {
+        f"asym_{a}_{c}_{band}": frame[f"bp_vid_{c}_{band}"]
+        - frame[f"bp_vid_{a}_{band}"]
+        for a, c in PAIRS
+        for band in BANDS
+        if f"bp_vid_{a}_{band}" in frame and f"bp_vid_{c}_{band}" in frame
+    }
+    peripheral = frame[[c for c in frame if c.startswith(PREFIXES)]]
+    return pd.concat([peripheral, pd.DataFrame(asym, index=frame.index)], axis=1)
 
 
 VIEWS = (
     features,
     channels,
-    centred_view(features),
-    centred_view(channels),
+    asymmetry,
 )
 
 
