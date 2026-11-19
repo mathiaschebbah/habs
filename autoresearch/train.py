@@ -53,6 +53,8 @@ def channels(frame):
 
 def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
+    low, high = x_train.quantile(0.01), x_train.quantile(0.99)
+    x_train, x_test = x_train.clip(low, high, axis=1), x_test.clip(low, high, axis=1)
     model = make_pipeline(
         SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
     )
@@ -78,18 +80,5 @@ def fit_predict(train, test):
     for target in TARGETS:
         y = centred(train, target)
         preds = [ridge(view(train), y, view(test)) for view in VIEWS]
-        # plus one model per cohort, used for test people of that cohort
-        for view in VIEWS:
-            local = np.zeros(len(test))
-            for cohort in test["cohort"].unique():
-                rows, fit = test["cohort"] == cohort, train["cohort"] == cohort
-                if fit.sum() < 500:
-                    rows = rows & False
-                    continue
-                local[rows.to_numpy()] = ridge(
-                    view(train[fit]), y[fit], view(test[rows])
-                )
-            if local.std() > 0:
-                preds.append(local)
         out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
