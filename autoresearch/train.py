@@ -43,7 +43,7 @@ def features(frame):
     power = regional(frame)
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
-    return pd.concat([x, (power - total).add_prefix("rel_")], axis=1)
+    return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
 def fit_predict(train, test):
@@ -51,9 +51,11 @@ def fit_predict(train, test):
     x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
-        y = train[target] - train[target].groupby(train["participant_id"]).transform(
-            "mean"
-        )
+        groups = train[target].groupby(train["participant_id"])
+        # each person's ratings on a common scale; flat raters contribute zeros
+        y = (train[target] - groups.transform("mean")) / groups.transform(
+            "std"
+        ).replace(0, np.inf)
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
