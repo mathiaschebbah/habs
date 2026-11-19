@@ -33,8 +33,8 @@ def person_centred(view):
 
     def transformed(frame):
         x = view(frame)
-        session = [frame["participant_id"].to_numpy(), frame["recorded_day"].to_numpy()]
-        return x - x.groupby(session).transform("mean")
+        groups = x.groupby(frame["participant_id"].to_numpy())
+        return (x - groups.transform("mean")) / groups.transform("std")
 
     return transformed
 
