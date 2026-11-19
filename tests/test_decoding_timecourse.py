@@ -74,7 +74,7 @@ def test_latency_and_other_parts_run(folder):
     table = timecourse.load(folder)
     result = timecourse.latency_test(table)
     heart = result["heart"]
-    assert heart[4]["test_new_person"] > heart[1]["test_new_person"] + 0.1
+    assert heart[4]["test_new_person"]["auc"] > heart[1]["test_new_person"]["auc"] + 0.1
     emotions = timecourse.emotions(table)
     assert emotions["dev"]["hr"]["fear"]["change_1_6s"][0] < 0
     assert set(timecourse.habituation(table)["hr_1_6s"]) == {"half", "day"}

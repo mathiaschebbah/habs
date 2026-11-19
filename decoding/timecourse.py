@@ -177,10 +177,19 @@ def latency_test(table):
             "vs_calm_negative": float(np.nanmean(stats["vs_calm_negative"])),
             "people": int(stats["stress"].notna().sum()),
         }
+        # post hoc (added after the primary cell turned out to hold 9 people):
+        # intervals for the two larger regimes; the model is fixed, nothing is tuned
         for regime in ("test_new_person", "test_new_video"):
             rows = test["split"] == regime
             other = person_stats(test[rows], score[rows].to_frame("stress"))
-            result[regime] = float(np.nanmean(other["stress"]))
+            result[regime] = {
+                "auc": float(np.nanmean(other["stress"])),
+                "ci95": common.bootstrap(
+                    other, lambda s: float(np.nanmean(s["stress"])), draws=2000
+                ),
+                "vs_excitement": float(np.nanmean(other["vs_excitement"])),
+                "people": int(other["stress"].notna().sum()),
+            }
         out.setdefault(family, {})[seconds] = result
     for by_time in out.values():
         reliable = [t for t, r in by_time.items() if r["ci95"][0] > 0.5]
