@@ -245,6 +245,7 @@ def main():
         if args.split == "dev":
             frame, predictions, elapsed = cross_fit(table, fit_predict)
             scores = {"dev": metrics(frame, predictions)}
+            scores["dev"]["ci95"] = bootstrap(frame, predictions, draws=1000)
         else:
             frame, predictions, elapsed = sealed_test(table, fit_predict)
             scores = {}
