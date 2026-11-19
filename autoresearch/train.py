@@ -46,11 +46,6 @@ def features(frame):
     return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
-def channels(frame):
-    """Channel-level video band power plus peripheral summaries."""
-    return frame[[c for c in frame if c.startswith(("bp_vid_",) + PREFIXES)]]
-
-
 def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
@@ -66,24 +61,23 @@ def centred(frame, target):
     )
 
 
-def person_centred(x, frame):
-    """Remove each person's own feature means (label-free)."""
-    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
-
-
 def fit_predict(train, test):
-    """Average regional, channel-level and person-centred regional ridges."""
+    """Average 20 ridges, each fitted on a bootstrap sample of people."""
+    x_train, x_test = features(train), features(test)
+    people = train["participant_id"].unique()
+    rng = np.random.default_rng(0)
     out = {}
     for target in TARGETS:
         y = centred(train, target)
-        preds = [
-            ridge(features(train), y, features(test)),
-            ridge(channels(train), y, channels(test)),
-            ridge(
-                person_centred(features(train), train),
-                y,
-                person_centred(features(test), test),
-            ),
-        ]
-        out[target] = sum(p / p.std() for p in preds) / len(preds)
+        preds = []
+        for _ in range(20):
+            chosen = rng.choice(people, len(people))
+            rows = np.concatenate(
+                [
+                    np.flatnonzero(train["participant_id"].to_numpy() == p)
+                    for p in chosen
+                ]
+            )
+            preds.append(ridge(x_train.iloc[rows], y.iloc[rows], x_test))
+        out[target] = np.mean(preds, axis=0)
     return pd.DataFrame(out, index=test.index)
