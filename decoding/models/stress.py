@@ -3,35 +3,60 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from decoding.common import PERIPHERAL
+from decoding.common import PERIPHERAL, regional
 from decoding.stress import SYMPATHETIC, label
 
+BODY = PERIPHERAL + SYMPATHETIC
+ALPHAS = np.logspace(0, 4, 9)
 
-def features(frame):
-    """Channel-level video band power plus peripheral summaries."""
-    return frame[
-        [c for c in frame if c.startswith(("bp_vid_",) + PERIPHERAL + SYMPATHETIC)]
-    ]
+
+def regional_view(frame):
+    """Regional absolute and relative band power plus body signals."""
+    power = regional(frame)
+    region = power.columns.str.rsplit("_", n=1).str[0]
+    total = np.log10((10**power).T.groupby(region).transform("sum").T)
+    body = frame[[c for c in frame if c.startswith(BODY)]]
+    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
+
+
+def channel_view(frame):
+    """Channel-level video band power plus body signals."""
+    return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
+
+
+VIEWS = (channel_view,)
+
+
+def ridge(x_train, y, x_test):
+    """Median-impute, standardise, ridge with GCV-chosen penalty."""
+    model = make_pipeline(
+        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=ALPHAS)
+    )
+    return model.fit(x_train, y).predict(x_test)
+
+
+def centred(values, people):
+    """Values minus each person's mean."""
+    return values - values.groupby(people).transform("mean")
+
+
+def ensemble(train, y, test):
+    """Average the views' standardised ridge predictions."""
+    preds = [ridge(view(train), y, view(test)) for view in VIEWS]
+    return sum(p / p.std() for p in preds) / len(preds)
+
+
+def target(train):
+    """Person-centred stress label."""
+    return centred(label(train).astype(float), train["participant_id"])
 
 
 def fit_predict(train, test):
     """Return a stress score per ``test`` row (higher means more likely)."""
-    model = make_pipeline(
-        SimpleImputer(strategy="median"),
-        StandardScaler(),
-        LogisticRegressionCV(
-            Cs=np.logspace(-4, 0, 9),
-            l1_ratios=(0,),
-            scoring="neg_log_loss",
-            use_legacy_attributes=False,
-            max_iter=2000,
-        ),
-    )
-    model.fit(features(train), label(train))
     return pd.DataFrame(
-        {"stress": model.predict_proba(features(test))[:, 1]}, index=test.index
+        {"stress": ensemble(train, target(train), test)}, index=test.index
     )
