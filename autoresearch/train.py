@@ -51,16 +51,16 @@ def fit_predict(train, test):
     x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
-        groups = train[target].groupby(train["participant_id"])
-        # each person's ratings on a common scale; flat raters contribute zeros
-        y = (train[target] - groups.transform("mean")) / groups.transform(
-            "std"
-        ).replace(0, np.inf)
+        y = train[target] - train[target].groupby(train["participant_id"]).transform(
+            "mean"
+        )
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
             RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
-        model.fit(x_train, y)
+        # every person counts equally, as in the metric
+        weight = 1 / train.groupby("participant_id")[target].transform("size")
+        model.fit(x_train, y, ridgecv__sample_weight=weight)
         out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
