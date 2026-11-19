@@ -57,8 +57,15 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=[1e2]),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
-        model.fit(x_train, y)
+        # fit on video means of person-centred features and ratings
+        xc = x_train - x_train.groupby(train["participant_id"].to_numpy()).transform(
+            "mean"
+        )
+        model.fit(
+            xc.groupby(train["video"].to_numpy()).mean(),
+            y.groupby(train["video"].to_numpy()).mean(),
+        )
         out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
