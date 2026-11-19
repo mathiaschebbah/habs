@@ -28,12 +28,7 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-def body_view(frame):
-    """Heart, skin and breathing only, so they get their own vote."""
-    return frame[[c for c in frame if c.startswith(BODY)]]
-
-
-VIEWS = (regional_view, channel_view, body_view)
+VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
@@ -63,6 +58,11 @@ def target(train):
 def fit_predict(train, test):
     """Predict valence and arousal, then score distress as arousal minus valence."""
     people = train["participant_id"]
-    valence = ensemble(train, centred(train["rating_valence"], people), test)
-    arousal = ensemble(train, centred(train["rating_arousal"], people), test)
+    # probability-like targets for each half of the stress definition
+    valence = ensemble(
+        train, centred((train["rating_valence"] > 4).astype(float), people), test
+    )
+    arousal = ensemble(
+        train, centred((train["rating_arousal"] >= 6).astype(float), people), test
+    )
     return pd.DataFrame({"stress": arousal - valence}, index=test.index)
