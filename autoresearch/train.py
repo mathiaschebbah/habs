@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ()  # ablation: EEG only
+PREFIXES = ("ecg_", "eda_", "resp_")
 
 REGIONS = {
     "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
@@ -66,10 +66,12 @@ def centred(frame, target):
     )
 
 
-VIEWS = (
-    features,
-    channels,
-)
+def peripheral(frame):
+    """Ablation: cardiac, skin and respiratory summaries only."""
+    return frame[[c for c in frame if c.startswith(PREFIXES)]]
+
+
+VIEWS = (peripheral,)
 
 
 def fit_predict(train, test):
