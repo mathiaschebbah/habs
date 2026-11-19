@@ -53,3 +53,16 @@ recognising stimuli already seen in training?
   how much a person-only evaluation overstates decoding.
 - The gap between the final model's development score and its sealed score:
   the cost of adaptive search.
+
+## Outcome (2026-11-19, after the sealed test)
+
+- Features: HABS job `20261119T185024-a98c67` (22,974 trials, 1,180 feature columns,
+  ICA-cleaned EEG for 22,898 trials).
+- Search: 72 experiments on branch `autoresearch/nov19`, 6 keeps (baseline, four gains,
+  one identical-output rewrite), 57 discards, 8 ablations, 1 reference. Development score
+  0.0305 → 0.1054 [0.089, 0.122]. Stopped after three batches without a kept change.
+- Sealed test, Actions run 44598712146, run once: final 0.139 [0.083, 0.196], starting
+  model 0.083 [0.031, 0.136], paired gain +0.056 [+0.012, +0.101]. New person, seen theme:
+  0.152; seen person, new theme: 0.106.
+- Deviation from the original loop: variants were written in parallel batches of 2 to 11,
+  and a 0.005 keep threshold replaced "any improvement".

@@ -76,6 +76,12 @@ in the run summary (`score:` line) or `gh run view <id> --log | grep score:`.
 - Simplicity criterion, as in the original: equal score with less code is a
   win; a tiny gain bought with lots of code is not.
 
+## Status
+
+Run `autoresearch/nov19` finished on 2026-11-19 after 72 experiments; see
+`results.tsv`, `journal/03_autoresearch.md` and `docs/research/autoresearch/`. Its sealed
+test has been used. A new run needs a new salt in `prepare.py`, hence a new sealed split.
+
 ## Loop
 
 1. Start from the current best `train.py`.

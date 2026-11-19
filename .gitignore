@@ -11,3 +11,6 @@ reports/
 .habs_inputs/
 .venv-agent/
 .venv-lsp/
+*.aux
+*.log
+*.out

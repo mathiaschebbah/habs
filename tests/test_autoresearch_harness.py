@@ -7,6 +7,9 @@ import pytest
 from autoresearch import prepare
 from autoresearch.train import fit_predict
 
+# The simulated table has one EEG channel, so most regional means are empty.
+pytestmark = pytest.mark.filterwarnings("ignore:Mean of empty slice")
+
 
 @pytest.fixture
 def table():
