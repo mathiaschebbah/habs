@@ -7,10 +7,11 @@ from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from decoding.common import PERIPHERAL, regional
-from decoding.stress import SYMPATHETIC, label
+from decoding.common import regional
+from decoding.stress import label
 
-BODY = PERIPHERAL + SYMPATHETIC
+# changes from the seconds before the video, not absolute levels
+BODY = ("hrv_hr_delta", "breath_rate_delta", "scr_", "eda_slope", "ecg_change")
 ALPHAS = np.logspace(0, 4, 9)
 
 
@@ -58,11 +59,6 @@ def target(train):
 def fit_predict(train, test):
     """Predict valence and arousal, then score distress as arousal minus valence."""
     people = train["participant_id"]
-    # probability-like targets for each half of the stress definition
-    valence = ensemble(
-        train, centred((train["rating_valence"] > 4).astype(float), people), test
-    )
-    arousal = ensemble(
-        train, centred((train["rating_arousal"] >= 6).astype(float), people), test
-    )
+    valence = ensemble(train, centred(train["rating_valence"], people), test)
+    arousal = ensemble(train, centred(train["rating_arousal"], people), test)
     return pd.DataFrame({"stress": arousal - valence}, index=test.index)
