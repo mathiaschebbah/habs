@@ -3,8 +3,9 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.neighbors import KNeighborsRegressor
+from sklearn.kernel_approximation import Nystroem
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -28,15 +29,16 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (regional_view,)
+VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then k nearest neighbours."""
+    """Median-impute, standardise, then an RBF kernel ridge (Nystroem)."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        KNeighborsRegressor(n_neighbors=200, weights="distance"),
+        Nystroem(gamma=1 / 2000, n_components=800, random_state=0),
+        RidgeCV(alphas=ALPHAS),
     )
     return model.fit(x_train, y).predict(x_test)
 
