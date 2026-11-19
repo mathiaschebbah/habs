@@ -66,9 +66,20 @@ def centred(frame, target):
     )
 
 
+def channel_relative(frame):
+    """Channel-level relative band power plus peripheral summaries."""
+    bp = frame.filter(like="bp_vid_")
+    channel = bp.columns.str.rsplit("_", n=1).str[0]
+    total = np.log10((10**bp).T.groupby(channel).transform("sum").T)
+    return pd.concat(
+        [frame[[c for c in frame if c.startswith(PREFIXES)]], bp - total], axis=1
+    )
+
+
 VIEWS = (
     features,
     channels,
+    channel_relative,
 )
 
 
