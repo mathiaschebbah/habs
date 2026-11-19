@@ -45,7 +45,7 @@ while people watch short emotional videos and rate them. Another team posted
 AUCs around 0.58 for high versus low ratings on Slack. The dataset guide warns
 that the same videos come back for many participants. If you only split by
 person, a model can do well by recognising a video it already saw in
-training, which says little about reading someone's emotion. Our first study
+training, which says little about reading someone's emotion. A HABS preprint shows the same trap on the FACED dataset, and our first study
 on this data also found that the video itself explains most of the ratings.
 So we wanted a cleaner question. Does physiology predict a viewer's rating
 when both the viewer and the video theme are new to the model? And how far can
@@ -225,7 +225,8 @@ their commit, score and decision, and the sealed numbers are in
 \nolinkurl{docs/research/affect/results/sealed_test.json}. The repository only
 publishes aggregate numbers.
 
-\paragraph{References.} HABS team, dataset paper and \texttt{DATASET.md}, HABS
-Neuro-AI Hackathon, 2026.
+\paragraph{References.} HABS team, Stimulus identity rather than emotion drives
+EEG classification on the FACED dataset, bioRxiv 10.64898/2026.06.12.731889.
+HABS team, dataset paper and \texttt{DATASET.md}, HABS Neuro-AI Hackathon, 2026.
 
 \end{document}

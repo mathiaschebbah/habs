@@ -6,7 +6,13 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
-**Study 04, stress detection (in progress):** [protocol](journal/04_stress_detection.md).
+**Study 04, can we detect stress from physiology?** [results](docs/research/stress/RESULTS.md),
+[five-page paper](docs/research/stress/paper.pdf), [all 43 experiments](docs/research/stress/experiments.tsv).
+A trial counts as a stress reaction when the participant rated it negative and activating. On the
+sealed test (new people, new video themes) EEG plus heart, skin and breathing detect these reactions
+above chance but weakly: within-person AUC 0.605 [0.544, 0.668]. A plain logistic regression did as
+well as our best searched model. Stressful videos lower alpha power, raise skin conductance responses,
+make breathing shallower and slow the heart.
 
 **Study 03, rating prediction for new viewers and new videos:**
 [results](docs/research/affect/RESULTS.md), [four-page paper](docs/research/affect/paper.pdf),

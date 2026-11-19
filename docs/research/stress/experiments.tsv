@@ -1,0 +1,44 @@
+commit	score	vs_excitement	vs_calm_negative	vs_relaxed	status	description
+9751113	0.5498	0.5535	0.5302	0.5594	ablation	two-view ensemble, EEG only
+fd178b4	0.5496	0.5302	0.5473	0.5908	ablation	heart, skin and breathing only
+a780870	0.5372	0.5181	0.5328	0.5580	keep	baseline: logistic regression on channel band power + heart/skin/breathing summaries
+e35d4fe	0.5411	0.5210	0.5415	0.5646	discard	+ short-window HRV, phasic skin conductance, breathing detail
+cdd4774	0.5599	0.5542	0.5465	0.5924	discard	ridge on person-centred stress label, channel view
+735c347	0.5697	0.5630	0.5575	0.6049	discard	two-view ridge ensemble on person-centred label
+c4d5630	0.5780	0.5625	0.5617	0.6232	keep	predict person-centred arousal and valence, score = arousal - valence
+fad432f	0.5741	0.5669	0.5627	0.6072	discard	two-view ensemble on person-centred aversive score
+c60647f	0.5604	0.5458	0.5438	0.5854	discard	shrinkage LDA classifier on the stress label
+54f34e0	0.5651	0.5506	0.5499	0.5959	discard	linear SVM classifier on the stress label
+9578fba	0.5581	0.5508	0.5306	0.5868	discard	circumplex with extra trees, regional view
+ee6a979	0.5633	0.5512	0.5477	0.5961	discard	circumplex with random forest, regional view
+e9e2408	0.5550	0.5402	0.5390	0.5919	discard	circumplex with gradient boosting, regional view
+a0838bb	0.5709	0.5520	0.5651	0.6083	discard	circumplex with MLP (32 units), regional view
+d0f8460	0.5451	0.5374	0.5396	0.5608	discard	circumplex with k nearest neighbours, regional view
+19c3644	0.5740	0.5588	0.5637	0.6191	discard	circumplex with RBF kernel ridge (Nystroem, 800 components)
+47a211f	0.5797	0.5589	0.5655	0.6277	discard	circumplex with PLS (8 components) instead of ridge (gain 0.0017)
+6add3b4	0.5707	0.5502	0.5547	0.6175	discard	circumplex with Huber regression
+4615945	0.5723	0.5607	0.5555	0.6135	discard	circumplex with linear SVR
+54aadaa	0.5785	0.5587	0.5636	0.6264	discard	score = arousal - 0.5 x valence
+e6af3d4	0.5748	0.5638	0.5597	0.6147	discard	score = arousal - 2 x valence
+e975187	0.5768	0.5638	0.5596	0.6172	discard	+ ensemble on the aversive score
+68486f1	0.5848	0.5689	0.5743	0.6203	keep	centre every feature on the person's own mean (label-free)
+03531dc	0.5769	0.5596	0.5625	0.6236	discard	+ separate heart/skin/breathing view
+e5ab460	0.5727	0.5564	0.5592	0.6151	discard	binary half-quadrant targets
+9c43c48	0.5702	0.5589	0.5580	0.5967	discard	body changes from baseline only
+13f1e0a	0.5820	0.5631	0.5600	0.6173	discard	centre per recording session instead of per person
+19b0752	0.5767	0.5671	0.5717	0.6090	discard	z-score within person
+bdfa0ed	0.5838	0.5651	0.5758	0.6192	discard	centre on the person's median
+3b4b57f	0.5854	0.5674	0.5778	0.6219	keep	regional view only (same score, one ridge per rating instead of two)
+a7988fe	0.5836	0.5655	0.5688	0.6259	discard	centred and raw views together
+76bf175	0.5725	0.5601	0.5526	0.6013	discard	z-score within session
+9de1467	0.5829	0.5684	0.5747	0.6190	ablation	final features without gamma
+e2e6f44	0.5396	0.5393	0.5096	0.5484	ablation	gamma band only
+39471d3	0.5662	0.5641	0.5494	0.5803	ablation	EEG only
+c6a1840	0.5524	0.5335	0.5506	0.5874	ablation	heart, skin and breathing only
+6576c8b	0.5828	0.5615	0.5766	0.6167	discard	+ video minus pre-onset regional power
+b7592b5	0.5868	0.5717	0.5825	0.6198	discard	+ regional evoked bins (gain 0.0014)
+6cbd509	0.5849	0.5672	0.5776	0.6232	discard	fixed alpha 1e3
+dedb6c5	0.5855	0.5704	0.5711	0.6225	discard	PLS (8 components) instead of ridge
+d2afcfb	0.5829	0.5684	0.5742	0.6182	discard	+ frontal theta/alpha/beta asymmetry (F4-F3, F8-F7, AF4-AF3, FC6-FC5)
+0a2f08d	0.5752	0.5636	0.5579	0.6124	discard	AND rule: min(arousal, -valence)
+0666762	0.5833	0.5708	0.5781	0.6161	discard	+ frontal asymmetry and regional evoked bins

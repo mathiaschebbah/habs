@@ -82,3 +82,20 @@ stress number:
   identity rather than emotion drives EEG classification on the FACED dataset"
   (bioRxiv 10.64898/2026.06.12.731889) shows that stimulus identity can drive
   emotion decoding, which is why every scored prediction is on an unseen theme.
+
+## Outcome (2026-11-19, after the sealed test)
+
+- Data: trial table from HABS job `20261119T195319-d95b8d` plus the three-channel
+  body pass `20261119T204649-527dc2` (the full re-extraction stalled and was
+  cancelled). Body coverage: HRV 93%, skin responses 73%, breathing 95%; RR-based
+  heart rate agrees with the older estimate (r = 0.94, 9,643 trials).
+- Search: 43 experiments on `experiments/stress`, 4 keeps (start; arousal minus
+  valence; person-centred features; regional view only), 33 discards including
+  eleven scikit-learn families, 6 ablations. Development AUC 0.537 → 0.585
+  [0.570, 0.601]. Stopped after two batches without a kept change.
+- Sealed test (run once): final 0.605 [0.544, 0.668], starting model 0.634
+  [0.570, 0.699], paired difference −0.029 [−0.069, +0.008]; larger regimes
+  +0.004 and +0.006, both with intervals across zero. The search gain did not
+  transfer. Stress vs excitement 0.45–0.59 (unreliable), vs relaxed 0.61–0.63.
+- Correlates (development): lower relative alpha, larger skin conductance
+  responses, shallower breathing, lower heart rate (cardiac deceleration).

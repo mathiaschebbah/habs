@@ -5,8 +5,9 @@
 - **Project / dataset:** HABS multimodal emotional video recordings.
 - **Goal:** Study individual emotional responses and subjective–EEG temporal repeatability with stimulus-aware controls, then deliver audited results and research papers.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
-- **Last experiment:** 03_affect_decoding, done (2026-11-19); feature extraction on HABS, 72 scored experiments, one sealed test, paper.
-- **Last result:** sealed test (55 new people × 21 new themes) within-person ρ 0.139 [0.083, 0.196] for the final model vs 0.083 [0.031, 0.136] for the starting model; paired gain +0.056 [+0.012, +0.101]. Video-averaged physiology scores at chance in development. [Results](../docs/research/affect/RESULTS.md), [paper](../docs/research/affect/paper.pdf).
+- **Last experiment:** 04_stress_detection, done (2026-11-19).
+- **Last result:** stress reactions detected above chance in new people and new videos (within-person AUC 0.56–0.60) but the 43-variant search did not beat the starting logistic regression on the sealed test. [Results](../docs/research/stress/RESULTS.md), [paper](../docs/research/stress/paper.pdf).
+- **Study 03 result:** sealed within-person ρ 0.139 [0.083, 0.196] vs 0.083; gain +0.056 [+0.012, +0.101]. [Results](../docs/research/affect/RESULTS.md).
 - **Study 02 result:** 53 paired IDs / 4,554 transitions; cross-day contrast covariance +0.003496 [−0.010277, +0.015055], p=0.253. [Results](../docs/research/carryover/RESULTS.md).
 - **Literature follow-up, 2026-11-09:** [systematized scoping review](../docs/research/literature/2026-11-09/REVIEW.md), 21 Exa searches and five complete Europe PMC queries; 28 core publications plus 29 contextual publications extracted. Its [question](../docs/research/literature/2026-11-09/QUESTION.md) was promoted and completed as study 02. Novelty remains conditional on the searched corpus.
 - **Workspace decisions** (user answers, 2026-11-08):
@@ -40,7 +41,7 @@
 | 01_aversive_reactivity | Test incremental physiology beyond stimulus and J1 calibration. | done | Gain −0.000383 [−0.002877, +0.001822], 22 reserved IDs; reports audited and four-page paper delivered. | [design](01_aversive_reactivity.md) |
 | 02_emotional_carryover | Test cross-session repeatability of the subjective–EEG history-effect contrast. | done | Covariance +0.003496 [−0.010277, +0.015055], p=0.253; correlation weakly identified; J2 gain −0.005539 [−0.012251, +0.000938]. Audited, five-page paper delivered. | [design](02_emotional_carryover.md) |
 | 03_affect_decoding | Step-by-step model search for rating prediction on new people and new video themes. | done | 72 experiments, dev 0.030 → 0.105; sealed test 0.139 [0.083, 0.196] vs 0.083, paired gain +0.056 [+0.012, +0.101]. Four-page paper delivered. | [design](03_affect_decoding.md) |
-| 04_stress_detection | Detect self-reported stress reactions from physiology in new people and new videos; separate stress from arousal. | running | Protocol frozen 2026-11-19. | [design](04_stress_detection.md) |
+| 04_stress_detection | Detect self-reported stress reactions from physiology in new people and new videos; separate stress from arousal. | done | Sealed AUC 0.605 [0.544, 0.668] vs 0.634 for the starting model; search gain did not transfer. Stress slows the heart and raises skin responses. Five-page paper. | [design](04_stress_detection.md) |
 
 ## Backlog
 

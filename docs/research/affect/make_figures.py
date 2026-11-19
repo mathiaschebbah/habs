@@ -173,7 +173,9 @@ def modalities(log, results):
 
 def main():
     """Write the three figures."""
-    log = pd.read_csv(Path("docs/research/affect/experiments.tsv"), sep="\t", dtype={"commit": str})
+    log = pd.read_csv(
+        Path("docs/research/affect/experiments.tsv"), sep="\t", dtype={"commit": str}
+    )
     short = {
         "ed5ec4d": "baseline",
         "abc371d": "person-centred ratings",
