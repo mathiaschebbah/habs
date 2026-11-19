@@ -66,41 +66,18 @@ def centred(frame, target):
     )
 
 
-PAIRS = [
-    ("Fp1", "Fp2"),
-    ("AF3", "AF4"),
-    ("F3", "F4"),
-    ("F7", "F8"),
-    ("FC5", "FC6"),
-    ("C3", "C4"),
-    ("T7", "T8"),
-    ("CP5", "CP6"),
-    ("P3", "P4"),
-    ("P7", "P8"),
-    ("O1", "O2"),
-    ("F1", "F2"),
-    ("F5", "F6"),
-    ("PO3", "PO4"),
-]
-
-
-def asymmetry(frame):
-    """Right-minus-left log power for 14 homologous pairs, plus peripheral."""
-    asym = {
-        f"asym_{a}_{c}_{band}": frame[f"bp_vid_{c}_{band}"]
-        - frame[f"bp_vid_{a}_{band}"]
-        for a, c in PAIRS
-        for band in BANDS
-        if f"bp_vid_{a}_{band}" in frame and f"bp_vid_{c}_{band}" in frame
-    }
+def baseline_diff(frame):
+    """Video minus pre-onset channel band power, plus peripheral."""
+    vid = frame.filter(like="bp_vid_")
+    pre = frame[[c.replace("bp_vid_", "bp_pre_") for c in vid]].to_numpy()
     peripheral = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return pd.concat([peripheral, pd.DataFrame(asym, index=frame.index)], axis=1)
+    return pd.concat([peripheral, vid - pre], axis=1)
 
 
 VIEWS = (
     features,
     channels,
-    asymmetry,
+    baseline_diff,
 )
 
 
