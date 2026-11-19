@@ -20,16 +20,7 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    pairs = (("F3", "F4"), ("F7", "F8"), ("AF3", "AF4"), ("FC5", "FC6"))
-    asym = {
-        f"asym_{left}_{right}_{band}": frame[f"bp_vid_{right}_{band}"]
-        - frame[f"bp_vid_{left}_{band}"]
-        for left, right in pairs
-        for band in ("theta", "alpha", "beta")
-    }
-    return pd.concat(
-        [body, power, (power - total).add_prefix("rel_"), pd.DataFrame(asym)], axis=1
-    )
+    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
 
 
 def channel_view(frame):
@@ -79,4 +70,6 @@ def fit_predict(train, test):
     people = train["participant_id"]
     valence = ensemble(train, centred(train["rating_valence"], people), test)
     arousal = ensemble(train, centred(train["rating_arousal"], people), test)
-    return pd.DataFrame({"stress": arousal - valence}, index=test.index)
+    # both halves must hold: activated AND negative
+    both = np.minimum(arousal / arousal.std(), -valence / valence.std())
+    return pd.DataFrame({"stress": both}, index=test.index)
