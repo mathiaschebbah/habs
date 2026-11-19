@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from autoresearch.extract import COV, extract
+from autoresearch.extract import COV, _erp, extract
 
 SAMPLE = Path(__file__).resolve().parents[1] / "sample"
 STEM = "P001_day-1_task-{}_multimodal"
@@ -57,3 +57,11 @@ def test_extract_on_sample(tmp_path):
     assert np.isfinite(inside.filter(like="bp_vid_Fz")).all().all()
     assert np.isfinite(inside.filter(like="cov_")).all().all()
     assert table.iloc[2].filter(like="bp_vid_").isna().all()  # window leaves the file
+
+
+def test_erp_with_non_integer_rate():
+    """A 999.2 Hz recording yields five finite evoked bins."""
+    fs = 999.2
+    x = np.r_[np.zeros(round(5 * fs)), np.ones(round(5 * fs))]
+    erp = _erp(x, fs, np.array([5.0]))
+    assert erp.shape == (1, 5) and np.allclose(erp, 1.0, atol=0.01)

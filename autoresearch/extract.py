@@ -86,8 +86,9 @@ def _log_bandpower(w, fs, nperseg):
 
 def _erp(x, fs, onsets):
     """Mean amplitude in five 200 ms bins after onset, minus a 200 ms baseline."""
-    w = _windows(x, fs, onsets, -ERP_BIN_S, ERP_BIN_S * (ERP_BINS + 1))
-    w = w.reshape(len(onsets), ERP_BINS + 1, -1).mean(axis=2)
+    n = round(ERP_BIN_S * fs)  # native rates are not always integers
+    w = _windows(x, fs, onsets, -ERP_BIN_S, n * (ERP_BINS + 1) / fs)
+    w = w[:, : n * (ERP_BINS + 1)].reshape(len(onsets), ERP_BINS + 1, n).mean(axis=2)
     return w[:, 1:] - w[:, :1]
 
 
@@ -119,12 +120,13 @@ def _eeg_source(raw_dir, trial):
     alt_meta = Path(str(meta).replace("/CURATED/", "/PREPROCESSED/", 1))
     if alternative == curated or not (alternative.is_file() and alt_meta.is_file()):
         return curated, 0.0
-    origin = json.loads(meta.read_text())["dataset_export"]["segments"]
-    alt_origin = json.loads(alt_meta.read_text())["dataset_export"]["segments"]
-    shift = float(origin["emotion-video"]["metadata_time_origin_s"]) - float(
-        alt_origin["emotion-video"]["metadata_time_origin_s"]
-    )
-    return alternative, shift
+    origins = []
+    for path in (meta, alt_meta):
+        segments = json.loads(path.read_text())["dataset_export"]["segments"]
+        origins.append(segments.get("emotion-video", {}).get("metadata_time_origin_s"))
+    if None in origins:
+        return curated, 0.0
+    return alternative, float(origins[0]) - float(origins[1])
 
 
 def _channel(reader, name):
@@ -136,15 +138,10 @@ def _channel(reader, name):
     return reader.readSignal(i), float(reader.getSampleFrequency(i)), unit
 
 
-def _recording_features(arguments):
-    raw_dir, trials = arguments
-    eeg_path, shift = _eeg_source(raw_dir, trials[0])
-    onsets = np.array([float(t["onset_s"]) for t in trials])
-    columns = {"trial_id": [physical_id(t) for t in trials]}
-    columns["eeg_source"] = [eeg_path.parts[-3]] * len(trials)
-    eeg_onsets = onsets + shift
-    filtered = {}
-    with pyedflib.EdfReader(str(eeg_path)) as reader:
+def _eeg_columns(path, onsets):
+    """Band powers, evoked bins and covariance for every trial of one file."""
+    columns, filtered = {}, {}
+    with pyedflib.EdfReader(str(path)) as reader:
         names = reader.getSignalLabels()
         # EEG channels precede the peripheral block; PREPROCESSED drops some.
         names = names[
@@ -157,32 +154,46 @@ def _recording_features(arguments):
             if unit not in EEG_UNITS or fs < 100:
                 continue
             x = x * EEG_UNITS[unit]
-            video = _clean(_windows(x, fs, eeg_onsets, 0, VIDEO_S))
-            pre = _clean(_windows(x, fs, eeg_onsets, -PRE_S, PRE_S))
+            video = _clean(_windows(x, fs, onsets, 0, VIDEO_S))
+            pre = _clean(_windows(x, fs, onsets, -PRE_S, PRE_S))
             for prefix, w, seg in (("bp_vid", video, 2.0), ("bp_pre", pre, 1.0)):
                 values = _log_bandpower(w, fs, round(seg * fs))
                 for b, band in enumerate(BANDS):
                     columns[f"{prefix}_{name}_{band}"] = values[:, b]
-            erp = _erp(x, fs, eeg_onsets)
+            erp = _erp(x, fs, onsets)
             erp[np.isnan(video).all(axis=1)] = np.nan
             for b in range(ERP_BINS):
                 columns[f"erp_{name}_{b}"] = erp[:, b]
             if name in COV:
                 sos = butter(4, (1, 45), btype="bandpass", fs=fs, output="sos")
-                filtered[name] = _windows(
-                    sosfiltfilt(sos, x), fs, eeg_onsets, 0, VIDEO_S
-                )
+                filtered[name] = _windows(sosfiltfilt(sos, x), fs, onsets, 0, VIDEO_S)
                 filtered[name][np.isnan(video).all(axis=1)] = np.nan
     if len(filtered) == len(COV):
         stack = np.stack([filtered[n] for n in COV], axis=1)
-        upper = np.triu_indices(len(COV))
-        for i, j in zip(*upper, strict=True):
-            a, b = stack[:, i], stack[:, j]
+        stack = stack - stack.mean(axis=2, keepdims=True)
+        for i, j in zip(*np.triu_indices(len(COV)), strict=True):
             columns[f"cov_{COV[i]}_{COV[j]}"] = np.mean(
-                (a - a.mean(axis=1, keepdims=True))
-                * (b - b.mean(axis=1, keepdims=True)),
-                axis=1,
+                stack[:, i] * stack[:, j], axis=1
             )
+    return columns
+
+
+def _recording_features(arguments):
+    raw_dir, trials = arguments
+    curated = Path(raw_dir) / trials[0]["recording"]
+    onsets = np.array([float(t["onset_s"]) for t in trials])
+    columns = {"trial_id": [physical_id(t) for t in trials]}
+    eeg_path, shift = _eeg_source(raw_dir, trials[0])
+    candidates = [(eeg_path, shift)] + ([(curated, 0.0)] if eeg_path != curated else [])
+    source = "error"
+    for path, offset in candidates:
+        try:
+            columns.update(_eeg_columns(path, onsets + offset))
+            source = path.parts[-3]
+            break
+        except (OSError, ValueError) as error:
+            print(f"EEG read failed for {path.name}: {error}", flush=True)
+    columns["eeg_source"] = [source] * len(trials)
     with pyedflib.EdfReader(str(Path(raw_dir) / trials[0]["recording"])) as reader:
         ecg, ecg_fs, _ = _channel(reader, "ECG")
         resp, resp_fs, _ = _channel(reader, "Resp")
