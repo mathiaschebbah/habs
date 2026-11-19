@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.linear_model import HuberRegressor
+from sklearn.svm import LinearSVR
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,11 +32,11 @@ VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then a Huber regression."""
+    """Median-impute, standardise, then a linear SVR."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        HuberRegressor(alpha=10.0, max_iter=500),
+        LinearSVR(C=0.001, max_iter=5000, random_state=0),
     )
     return model.fit(x_train, y).predict(x_test)
 
