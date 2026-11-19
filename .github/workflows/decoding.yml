@@ -96,7 +96,7 @@ jobs:
         run: |
           files=""; for ref in $REFS; do files="$files candidates/$ref.py"; done
           python -m "decoding.$STUDY" --split "$SPLIT" --model $files --out results 2>&1 | tee run.log
-          { echo '```'; grep -E '^[a-z_]+: ' run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo '```'; grep -E '^[a-z_]+: ' run.log || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: metrics-${{ inputs.study }}-${{ inputs.split }}-${{ strategy.job-index }}
