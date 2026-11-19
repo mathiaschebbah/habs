@@ -3,14 +3,15 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import GridSearchCV, GroupKFold
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("bp_vid_", "bp_pre_", "ecg_", "eda_", "resp_")
+PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
@@ -27,11 +28,16 @@ def fit_predict(train, test):
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        model = make_pipeline(
-            SimpleImputer(strategy="median"),
-            StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
+        pipe = make_pipeline(
+            SimpleImputer(strategy="median"), StandardScaler(), Ridge()
         )
-        model.fit(x_train, y)
+        # choose alpha on held-out people, not leave-one-trial-out
+        model = GridSearchCV(
+            pipe,
+            {"ridge__alpha": np.logspace(0, 6, 13)},
+            cv=GroupKFold(3),
+            scoring="r2",
+        )
+        model.fit(x_train, y, groups=train["participant_id"])
         out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
