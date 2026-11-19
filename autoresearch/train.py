@@ -12,14 +12,36 @@ TARGETS = ("rating_valence", "rating_arousal")
 
 PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
+PAIRS = [
+    ("Fp1", "Fp2"),
+    ("AF3", "AF4"),
+    ("F3", "F4"),
+    ("F7", "F8"),
+    ("FC5", "FC6"),
+    ("C3", "C4"),
+    ("T7", "T8"),
+    ("CP5", "CP6"),
+    ("P3", "P4"),
+    ("P7", "P8"),
+    ("O1", "O2"),
+    ("F1", "F2"),
+    ("F5", "F6"),
+    ("PO3", "PO4"),
+]
+BANDS = ("delta", "theta", "alpha", "beta", "gamma")
+
 
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    bp = frame.filter(like="bp_vid_")
-    channel = bp.columns.str.rsplit("_", n=1).str[0]
-    total = np.log10((10**bp).T.groupby(channel).transform("sum").T)
-    return pd.concat([x, (bp - total).add_prefix("rel_")], axis=1)
+    asym = {
+        f"asym_{left}_{right}_{band}": frame[f"bp_vid_{right}_{band}"]
+        - frame[f"bp_vid_{left}_{band}"]
+        for left, right in PAIRS
+        for band in BANDS
+        if f"bp_vid_{left}_{band}" in frame and f"bp_vid_{right}_{band}" in frame
+    }
+    return pd.concat([x, pd.DataFrame(asym, index=frame.index)], axis=1)
 
 
 def fit_predict(train, test):
