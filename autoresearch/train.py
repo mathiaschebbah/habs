@@ -8,37 +8,34 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
+
+
+def person_z(x, people):
+    """Z-score each feature within person, from that person's own trials."""
+    groups = x.groupby(people.to_numpy())
+    return (x - groups.transform("mean")) / groups.transform("std").replace(0, np.nan)
+
+
 PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
-    """Video-window band powers and peripheral summaries."""
-    return frame[[c for c in frame if c.startswith(PREFIXES)]]
+    """Selected feature groups, z-scored within person."""
+    x = frame[[c for c in frame if c.startswith(PREFIXES)]]
+    return person_z(x, frame["participant_id"])
 
 
 def fit_predict(train, test):
-    """Fit on labelled ``train`` rows and predict both ratings for ``test``.
-
-    Parameters
-    ----------
-    train : pandas.DataFrame
-        Development rows with features, metadata, ratings and stimulus columns.
-    test : pandas.DataFrame
-        Rows to predict: features and metadata only, from people and video
-        themes absent from ``train``.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Index of ``test``, one column per target.
-    """
+    """Fit on labelled ``train`` rows and predict both ratings for ``test``."""
+    x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
+        y = train[target]
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
             RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
-        model.fit(features(train), train[target])
-        out[target] = model.predict(features(test))
+        model.fit(x_train, y)
+        out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
