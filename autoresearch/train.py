@@ -16,7 +16,11 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return x
+    bp = frame.filter(like="bp_vid_")
+    channel = bp.columns.str.rsplit("_", n=1).str[0]
+    total = np.log10((10**bp).T.groupby(channel).transform("sum").T)
+    x = x.drop(columns=bp.columns)
+    return pd.concat([x, (bp - total).add_prefix("rel_")], axis=1)
 
 
 def fit_predict(train, test):
@@ -30,7 +34,7 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=np.logspace(-3, 1, 9)),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
