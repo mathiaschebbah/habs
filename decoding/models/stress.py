@@ -4,11 +4,12 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
-from decoding.stress import SYMPATHETIC
+from decoding.stress import SYMPATHETIC, label
 
 BODY = PERIPHERAL + SYMPATHETIC
 ALPHAS = np.logspace(0, 4, 9)
@@ -51,14 +52,24 @@ def ensemble(train, y, test):
 
 
 def target(train):
-    """Person-centred aversive score: negativity times activation, in [0, 1]."""
-    negative = ((5 - train["rating_valence"]) / 4).clip(lower=0)
-    activation = (train["rating_arousal"] - 1) / 8
-    return centred(negative * activation, train["participant_id"])
+    """Person-centred stress label."""
+    return centred(label(train).astype(float), train["participant_id"])
+
+
+def CLASSIFIER():  # noqa: N802
+    """Shrinkage LDA, a standard EEG classifier."""
+    return LinearDiscriminantAnalysis(solver="lsqr", shrinkage="auto")
 
 
 def fit_predict(train, test):
-    """Return a stress score per ``test`` row (higher means more likely)."""
-    return pd.DataFrame(
-        {"stress": ensemble(train, target(train), test)}, index=test.index
-    )
+    """Classify stressed trials directly; average the views' decision scores."""
+    y = label(train)
+    preds = []
+    for view in VIEWS:
+        model = make_pipeline(
+            SimpleImputer(strategy="median"), StandardScaler(), CLASSIFIER()
+        )
+        model.fit(view(train), y)
+        p = model.decision_function(view(test))
+        preds.append(p / p.std())
+    return pd.DataFrame({"stress": sum(preds) / len(preds)}, index=test.index)
