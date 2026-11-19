@@ -38,7 +38,12 @@ def person_centred(view):
     return transformed
 
 
-VIEWS = (person_centred(regional_view),)
+VIEWS = (
+    person_centred(regional_view),
+    person_centred(channel_view),
+    regional_view,
+    channel_view,
+)
 
 
 def ridge(x_train, y, x_test):
