@@ -14,6 +14,8 @@ report pooled AUC and two specificity contrasts:
   positive (valence >= 6). Can physiology tell stress from excitement?
 - ``vs_calm_negative``: among negative trials (valence <= 4), activated versus
   calm (arousal <= 4). Does it track the activation part?
+- ``vs_relaxed``: stressed versus relaxed (valence >= 6, arousal <= 4), the
+  contrast of Giannakakis et al. (EMBC 2015) on self-rated video trials.
 
 ``--split correlates`` describes, on development data only, how each
 interpretable physiological feature differs within person between stressed and
@@ -27,6 +29,9 @@ import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
 from decoding.common import PERIPHERAL, bootstrap, regional, run
+
+# Short-window heart rate variability, phasic skin conductance and breathing.
+SYMPATHETIC = ("hrv_", "scr_", "breath_")
 
 SALT = "habs-stress-2026-11-19"
 OUTPUTS = ("stress",)
@@ -48,6 +53,7 @@ def contrasts(frame):
         "strict": ((v <= 3) & (a >= 7), ~((v <= 3) & (a >= 7))),
         "vs_excitement": (stressed, (v >= 6) & (a >= 6)),
         "vs_calm_negative": (stressed, (v <= 4) & (a <= 4)),
+        "vs_relaxed": (stressed, (v >= 6) & (a <= 4)),
     }
 
 
@@ -78,7 +84,7 @@ def metrics(frame, predictions, stats):
     """Score, specificity contrasts and pooled detection metrics."""
     y, p = label(frame), predictions["stress"]
     result = {"score": score(stats)}
-    for name in ("strict", "vs_excitement", "vs_calm_negative"):
+    for name in ("strict", "vs_excitement", "vs_calm_negative", "vs_relaxed"):
         result[name] = float(np.nanmean(stats[name]))
         result[f"{name}_people"] = int(stats[name].notna().sum())
     result["pooled_auc"] = float(roc_auc_score(y, p))
@@ -90,12 +96,16 @@ def metrics(frame, predictions, stats):
 
 
 def interpretable(frame):
-    """Regional log band power, relative power and peripheral summaries."""
+    """Regional log band power, relative power, peripheral and sympathetic features."""
     power = regional(frame)
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     peripheral = frame[
-        [c for c in frame if c.startswith(PERIPHERAL) and not c.endswith("_valid")]
+        [
+            c
+            for c in frame
+            if c.startswith(PERIPHERAL + SYMPATHETIC) and not c.endswith("_valid")
+        ]
     ]
     return pd.concat([power, (power - total).add_prefix("rel_"), peripheral], axis=1)
 
@@ -126,7 +136,7 @@ def extra_splits(name, table):
     dev = table[table["split"] == "dev"]
     features = interpretable(dev)
     out = {}
-    for contrast in ("stress", "vs_excitement", "vs_calm_negative"):
+    for contrast in ("stress", "vs_excitement", "vs_calm_negative", "vs_relaxed"):
         positive, negative = contrasts(dev)[contrast]
         d = effect_sizes(features, positive, negative, dev["participant_id"])
         out[contrast] = {

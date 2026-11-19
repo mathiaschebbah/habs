@@ -22,6 +22,7 @@ from scipy.integrate import trapezoid
 from scipy.signal import butter, find_peaks, sosfiltfilt, welch
 
 from habs.features import _ecg_features, _eda_features
+from habs.signals import eda_to_conductance
 from habs.temporal.data import physical_id
 
 BANDS = {
@@ -108,6 +109,103 @@ def _resp(x, fs, onsets):
             peaks, _ = find_peaks(row, distance=round(1.5 * fs), prominence=0.5 * scale)
             result["resp_rate"][k] = len(peaks) * 60 / VIDEO_S
     return result
+
+
+def _r_peaks(x, fs):
+    """R-peak times in seconds: 5-25 Hz band, rectified 80 ms envelope, peaks."""
+    y = sosfiltfilt(butter(2, (5, 25), btype="bandpass", fs=fs, output="sos"), x)
+    width = max(1, round(0.08 * fs))
+    envelope = np.convolve(np.abs(y), np.ones(width) / width, mode="same")
+    peaks, _ = find_peaks(
+        envelope, distance=round(0.3 * fs), prominence=np.std(envelope)
+    )
+    return peaks / fs
+
+
+def _rr(times, start, stop):
+    """Plausible RR intervals (0.35-1.5 s) between beats in [start, stop)."""
+    rr = np.diff(times[(times >= start) & (times < stop)])
+    plausible = (rr >= 0.35) & (rr <= 1.5)
+    return rr[plausible] if len(rr) and plausible.mean() >= 0.8 else np.array([])
+
+
+def _cardiac(x, fs, onsets):
+    """Short-window heart rate variability and heart-rate change from baseline."""
+    names = ("hrv_rr_mean", "hrv_rmssd", "hrv_sdnn", "hrv_hr_delta")
+    out = {name: np.full(len(onsets), np.nan) for name in names}
+    if x is None or fs < 100 or not np.isfinite(x).all():
+        return out
+    beats = _r_peaks(x, fs)
+    for k, onset in enumerate(onsets):
+        rr, before = _rr(beats, onset, onset + VIDEO_S), _rr(beats, onset - 5, onset)
+        if len(rr) < 5:
+            continue
+        out["hrv_rr_mean"][k] = rr.mean()
+        out["hrv_rmssd"][k] = np.sqrt(np.mean(np.diff(rr) ** 2))
+        out["hrv_sdnn"][k] = rr.std()
+        if len(before) >= 2:
+            out["hrv_hr_delta"][k] = 60 / rr.mean() - 60 / before.mean()
+    return out
+
+
+def _phasic(x, fs, unit, onsets):
+    """Event-related skin conductance response in the 1-6 s after onset."""
+    names = ("scr_rise", "scr_count", "scr_slope_max")
+    out = {name: np.full(len(onsets), np.nan) for name in names}
+    if x is None or fs < 10:
+        return out
+    conductance, _ = eda_to_conductance(x, unit, max_invalid_fraction=1.0)
+    width = max(1, round(0.25 * fs))
+    for k, onset in enumerate(onsets):
+        w = _windows(conductance, fs, [onset], -1.0, VIDEO_S + 1)[0]
+        if not np.isfinite(w).all():
+            continue
+        w = np.convolve(w, np.ones(width) / width, mode="valid")
+        t = np.arange(len(w)) / fs - 1.0 + width / (2 * fs)
+        base = w[t < 0].mean()
+        response = (t >= 1) & (t <= 6)
+        peaks, _ = find_peaks(w[t >= 1], prominence=0.01)
+        out["scr_rise"][k] = w[response].max() - base
+        out["scr_count"][k] = len(peaks)
+        after, step = w[t >= 1], round(0.5 * fs)  # 0.5 s steps damp sample noise
+        out["scr_slope_max"][k] = np.max(after[step:] - after[:-step]) / 0.5
+    return out
+
+
+def _breathing(x, fs, onsets):
+    """Breathing rate, depth, irregularity and pauses around each video."""
+    names = ("breath_rate", "breath_rate_delta", "breath_depth", "breath_cv")
+    out = {name: np.full(len(onsets), np.nan) for name in (*names, "breath_pause")}
+    if x is None or fs < 10 or not np.isfinite(x).all():
+        return out
+    y = sosfiltfilt(butter(2, (0.1, 1.0), btype="bandpass", fs=fs, output="sos"), x)
+    scale = np.std(y)
+    if not scale > 0:
+        return out
+    tops, _ = find_peaks(y, distance=round(1.5 * fs), prominence=0.3 * scale)
+    bottoms, _ = find_peaks(-y, distance=round(1.5 * fs), prominence=0.3 * scale)
+    t_top, t_bottom = tops / fs, bottoms / fs
+    for k, onset in enumerate(onsets):
+        inside = t_top[(t_top >= onset) & (t_top < onset + VIDEO_S)]
+        before = t_top[(t_top >= onset - VIDEO_S) & (t_top < onset)]
+        if len(inside) < 2:
+            continue
+        gaps = np.diff(inside)
+        out["breath_rate"][k] = 60 / gaps.mean()
+        out["breath_cv"][k] = gaps.std() / gaps.mean()
+        around = t_top[(t_top >= onset - 2) & (t_top < onset + VIDEO_S + 2)]
+        out["breath_pause"][k] = np.diff(around).max()
+        if len(before) >= 2:
+            out["breath_rate_delta"][k] = (
+                out["breath_rate"][k] - 60 / np.diff(before).mean()
+            )
+        depth = [
+            y[round(top * fs)] - y[round(t_bottom[t_bottom < top][-1] * fs)]
+            for top in inside
+            if (t_bottom < top).any()
+        ]
+        out["breath_depth"][k] = np.mean(depth) / scale if depth else np.nan
+    return out
 
 
 def _eeg_source(raw_dir, trial):
@@ -218,6 +316,9 @@ def _recording_features(arguments):
     peripheral = pd.DataFrame(peripheral).drop(columns=["eda_reason"])
     columns.update({k: peripheral[k].to_numpy(dtype=float) for k in peripheral})
     columns.update(_resp(resp, resp_fs, onsets))
+    columns.update(_cardiac(ecg, ecg_fs, onsets))
+    columns.update(_phasic(eda, eda_fs, eda_unit, onsets))
+    columns.update(_breathing(resp, resp_fs, onsets))
     return pd.DataFrame(columns)
 
 
@@ -275,7 +376,7 @@ def main():
             g: float(
                 table[[c for c in table if c.startswith(g + "_")]].isna().mean().mean()
             )
-            for g in ("bp", "erp", "cov", "ecg", "eda", "resp")
+            for g in ("bp", "erp", "cov", "ecg", "eda", "resp", "hrv", "scr", "breath")
         },
         "workers": workers,
     }

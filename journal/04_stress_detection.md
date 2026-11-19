@@ -61,3 +61,24 @@ sensitivity check.
 - Stress vs excitement above 0.5: the detector carries something beyond arousal.
   If it sits at 0.5 while stress vs calm negative is high, we are detecting
   arousal, not stress.
+
+## Amendment (2026-11-19, still before any stress score)
+
+After reading the team's notes (Ash's proposal on acute stress and mental load,
+Aurélien's point that sympathetic tone shows in breathing and heart signals) and
+the two references they shared, we changed three things before looking at any
+stress number:
+
+- **Richer sympathetic features.** The extractor now adds short-window heart
+  rate variability (mean RR, RMSSD, SDNN, heart-rate change from the 5 s before
+  the video), the event-related skin conductance response (rise 1–6 s after
+  onset, number of responses, steepest rise) and breathing detail (rate, change
+  from the previous 10 s, depth, irregularity, longest pause). They use new
+  prefixes (`hrv_`, `scr_`, `breath_`), so study 03's final model is unaffected.
+- **A fourth control contrast,** stress versus relaxed (valence ≥ 6, arousal ≤
+  4), the contrast used by Giannakakis et al. (EMBC 2015, PMID 26737667), who
+  also mapped self-rated video trials to stress and relaxed states.
+- **Motivation for the theme-disjoint split:** the HABS preprint "Stimulus
+  identity rather than emotion drives EEG classification on the FACED dataset"
+  (bioRxiv 10.64898/2026.06.12.731889) shows that stimulus identity can drive
+  emotion decoding, which is why every scored prediction is on an unseen theme.

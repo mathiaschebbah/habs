@@ -57,6 +57,8 @@ def test_extract_on_sample(tmp_path):
     assert np.isfinite(inside.filter(like="bp_vid_Fz")).all().all()
     assert np.isfinite(inside.filter(like="cov_")).all().all()
     assert table.iloc[2].filter(like="bp_vid_").isna().all()  # window leaves the file
+    rr = inside["hrv_rr_mean"]
+    assert rr.between(0.4, 1.5).all() and inside["breath_rate"].between(6, 40).all()
 
 
 def test_erp_with_non_integer_rate():
