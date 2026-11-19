@@ -66,12 +66,24 @@ def centred(frame, target):
     )
 
 
+def person_centred(x, frame):
+    """Remove each person's own feature means (label-free)."""
+    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+
+
 def fit_predict(train, test):
-    """Average a regional and a channel-level ridge."""
+    """Average regional, channel-level and person-centred regional ridges."""
     out = {}
     for target in TARGETS:
         y = centred(train, target)
-        a = ridge(features(train), y, features(test))
-        b = ridge(channels(train), y, channels(test))
-        out[target] = (a / a.std() + b / b.std()) / 2
+        preds = [
+            ridge(features(train), y, features(test)),
+            ridge(channels(train), y, channels(test)),
+            ridge(
+                person_centred(features(train), train),
+                y,
+                person_centred(features(test), test),
+            ),
+        ]
+        out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
