@@ -7,10 +7,10 @@ from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from decoding.common import regional
-from decoding.stress import label
+from decoding.common import PERIPHERAL, regional
+from decoding.stress import SYMPATHETIC, label
 
-BODY = ()  # ablation: EEG only
+BODY = PERIPHERAL + SYMPATHETIC
 ALPHAS = np.logspace(0, 4, 9)
 
 
@@ -28,7 +28,12 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (regional_view, channel_view)
+def body_view(frame):
+    """Ablation: heart, skin and breathing only."""
+    return frame[[c for c in frame if c.startswith(BODY)]]
+
+
+VIEWS = (body_view,)
 
 
 def ridge(x_train, y, x_test):
