@@ -3,9 +3,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.kernel_approximation import Nystroem
+from sklearn.cross_decomposition import PLSRegression
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -33,14 +32,13 @@ VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then an RBF kernel ridge (Nystroem)."""
+    """Median-impute, standardise, then partial least squares."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        Nystroem(gamma=1 / 2000, n_components=800, random_state=0),
-        RidgeCV(alphas=ALPHAS),
+        PLSRegression(n_components=8),
     )
-    return model.fit(x_train, y).predict(x_test)
+    return model.fit(x_train, y).predict(x_test).ravel()
 
 
 def centred(values, people):
