@@ -54,9 +54,8 @@ def fit_predict(train, test):
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        y = 0.5 * y + 0.5 * y.groupby(train["video"]).transform("mean")
         model = make_pipeline(
-            SimpleImputer(strategy="median"),
+            SimpleImputer(strategy="median", add_indicator=True),
             StandardScaler(),
             RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
