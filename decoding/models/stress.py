@@ -28,17 +28,12 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-def person_centred(view):
-    """The same view minus each person's own feature means (label-free)."""
-
-    def transformed(frame):
-        x = view(frame)
-        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
-
-    return transformed
+def body_view(frame):
+    """Heart, skin and breathing only, so they get their own vote."""
+    return frame[[c for c in frame if c.startswith(BODY)]]
 
 
-VIEWS = (person_centred(regional_view), person_centred(channel_view))
+VIEWS = (regional_view, channel_view, body_view)
 
 
 def ridge(x_train, y, x_test):
