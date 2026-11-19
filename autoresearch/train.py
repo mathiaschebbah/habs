@@ -10,19 +10,13 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-def person_z(x, people):
-    """Z-score each feature within person, from that person's own trials."""
-    groups = x.groupby(people.to_numpy())
-    return (x - groups.transform("mean")) / groups.transform("std").replace(0, np.nan)
-
-
-PREFIXES = ("bp_vid_",)
+PREFIXES = ("bp_vid_", "bp_pre_", "erp_", "cov_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
-    """Selected feature groups, z-scored within person."""
+    """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return person_z(x, frame["participant_id"])
+    return x
 
 
 def fit_predict(train, test):
