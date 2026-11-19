@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -53,10 +53,8 @@ def channels(frame):
 
 def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
-    low, high = x_train.quantile(0.01), x_train.quantile(0.99)
-    x_train, x_test = x_train.clip(low, high, axis=1), x_test.clip(low, high, axis=1)
     model = make_pipeline(
-        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
+        SimpleImputer(strategy="median"), RobustScaler(), RidgeCV(alphas=alphas)
     )
     return model.fit(x_train, y).predict(x_test)
 
