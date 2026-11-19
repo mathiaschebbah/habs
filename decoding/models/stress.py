@@ -60,4 +60,12 @@ def fit_predict(train, test):
     people = train["participant_id"]
     valence = ensemble(train, centred(train["rating_valence"], people), test)
     arousal = ensemble(train, centred(train["rating_arousal"], people), test)
-    return pd.DataFrame({"stress": arousal - 2 * valence}, index=test.index)
+    negative = ((5 - train["rating_valence"]) / 4).clip(lower=0)
+    aversive = ensemble(
+        train, centred(negative * (train["rating_arousal"] - 1) / 8, people), test
+    )
+    circumplex = arousal - valence
+    return pd.DataFrame(
+        {"stress": circumplex / circumplex.std() + aversive / aversive.std()},
+        index=test.index,
+    )
