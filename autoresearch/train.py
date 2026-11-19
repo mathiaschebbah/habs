@@ -10,38 +10,38 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
+def tangent(frame):
+    """Log-Euclidean tangent vectors of the 20-channel covariance."""
+    cov = frame.filter(like="cov_")
+    names = sorted(
+        {c.split("_")[1] for c in cov},
+        key=lambda n: list(cov.columns).index(f"cov_{n}_{n}"),
+    )
+    k = len(names)
+    iu = np.triu_indices(k)
+    mats = np.full((len(frame), k, k), np.nan)
+    mats[:, iu[0], iu[1]] = cov.to_numpy()
+    mats[:, iu[1], iu[0]] = cov.to_numpy()
+    ok = np.isfinite(mats).all(axis=(1, 2))
+    out = np.full((len(frame), len(iu[0])), np.nan)
+    if ok.any():
+        m = mats[ok] + 1e-3 * np.trace(mats[ok], axis1=1, axis2=2)[
+            :, None, None
+        ] / k * np.eye(k)
+        w, v = np.linalg.eigh(m)
+        logm = (v * np.log(np.clip(w, 1e-12, None))[:, None, :]) @ v.transpose(0, 2, 1)
+        weight = np.where(iu[0] == iu[1], 1.0, np.sqrt(2))
+        out[ok] = logm[:, iu[0], iu[1]] * weight
+    return pd.DataFrame(out, index=frame.index).add_prefix("ts_")
 
-PAIRS = [
-    ("Fp1", "Fp2"),
-    ("AF3", "AF4"),
-    ("F3", "F4"),
-    ("F7", "F8"),
-    ("FC5", "FC6"),
-    ("C3", "C4"),
-    ("T7", "T8"),
-    ("CP5", "CP6"),
-    ("P3", "P4"),
-    ("P7", "P8"),
-    ("O1", "O2"),
-    ("F1", "F2"),
-    ("F5", "F6"),
-    ("PO3", "PO4"),
-]
-BANDS = ("delta", "theta", "alpha", "beta", "gamma")
+
+PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    asym = {
-        f"asym_{left}_{right}_{band}": frame[f"bp_vid_{right}_{band}"]
-        - frame[f"bp_vid_{left}_{band}"]
-        for left, right in PAIRS
-        for band in BANDS
-        if f"bp_vid_{left}_{band}" in frame and f"bp_vid_{right}_{band}" in frame
-    }
-    return pd.concat([x, pd.DataFrame(asym, index=frame.index)], axis=1)
+    return pd.concat([x, tangent(frame)], axis=1)
 
 
 def fit_predict(train, test):
