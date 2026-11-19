@@ -127,11 +127,21 @@ def curves(table):
     return out
 
 
-def _features(frame, family, seconds):
-    """Baseline-corrected bins from onset to ``seconds``, centred per person."""
+def _features(frame, family, seconds, mode="change"):
+    """Bins from onset to ``seconds``, centred per person.
+
+    ``change`` subtracts each trial's pre-onset mean (the protocol), ``level``
+    keeps raw values, and ``pre`` uses only the three pre-onset seconds.
+    """
     columns = []
     for signal in FAMILIES[family]:
-        values = corrected(frame, signal)[:, ONSET : ONSET + seconds]
+        raw = frame[[f"tc_{signal}_{k}" for k in range(BINS)]].to_numpy(float)
+        if mode == "pre":
+            values = raw[:, :ONSET]
+        elif mode == "level":
+            values = raw[:, ONSET : ONSET + seconds]
+        else:
+            values = corrected(frame, signal)[:, ONSET : ONSET + seconds]
         columns.append(pd.DataFrame(values, index=frame.index).add_prefix(f"{signal}_"))
     x = pd.concat(columns, axis=1)
     return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
@@ -152,11 +162,11 @@ def _model():
     )
 
 
-def _fit_score(train, test, family, seconds):
+def _fit_score(train, test, family, seconds, mode="change"):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        model = _model().fit(_features(train, family, seconds), label(train))
-        scores = model.decision_function(_features(test, family, seconds))
+        model = _model().fit(_features(train, family, seconds, mode), label(train))
+        scores = model.decision_function(_features(test, family, seconds, mode))
     return pd.Series(scores, index=test.index)
 
 
@@ -227,6 +237,40 @@ def latency_dev(table):
                 ),
                 "vs_excitement": float(np.nanmean(stats["vs_excitement"])),
             }
+    return out
+
+
+def explore(table):
+    """Exploratory: pre-onset state versus raw levels versus changes (dev)."""
+    dev = table[table["split"] == "dev"]
+    blocks = [(p, t) for p in range(3) for t in range(3)]
+    variants = [
+        (f, m) for f in ("all", "eeg", "body") for m in ("pre", "level", "change")
+    ]
+
+    def one(family, mode, block):
+        p, t = block
+        rows = (dev["person_fold"] == p) & (dev["theme_fold"] == t)
+        train = dev[(dev["person_fold"] != p) & (dev["theme_fold"] != t)]
+        return _fit_score(train, dev[rows], family, 10, mode)
+
+    tasks = [(f, m, b) for f, m in variants for b in blocks]
+    scores = Parallel(n_jobs=-1)(delayed(one)(*task) for task in tasks)
+    out = {}
+    for f, m in variants:
+        parts = [
+            sc
+            for (ff, mm, _), sc in zip(tasks, scores, strict=True)
+            if (ff, mm) == (f, m)
+        ]
+        stats = person_stats(dev, pd.concat(parts).loc[dev.index].to_frame("stress"))
+        out.setdefault(f, {})[m] = {
+            "auc": float(np.nanmean(stats["stress"])),
+            "ci95": common.bootstrap(
+                stats, lambda x: float(np.nanmean(x["stress"])), draws=1000
+            ),
+            "vs_excitement": float(np.nanmean(stats["vs_excitement"])),
+        }
     return out
 
 
@@ -372,7 +416,15 @@ def hrv(folder=None):
 def main():
     """Run one analysis and write aggregate JSON only."""
     parser = argparse.ArgumentParser()
-    parts = ("curves", "latency_test", "latency_dev", "emotions", "habituation", "hrv")
+    parts = (
+        "curves",
+        "latency_test",
+        "latency_dev",
+        "explore",
+        "emotions",
+        "habituation",
+        "hrv",
+    )
     parser.add_argument("--split", choices=parts, required=True)
     parser.add_argument("--model", nargs="*")  # accepted for the shared workflow
     parser.add_argument("--out", type=Path)

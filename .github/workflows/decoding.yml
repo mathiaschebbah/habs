@@ -16,7 +16,7 @@ on:
         required: true
       split:
         type: choice
-        options: [dev, test, correlates, curves, latency_test, latency_dev, emotions, habituation, hrv]
+        options: [dev, test, correlates, curves, latency_test, latency_dev, explore, emotions, habituation, hrv]
         default: dev
         description: "dev = search objective; test = one-time sealed evaluation of all refs together; correlates = stress feature differences on dev"
       source_job:
