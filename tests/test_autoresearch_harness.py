@@ -8,7 +8,10 @@ from autoresearch import prepare
 from autoresearch.train import fit_predict
 
 # The simulated table has one EEG channel, so most regional means are empty.
-pytestmark = pytest.mark.filterwarnings("ignore:Mean of empty slice")
+pytestmark = [
+    pytest.mark.filterwarnings("ignore:Skipping features without any observed values"),
+    pytest.mark.filterwarnings("ignore:divide by zero encountered in log10"),
+]
 
 
 @pytest.fixture
