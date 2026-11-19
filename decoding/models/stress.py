@@ -56,7 +56,8 @@ def target(train):
 
 
 def fit_predict(train, test):
-    """Return a stress score per ``test`` row (higher means more likely)."""
-    return pd.DataFrame(
-        {"stress": ensemble(train, target(train), test)}, index=test.index
-    )
+    """Predict valence and arousal, then score distress as arousal minus valence."""
+    people = train["participant_id"]
+    valence = ensemble(train, centred(train["rating_valence"], people), test)
+    arousal = ensemble(train, centred(train["rating_arousal"], people), test)
+    return pd.DataFrame({"stress": arousal - valence}, index=test.index)
