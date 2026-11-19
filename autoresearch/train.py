@@ -1,11 +1,7 @@
 """The one file the autoresearch loop edits. Rules: autoresearch/program.md."""
 
-import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import HistGradientBoostingRegressor
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -13,18 +9,12 @@ TARGETS = ("rating_valence", "rating_arousal")
 PREFIXES = ("ecg_", "eda_", "resp_")
 
 REGIONS = {
-    "frontal_left": ("Fp1", "AF3", "AF7", "F1", "F3", "F5"),
-    "frontal_mid": ("Fz", "FCz"),
-    "frontal_right": ("Fp2", "AF4", "AF8", "F2", "F4", "F6"),
+    "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
     "left_temporal": ("F7", "FT7", "T7", "TP7", "F9", "T9", "P9"),
     "right_temporal": ("F8", "FT8", "T8", "TP8", "F10", "T10", "P10"),
-    "central_left": ("FC1", "FC3", "FC5", "C1", "C3", "C5", "CP1", "CP3", "CP5"),
-    "central_right": ("FC2", "FC4", "FC6", "C2", "C4", "C6", "CP2", "CP4", "CP6"),
-    "parietal_left": ("P1", "P3", "P5", "P7"),
-    "parietal_right": ("P2", "P4", "P6", "P8"),
-    "midline_posterior": ("Pz", "POz"),
-    "occipital_left": ("O1", "PO3", "PO5", "PO7"),
-    "occipital_right": ("O2", "PO4", "PO6", "PO8"),
+    "central": ("FC1", "FC2", "FCz", "C1", "C2", "C3", "C4", "CP1", "CP2"),
+    "parietal": ("P1", "P2", "P3", "P4", "Pz", "P5", "P6", "P7", "P8", "CP3", "CP4"),
+    "occipital": ("O1", "O2", "PO3", "PO4", "PO7", "PO8", "POz", "PO5", "PO6"),
 }
 BANDS = ("delta", "theta", "alpha", "beta", "gamma")
 
@@ -51,16 +41,20 @@ def features(frame):
 
 def fit_predict(train, test):
     """Fit on labelled ``train`` rows and predict both ratings for ``test``."""
-    x_train, x_test = features(train), features(test)
+    x_train = features(train).dropna(axis=1, how="all")
+    x_test = features(test)[x_train.columns]
     out = {}
     for target in TARGETS:
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        model = make_pipeline(
-            SimpleImputer(strategy="median"),
-            StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
+        model = HistGradientBoostingRegressor(
+            max_iter=200,
+            learning_rate=0.03,
+            max_leaf_nodes=15,
+            min_samples_leaf=50,
+            l2_regularization=1.0,
+            random_state=0,
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
