@@ -46,26 +46,29 @@ def features(frame):
     return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
+def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
+    """Median-impute, standardise, ridge with GCV-chosen penalty."""
+    model = make_pipeline(
+        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
+    )
+    return model.fit(x_train, y).predict(x_test)
+
+
+def centred(frame, target):
+    """Ratings minus each training person's mean rating."""
+    return frame[target] - frame[target].groupby(frame["participant_id"]).transform(
+        "mean"
+    )
+
+
 def fit_predict(train, test):
-    """Fit on labelled ``train`` rows and predict both ratings for ``test``."""
+    """Valence from EEG only; arousal from EEG and peripheral signals."""
     x_train, x_test = features(train), features(test)
-    out = {}
-    for target in TARGETS:
-        y = train[target] - train[target].groupby(train["participant_id"]).transform(
-            "mean"
-        )
-        model = make_pipeline(
-            SimpleImputer(strategy="median"),
-            StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
-        )
-        # fit on video means of person-centred features and ratings
-        xc = x_train - x_train.groupby(train["participant_id"].to_numpy()).transform(
-            "mean"
-        )
-        model.fit(
-            xc.groupby(train["video"].to_numpy()).mean(),
-            y.groupby(train["video"].to_numpy()).mean(),
-        )
-        out[target] = model.predict(x_test)
+    eeg = [c for c in x_train if not c.startswith(PREFIXES)]
+    out = {
+        "rating_valence": ridge(
+            x_train[eeg], centred(train, "rating_valence"), x_test[eeg]
+        ),
+        "rating_arousal": ridge(x_train, centred(train, "rating_arousal"), x_test),
+    }
     return pd.DataFrame(out, index=test.index)
