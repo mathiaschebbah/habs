@@ -66,15 +66,9 @@ def centred(frame, target):
     )
 
 
-def pre_onset(frame):
-    """Pre-onset channel band power, plus peripheral."""
-    return frame[[c for c in frame if c.startswith(("bp_pre_",) + PREFIXES)]]
-
-
 VIEWS = (
     features,
     channels,
-    pre_onset,
 )
 
 
@@ -84,5 +78,18 @@ def fit_predict(train, test):
     for target in TARGETS:
         y = centred(train, target)
         preds = [ridge(view(train), y, view(test)) for view in VIEWS]
+        # plus one model per cohort, used for test people of that cohort
+        for view in VIEWS:
+            local = np.zeros(len(test))
+            for cohort in test["cohort"].unique():
+                rows, fit = test["cohort"] == cohort, train["cohort"] == cohort
+                if fit.sum() < 500:
+                    rows = rows & False
+                    continue
+                local[rows.to_numpy()] = ridge(
+                    view(train[fit]), y[fit], view(test[rows])
+                )
+            if local.std() > 0:
+                preds.append(local)
         out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
