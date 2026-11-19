@@ -13,12 +13,18 @@ TARGETS = ("rating_valence", "rating_arousal")
 PREFIXES = ("ecg_", "eda_", "resp_")
 
 REGIONS = {
-    "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
+    "frontal_left": ("Fp1", "AF3", "AF7", "F1", "F3", "F5"),
+    "frontal_mid": ("Fz", "FCz"),
+    "frontal_right": ("Fp2", "AF4", "AF8", "F2", "F4", "F6"),
     "left_temporal": ("F7", "FT7", "T7", "TP7", "F9", "T9", "P9"),
     "right_temporal": ("F8", "FT8", "T8", "TP8", "F10", "T10", "P10"),
-    "central": ("FC1", "FC2", "FCz", "C1", "C2", "C3", "C4", "CP1", "CP2"),
-    "parietal": ("P1", "P2", "P3", "P4", "Pz", "P5", "P6", "P7", "P8", "CP3", "CP4"),
-    "occipital": ("O1", "O2", "PO3", "PO4", "PO7", "PO8", "POz", "PO5", "PO6"),
+    "central_left": ("FC1", "FC3", "FC5", "C1", "C3", "C5", "CP1", "CP3", "CP5"),
+    "central_right": ("FC2", "FC4", "FC6", "C2", "C4", "C6", "CP2", "CP4", "CP6"),
+    "parietal_left": ("P1", "P3", "P5", "P7"),
+    "parietal_right": ("P2", "P4", "P6", "P8"),
+    "midline_posterior": ("Pz", "POz"),
+    "occipital_left": ("O1", "PO3", "PO5", "PO7"),
+    "occipital_right": ("O2", "PO4", "PO6", "PO8"),
 }
 BANDS = ("delta", "theta", "alpha", "beta", "gamma")
 
@@ -40,8 +46,7 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    video, pre = regional(frame), regional(frame, "bp_pre")
-    return pd.concat([x, video, (video - pre.to_numpy()).add_prefix("d_")], axis=1)
+    return pd.concat([x, regional(frame)], axis=1)
 
 
 def fit_predict(train, test):
