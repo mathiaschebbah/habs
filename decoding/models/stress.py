@@ -60,4 +60,4 @@ def fit_predict(train, test):
     people = train["participant_id"]
     valence = ensemble(train, centred(train["rating_valence"], people), test)
     arousal = ensemble(train, centred(train["rating_arousal"], people), test)
-    return pd.DataFrame({"stress": arousal - 0.5 * valence}, index=test.index)
+    return pd.DataFrame({"stress": arousal - 2 * valence}, index=test.index)
