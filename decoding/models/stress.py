@@ -33,12 +33,12 @@ def person_centred(view):
 
     def transformed(frame):
         x = view(frame)
-        return x - x.groupby(frame["participant_id"].to_numpy()).transform("median")
+        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
     return transformed
 
 
-VIEWS = (person_centred(regional_view), person_centred(channel_view))
+VIEWS = (person_centred(regional_view),)
 
 
 def ridge(x_train, y, x_test):
