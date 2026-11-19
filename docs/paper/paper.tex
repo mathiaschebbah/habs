@@ -1,0 +1,302 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=1.9cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parskip}{3pt}
+\graphicspath{{../research/stress/figures/}{../research/timecourse/figures/}}
+
+\title{The heart slows down: what physiology shows of acute stress reactions\\
+to short videos, how fast, and in people the model has never seen}
+\author{Team 12: Mathias Chebbah, Aur\'elien Saint-Gr\'egoire, Ashley\\
+\small HABS Neuro-AI Hackathon, Universit\'e Paris-Saclay, November 2026}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+People in high-pressure jobs, surgeons for example, rarely say when they are
+stressed, but their bodies react. We asked what EEG, heart, skin and breathing
+show during an acute stress reaction, how quickly each signal changes, and
+whether a model can detect the reaction in people and videos it has never
+seen. The HABS dataset (314 participants, 22,974 rated 10-second videos) has
+no stress measure, so we counted a trial as a stress reaction when the
+participant rated it negative and activating. Second by second, stressful
+videos first raised slow (delta) EEG power across the whole scalp within the
+first second, then slowed the heart from about 1 s, made breathing shallower
+from 2 s and raised skin conductance from 4 s. The skin result replicated on
+held-out people. The heart slowed for fear, disgust, sadness and anger alike,
+which points to a shared orienting response rather than the acceleration
+usually expected. Detection is possible but weak. A model given only the first
+second already beats chance on new people (within-person AUC 0.517, 95\%
+interval 0.504 to 0.531), and the whole video reaches 0.55 to 0.64 depending on
+the test set. EEG carries the earliest information and the body joins when the
+skin responds. Separating stress from excitement at equal arousal stays
+unreliable. A 43-variant model search did not beat a plain logistic regression
+on a sealed test. Finally, heart rate is reliable on 10-second windows during
+emotional videos (r = 0.94 with 60 s), but RMSSD is not (r = 0.75), unlike at
+rest.
+\end{abstract}
+
+\section{Why we asked this}
+
+Two of us train in medicine and one in data science. We wanted a question that matters outside the lab: can you read an
+acute stress reaction from physiology, early, in someone you have never
+calibrated on? That is what a stress monitor for an operating room or a
+cockpit would need. Three facts shaped the study. First, HABS has no stress
+questionnaire, no cortisol and no stress task, so we used self-report.
+Giannakakis et al.\ \cite{giannakakis2015} also mapped self-rated videos to
+stress and relaxed states. Second, the same videos come back across
+participants, and a HABS preprint showed that emotion decoders can learn video
+identity instead of the person's state \cite{gerster2026}; block designs cause
+similar problems \cite{li2021}. Third, the mentors asked about delays between
+signals, real-time detection and heart rate variability on windows shorter
+than 30 seconds. We built the study around all three.
+
+\section{What we did}
+
+\paragraph{Data and labels.} We used every audited trial: 22,974 videos rated
+by 314 participants in 5 cohorts, with 64-channel EEG (ICA-cleaned for 99.7\%
+of trials, no EOG channel), ECG, skin conductance and a breathing belt. We left
+out eye tracking, which the organisers reported as misaligned. A trial is a
+\emph{stress reaction} when valence $\le 4$ and arousal $\ge 6$ on 1 to 9
+(23\% of trials). Before looking at any result we fixed three control
+contrasts: stress versus excitement (arousal $\ge 6$; valence $\le 4$ versus
+$\ge 6$), stress versus calm negative (valence $\le 4$; arousal $\ge 6$ versus
+$\le 4$) and stress versus relaxed (valence $\ge 6$, arousal $\le 4$).
+
+\paragraph{Features.} Jobs on the HABS GPU servers computed, without looking at
+ratings: per trial, EEG band power per channel and per region, heart rate and
+10-second heart rate variability, the skin conductance rise 1 to 6 s after
+onset, and breathing rate, depth and irregularity; and per second, from 3 s
+before to 12 s after onset, heart rate (from R peaks, at 4 Hz), skin
+conductance, breathing amplitude and rate, and log power in five bands over
+six scalp regions, each minus the trial's own 3 seconds before onset. For the
+HRV question we cut each recording's ECG into 60-second windows (10,263
+windows, 508 recordings) and computed heart rate and RMSSD on their first 5,
+10, 20 and 30 seconds.
+
+\paragraph{Evaluation.} Each study hashes participants and video themes into
+five buckets. One bucket of each forms the sealed test (new person, new
+theme), opened once. Test people with other themes and other people with test
+themes form two larger test sets. On the remaining development data, a
+$3\times3$ cross-fit predicts every block of people and themes with a model
+trained on other people and other themes. Models never see the video, theme,
+intended emotion or start marker of the rows they predict. The score is the
+ROC AUC computed inside each person with at least three trials of each kind,
+averaged over people (chance 0.5), so a person's general physiology or rating
+habits cannot raise it. Effect sizes are within-person Cohen's $d$, averaged
+over people, with 95\% intervals from resampling people \cite{varoquaux2018}.
+
+\paragraph{Two kinds of models.} For whole-video detection we searched over 43
+model variants: one model file changed per commit, a CI job scored it with
+fixed code from \texttt{main}, and a change was kept only if it beat the best
+development score by at least 0.005. For the time course we froze one model in
+advance and never tuned it: logistic regression on person-centred,
+baseline-corrected bins from onset to second $t$, for $t = 1$ to 10. With no
+search, its development cross-fit is an honest out-of-sample estimate. All
+protocols were written in our journal before we read the corresponding scores.
+
+\section{Results}
+
+\subsection{What changes}
+
+Over the whole video (Figure~\ref{fig:body}), stressful trials had a lower
+heart rate ($d = -0.12$) that dropped relative to the 5 seconds before ($-0.11$),
+a larger skin conductance rise ($+0.20$), shallower breathing ($-0.12$), lower
+relative alpha power over the whole scalp ($-0.20$ to $-0.25$) and higher
+relative delta ($+0.21$ frontally). Against excitement at the same arousal, the
+slower heart ($-0.17$) and the larger skin response ($+0.14$) remained. These
+effects are small but consistent across contrasts.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{correlates_body.png}
+\caption{Whole-video within-person effect sizes of heart, skin and breathing
+features (development data, 95\% intervals; coloured when the interval excludes
+zero). Red is higher on stressed trials.}
+\label{fig:body}
+\end{figure}
+
+\subsection{When it changes}
+
+Figure~\ref{fig:curves} shows the second-by-second differences. In development
+(235 people), slow EEG power rose from the first second ($d = +0.11$ to $+0.14$),
+heart rate fell from 1 s ($-0.08$, reaching $-0.12$ at 7 s), breathing amplitude
+dipped between 2 and 6 s ($-0.06$ to $-0.08$) and skin conductance rose from 4 s
+($+0.11$, reaching $+0.16$). In the 52 held-out test people, the skin response
+replicated with the same 4-second onset and a larger size (up to $+0.25$). The
+heart and breathing curves had the same shape but crossed significance only
+briefly (heart at 4 to 5 s, $-0.11$), and slow EEG power rose from 3 s. The
+order, brain first, then heart and breathing, then skin, matches what picture
+studies report: cardiac deceleration within 2 s \cite{bradley2009} and skin
+responses starting near 1.3 s and peaking later \cite{benedek2010}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{curves.png}
+\caption{Within-person effect size of stress versus other trials, second by
+second around video onset. Blue: development (band: 95\% interval). Orange
+dashed: held-out test people. Each bin is relative to the trial's own 3 s
+before onset.}
+\label{fig:curves}
+\end{figure}
+
+Is the slow EEG effect eye movement? Blinks and eye movements load on
+frontopolar channels and fade towards the back of the head \cite{hagemann2001}.
+Our delta effect did not fade: $+0.16$ at Fp1, $+0.16$ at Pz, $+0.12$ at O1 and
+O2. That argues against a purely ocular source, although global movement
+artefacts remain possible without EOG.
+
+\subsection{Not four kinds of stress}
+
+Film studies report heart rate increases for fear, anger and sadness on average
+\cite{siegel2018}, and decreases for disgust after surgery films
+\cite{palomba2000}. In development, the heart slowed for all four reported
+emotions compared with each person's non-stress trials (Figure~\ref{fig:emotions}):
+fear $-0.90$ bpm ($-1.62$ to $-0.17$, 192 people), disgust $-0.70$ ($-1.32$ to
+$-0.03$), sadness $-0.90$ ($-1.59$ to $-0.25$) and anger $-0.51$ ($-1.06$ to
+$+0.03$). On the test people, with 33 to 52 people per emotion, no emotion
+differed from zero. With 10-second clips, a shared orienting response, the
+"sensory intake" deceleration of Bradley \cite{bradley2009} and the freezing
+literature \cite{roelofs2017}, explains our data better than
+emotion-specific patterns.
+
+\begin{figure}[t]
+\centering
+\begin{minipage}{0.49\linewidth}
+\includegraphics[width=\linewidth]{emotions.png}
+\end{minipage}\hfill
+\begin{minipage}{0.49\linewidth}
+\includegraphics[width=\linewidth]{hrv.png}
+\end{minipage}
+\caption{Left: heart rate of stress trials by reported emotion, minus the same
+person's non-stress trials (development; number of people in brackets).
+Right: correlation of heart rate and RMSSD computed on 5 to 30 s with the same
+60-second window, across all windows (solid) and within recordings (dashed).}
+\label{fig:emotions}
+\end{figure}
+
+\subsection{How early and how well we can detect it}
+
+With the frozen model and development cross-fit (257 people, new person and
+new theme for every prediction), all signals together beat chance from the
+first second (AUC 0.517, 0.504 to 0.531) and reached 0.546 (0.532 to 0.559) by
+8 seconds (Figure~\ref{fig:latency}). EEG alone was reliable from 2 s, the
+heart, skin and breathing combination from 4 s, and no single body signal was
+reliable on its own. The test sets agreed: on new people (51 eligible), all
+signals were reliable from 3 s and reached 0.570 at 9 s; on held-out themes
+(35 eligible), from 4 s up to 0.642 (0.586 to 0.700) at 8 s, with the body
+signals catching up when the skin responded. Our primary sealed cell (new
+person and new theme) drew only 13 themes and 9 eligible people, too few for
+any conclusion, which we report as a failure of that split rather than a
+result. The information comes from the reaction to the video: using only the
+3 seconds before onset gave 0.483, below chance.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{latency.png}
+\caption{Within-person AUC of the frozen model using only the first $t$
+seconds of each video. Left: development cross-fit. Right: sealed test,
+held-out themes. Bands are 95\% intervals.}
+\label{fig:latency}
+\end{figure}
+
+Over the whole video, our 43-variant search raised the development AUC from
+0.537 to 0.585, but on its sealed test (60 people, 18 themes) the final model
+scored 0.605 (0.544 to 0.668) against 0.634 (0.570 to 0.699) for the starting
+logistic regression (Table~\ref{tab:test}). None of eleven scikit-learn
+families (random forests, boosting, MLP, kernels, LDA, SVM and others) beat a
+linear model. Stress versus relaxed held at 0.61 to 0.63, while stress versus
+excitement ranged from 0.45 to 0.59 across test sets: the detector mostly reads
+how negative and how intense a reaction is, and the body signals mostly read
+arousal.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+Model & New person, new theme & New person, seen theme & Seen person, new theme\\
+\midrule
+Starting logistic regression & 0.634 [0.570, 0.699] & 0.588 [0.561, 0.615] & 0.555 [0.524, 0.586]\\
+Final searched model & 0.605 [0.544, 0.668] & 0.592 [0.563, 0.621] & 0.561 [0.531, 0.590]\\
+\quad EEG only & 0.603 & 0.586 & 0.560\\
+\quad Body only & 0.541 & 0.545 & 0.545\\
+Final, stress vs excitement & 0.448 (10 people) & 0.586 (51) & 0.519 (41)\\
+Final, stress vs relaxed & 0.633 (20) & 0.629 (49) & 0.612 (77)\\
+\bottomrule
+\end{tabular}
+\caption{Within-person AUC on the sealed test of the whole-video study, with
+95\% intervals from resampling people (35, 55 and 136 eligible people).}
+\label{tab:test}
+\end{table}
+
+\subsection{Short-window heart rate variability and habituation}
+
+Heart rate on 10 seconds agreed with the same 60-second window ($r = 0.94$,
+limits of agreement $\pm 7.3$ bpm), and on 30 seconds almost perfectly
+($r = 0.985$). RMSSD did not: $r = 0.62$ at 5 s, 0.75 at 10 s, 0.86 at 20 s and
+0.92 at 30 s, with a within-recording correlation of only 0.43 at 10 s. At
+rest, a single 10-second RMSSD reaches $r = 0.85$ with 5 minutes
+\cite{munoz2015}; during emotional videos it is clearly worse, in line with the
+30-second minimum proposed by Baek et al.\ \cite{baek2015}. Neither the heart
+nor the skin response shrank between the first and second half of a session or
+from day 1 to day 2 (all intervals included zero).
+
+\section{What we take from it}
+
+Physiology does show acute stress reactions to short videos, and in a
+consistent order: slow EEG activity changes within the first second, the heart
+slows and breathing becomes shallower within 1 to 2 seconds, and the skin
+responds from about 4 seconds. The heart slows rather than speeds up, for every
+negative emotion we could test. For anyone designing a stress monitor, this
+matters: a short aversive event can lower heart rate, so a detector that only
+looks for tachycardia would miss it, and short-window RMSSD should not be
+trusted during stimulation.
+
+Detecting the reaction in someone new is possible from the first seconds but
+weak, around an AUC of 0.55 to 0.64. EEG gives the earliest signal; heart,
+skin and breathing add information once the skin responds. Telling stress from
+excitement at equal arousal remains out of reach with these signals.
+
+On method, two lessons. A model search that improved the development score by
+0.048 gave nothing on a sealed test, and a plain logistic regression did as
+well; without the sealed test we would have claimed a better model. And a
+hash split can leave a sealed cell too small to say anything, which we only
+saw after opening it; a power check on eligible people before freezing a split
+would have caught it.
+
+\paragraph{Limitations.} The label is a self-report about a 10-second video in
+healthy volunteers, not clinical or occupational stress. Effects are small
+($|d| \le 0.25$). The slow EEG effect could still include movement artefacts.
+Our latency estimates rest mostly on development cross-fit and two secondary
+test sets. We have no performance task, so the "breaking point before an
+error" that motivated us cannot be studied with these data.
+
+\paragraph{Reproducibility.} The repository holds the two feature
+extractors and the fixed scorers in \texttt{decoding/}, the, models, all experiment logs, and the frozen protocols in
+\texttt{journal/}. Only aggregate numbers leave the HABS servers.
+
+\begin{thebibliography}{99}\small
+\bibitem{giannakakis2015} G. Giannakakis, D. Grigoriadis, M. Tsiknakis. Detection of stress/anxiety state from EEG features during video watching. IEEE EMBC 2015, 6034--6037. PMID 26737667.
+\bibitem{gerster2026} M. Gerster et al. Stimulus identity rather than emotion drives EEG classification on the FACED dataset. bioRxiv 2026, doi:10.64898/2026.06.12.731889.
+\bibitem{li2021} R. Li et al. The perils and pitfalls of block design for EEG classification experiments. IEEE TPAMI 43 (2021) 316--333.
+\bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
+\bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
+\bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.
+\bibitem{hagemann2001} D. Hagemann, E. Naumann. The effects of ocular artifacts on (lateralized) broadband power in the EEG. Clin. Neurophysiol. 112 (2001) 215--231.
+\bibitem{siegel2018} E. H. Siegel et al. Emotion fingerprints or emotion populations? A meta-analytic investigation of autonomic features of emotion categories. Psychol. Bull. 144 (2018) 343--393.
+\bibitem{palomba2000} D. Palomba et al. Cardiac responses associated with affective processing of unpleasant film stimuli. Int. J. Psychophysiol. 36 (2000) 45--57.
+\bibitem{roelofs2017} K. Roelofs. Freeze for action: neurobiological mechanisms in animal and human freezing. Phil. Trans. R. Soc. B 372 (2017) 20160206.
+\bibitem{munoz2015} M. L. Munoz et al. Validity of (ultra-)short recordings for heart rate variability measurements. PLoS ONE 10 (2015) e0138921.
+\bibitem{baek2015} H. J. Baek et al. Reliability of ultra-short-term analysis as a surrogate of standard 5-min analysis of heart rate variability. Telemed. e-Health 21 (2015) 404--414.
+\end{thebibliography}
+
+\end{document}

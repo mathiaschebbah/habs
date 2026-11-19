@@ -5,8 +5,8 @@
 - **Project / dataset:** HABS multimodal emotional video recordings.
 - **Goal:** Study individual emotional responses and subjective–EEG temporal repeatability with stimulus-aware controls, then deliver audited results and research papers.
 - **Research direction:** the user-selected [project](../docs/research/PROJECT.md), supplied and confirmed on 2026-11-08. The historical arousal-only study is not the experiment being evaluated.
-- **Last experiment:** 04_stress_detection, done (2026-11-19).
-- **Last result:** stress reactions detected above chance in new people and new videos (within-person AUC 0.56–0.60) but the 43-variant search did not beat the starting logistic regression on the sealed test. [Results](../docs/research/stress/RESULTS.md), [paper](../docs/research/stress/paper.pdf).
+- **Last experiment:** 05_stress_timecourse, done (2026-11-20). Final submission paper: [docs/paper/paper.pdf](../docs/paper/paper.pdf).
+- **Last result:** stress reactions show a consistent physiological sequence (EEG slow power, then cardiac deceleration and shallower breathing, then skin conductance at 4 s) and are detectable above chance from the first seconds in new people, weakly (AUC 0.52–0.64).
 - **Study 03 result:** sealed within-person ρ 0.139 [0.083, 0.196] vs 0.083; gain +0.056 [+0.012, +0.101]. [Results](../docs/research/affect/RESULTS.md).
 - **Study 02 result:** 53 paired IDs / 4,554 transitions; cross-day contrast covariance +0.003496 [−0.010277, +0.015055], p=0.253. [Results](../docs/research/carryover/RESULTS.md).
 - **Literature follow-up, 2026-11-09:** [systematized scoping review](../docs/research/literature/2026-11-09/REVIEW.md), 21 Exa searches and five complete Europe PMC queries; 28 core publications plus 29 contextual publications extracted. Its [question](../docs/research/literature/2026-11-09/QUESTION.md) was promoted and completed as study 02. Novelty remains conditional on the searched corpus.
@@ -42,6 +42,7 @@
 | 02_emotional_carryover | Test cross-session repeatability of the subjective–EEG history-effect contrast. | done | Covariance +0.003496 [−0.010277, +0.015055], p=0.253; correlation weakly identified; J2 gain −0.005539 [−0.012251, +0.000938]. Audited, five-page paper delivered. | [design](02_emotional_carryover.md) |
 | 03_affect_decoding | Step-by-step model search for rating prediction on new people and new video themes. | done | 72 experiments, dev 0.030 → 0.105; sealed test 0.139 [0.083, 0.196] vs 0.083, paired gain +0.056 [+0.012, +0.101]. Four-page paper delivered. | [design](03_affect_decoding.md) |
 | 04_stress_detection | Detect self-reported stress reactions from physiology in new people and new videos; separate stress from arousal. | done | Sealed AUC 0.605 [0.544, 0.668] vs 0.634 for the starting model; search gain did not transfer. Stress slows the heart and raises skin responses. Five-page paper. | [design](04_stress_detection.md) |
+| 05_stress_timecourse | Time course, detection latency, emotion split, habituation and ultra-short HRV of stress reactions. | done | Brain first (0–1 s), heart and breathing 1–2 s, skin 4 s; detectable from 1–4 s in new people; heart slows for every negative emotion; 10-s RMSSD unreliable during videos. | [design](05_stress_timecourse.md) |
 
 ## Backlog
 

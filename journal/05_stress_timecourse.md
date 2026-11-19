@@ -83,3 +83,30 @@ windows shorter than 30 seconds. This study asks those questions directly.
 - Distinct cardiac curves by emotion would show that "stress" mixes
   physiologically different reactions; similar curves would support one
   shared defensive response.
+
+## Outcome (2026-11-20)
+
+- Extraction: HABS job `20261119T230123-4e5f45` (22,974 trials; bin-5 coverage
+  heart 98%, skin 74%, breathing 96%, EEG 96%; 10,263 ECG windows from 508
+  recordings).
+- Splits: development 16,706 trials, 257 people, 71 themes. The primary sealed
+  cell drew 13 themes and held only 9 eligible people: the frozen primary
+  outcome (earliest reliable second on that cell) is uninformative. We report
+  it as a split failure. Intervals for the two larger test regimes were added
+  afterwards and labelled post hoc; the model stayed fixed.
+- Q1 curves (development, replicated on 52 test people): slow EEG power up
+  from 0–1 s (scalp-wide, not peaking frontopolar), heart rate down from 1 s,
+  breathing amplitude down 2–6 s, skin conductance up from 4 s (replicated,
+  same onset).
+- Q2 latency: development cross-fit "all" reliable from 1 s (0.517
+  [0.504, 0.531]), 0.546 by 8 s; EEG from 2 s; body from 4 s. Test, new people:
+  from 3 s, 0.570 at 9 s; held-out themes: from 4 s, 0.642 at 8 s. Exploratory:
+  pre-onset state alone 0.483 [0.471, 0.496].
+- Q3: heart slowed for fear, disgust, sadness and anger in development; no
+  emotion differed from zero on the test people.
+- Q4: no habituation of heart or skin responses (session halves, days).
+  Alpha effect larger on day 2 (−0.115 [−0.207, −0.023]), one of six tests.
+- Q5: heart rate at 10 s r = 0.94 with 60 s; RMSSD r = 0.62 (5 s), 0.75 (10 s),
+  0.86 (20 s), 0.92 (30 s).
+- Literature: docs/research/stress/LITERATURE.md (42 verified references).
+- Final paper for the submission: docs/paper/paper.pdf (studies 04 and 05).
