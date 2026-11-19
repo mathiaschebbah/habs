@@ -43,7 +43,23 @@ def features(frame):
     power = regional(frame)
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
-    return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
+    x = pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
+    return detrend(x, frame)
+
+
+def detrend(x, frame):
+    """Remove each person's linear drift over the session, label-free."""
+    order = frame["event_order"].astype(float)
+    key = [frame["participant_id"].to_numpy(), frame["recorded_day"].to_numpy()]
+    t = order - order.groupby(key).transform("mean")
+    xc = x - x.groupby(key).transform("mean")
+    slope = (
+        (xc.mul(t, axis=0))
+        .groupby(key)
+        .transform("sum")
+        .div((t**2).groupby(key).transform("sum").replace(0, np.inf), axis=0)
+    )
+    return x - slope.mul(t, axis=0)
 
 
 def fit_predict(train, test):
@@ -55,7 +71,7 @@ def fit_predict(train, test):
             "mean"
         )
         model = make_pipeline(
-            SimpleImputer(strategy="median", add_indicator=True),
+            SimpleImputer(strategy="median"),
             StandardScaler(),
             RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
