@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,11 +32,11 @@ VIEWS = (regional_view,)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then extremely randomised trees."""
+    """Median-impute, standardise, then a random forest."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        ExtraTreesRegressor(
+        RandomForestRegressor(
             n_estimators=200,
             min_samples_leaf=20,
             max_features=0.3,
