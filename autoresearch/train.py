@@ -16,8 +16,7 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    # label-free: remove each person's own feature means
-    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+    return x
 
 
 def fit_predict(train, test):
@@ -31,7 +30,7 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
+            RidgeCV(alphas=np.logspace(1, 6, 11)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
