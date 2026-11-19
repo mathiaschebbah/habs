@@ -22,6 +22,9 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups, z-scored within person."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
+    vid = x.filter(like="bp_vid_")
+    pre = frame[[c.replace("bp_vid_", "bp_pre_") for c in vid]].to_numpy()
+    x = pd.concat([x, (vid - pre).add_prefix("d_")], axis=1)
     return person_z(x, frame["participant_id"])
 
 
