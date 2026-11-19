@@ -40,7 +40,10 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return pd.concat([x, regional(frame)], axis=1)
+    power = regional(frame)
+    region = power.columns.str.rsplit("_", n=1).str[0]
+    total = np.log10((10**power).T.groupby(region).transform("sum").T)
+    return pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
 
 
 def fit_predict(train, test):
