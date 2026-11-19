@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("ecg_", "eda_", "resp_")
+PREFIXES = ()  # ablation: EEG only
 
 REGIONS = {
     "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
@@ -66,11 +66,6 @@ def centred(frame, target):
     )
 
 
-def impute_by_person(x, frame):
-    """Fill gaps with the person's own median (label-free)."""
-    return x.fillna(x.groupby(frame["participant_id"].to_numpy()).transform("median"))
-
-
 VIEWS = (
     features,
     channels,
@@ -82,13 +77,6 @@ def fit_predict(train, test):
     out = {}
     for target in TARGETS:
         y = centred(train, target)
-        preds = [
-            ridge(
-                impute_by_person(view(train), train),
-                y,
-                impute_by_person(view(test), test),
-            )
-            for view in VIEWS
-        ]
+        preds = [ridge(view(train), y, view(test)) for view in VIEWS]
         out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
