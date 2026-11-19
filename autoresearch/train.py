@@ -3,7 +3,6 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.kernel_approximation import Nystroem
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
@@ -17,7 +16,8 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return x
+    # label-free: each feature as its within-person percentile
+    return x.groupby(frame["participant_id"].to_numpy()).rank(pct=True) - 0.5
 
 
 def fit_predict(train, test):
@@ -31,7 +31,6 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            Nystroem(gamma=1 / 400, n_components=1000, random_state=0),
             RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
