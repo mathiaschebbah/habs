@@ -66,18 +66,15 @@ def centred(frame, target):
     )
 
 
-def baseline_diff(frame):
-    """Video minus pre-onset channel band power, plus peripheral."""
-    vid = frame.filter(like="bp_vid_")
-    pre = frame[[c.replace("bp_vid_", "bp_pre_") for c in vid]].to_numpy()
-    peripheral = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return pd.concat([peripheral, vid - pre], axis=1)
+def evoked_and_covariance(frame):
+    """Evoked bins and 20-channel covariance, plus peripheral."""
+    return frame[[c for c in frame if c.startswith(("erp_", "cov_") + PREFIXES)]]
 
 
 VIEWS = (
     features,
     channels,
-    baseline_diff,
+    evoked_and_covariance,
 )
 
 
