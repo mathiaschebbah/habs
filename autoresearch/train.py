@@ -2,7 +2,10 @@
 
 import numpy as np
 import pandas as pd
-from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import RidgeCV
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -13,7 +16,7 @@ def person_z(x, people):
     return (x - groups.transform("mean")) / groups.transform("std").replace(0, np.nan)
 
 
-PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
+PREFIXES = ("ecg_", "eda_", "resp_")
 
 
 def features(frame):
@@ -30,8 +33,10 @@ def fit_predict(train, test):
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        model = HistGradientBoostingRegressor(
-            max_iter=300, learning_rate=0.05, random_state=0
+        model = make_pipeline(
+            SimpleImputer(strategy="median"),
+            StandardScaler(),
+            RidgeCV(alphas=np.logspace(0, 4, 9)),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
