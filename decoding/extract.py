@@ -36,6 +36,7 @@ COV = ("Fp1", "Fp2", "F7", "F3", "Fz", "F4", "F8", "FC1", "FC2", "T7")
 COV += ("C3", "C4", "T8", "P7", "P3", "Pz", "P4", "P8", "O1", "O2")
 VIDEO_S, PRE_S, ERP_BINS, ERP_BIN_S = 10.0, 2.0, 5, 0.2
 EEG_UNITS = {"V": 1e6, "mV": 1e3, "uV": 1.0}
+BODY = ("hrv_", "scr_", "breath_")
 META = (
     "cohort",
     "participant_id",
@@ -276,6 +277,63 @@ def _eeg_columns(path, onsets):
     return columns
 
 
+def _read_body(path):
+    """ECG, respiration and skin channels with their rates and GSR bounds."""
+    with pyedflib.EdfReader(str(path)) as reader:
+        ecg, ecg_fs, _ = _channel(reader, "ECG")
+        resp, resp_fs, _ = _channel(reader, "Resp")
+        names = reader.getSignalLabels()
+        eda, eda_fs, eda_unit, bounds = None, 0.0, "", None
+        if "GSR" in names:
+            i = names.index("GSR")
+            eda, eda_fs = reader.readSignal(i), float(reader.getSampleFrequency(i))
+            eda_unit = reader.getPhysicalDimension(i)
+            low, high = reader.getPhysicalMinimum(i), reader.getPhysicalMaximum(i)
+            step = (high - low) / (
+                reader.getDigitalMaximum(i) - reader.getDigitalMinimum(i)
+            )
+            bounds = (low, high, step)
+    return ecg, ecg_fs, resp, resp_fs, eda, eda_fs, eda_unit, bounds
+
+
+def _sympathetic(signals, onsets):
+    """Short-window HRV, phasic skin conductance and breathing detail."""
+    ecg, ecg_fs, resp, resp_fs, eda, eda_fs, eda_unit, _ = signals
+    return {
+        **_cardiac(ecg, ecg_fs, onsets),
+        **_phasic(eda, eda_fs, eda_unit, onsets),
+        **_breathing(resp, resp_fs, onsets),
+    }
+
+
+def _body_columns(raw_dir, trials, onsets):
+    """Peripheral summaries of the first release plus the sympathetic features."""
+    signals = _read_body(Path(raw_dir) / trials[0]["recording"])
+    ecg, ecg_fs, resp, resp_fs, eda, eda_fs, eda_unit, bounds = signals
+    peripheral = []
+    for onset in onsets:
+        row = _ecg_features(ecg, ecg_fs, onset, VIDEO_S)
+        row.update(_eda_features(eda, eda_fs, eda_unit, bounds, onset, VIDEO_S))
+        pre = _eda_features(eda, eda_fs, eda_unit, bounds, onset - PRE_S, PRE_S)
+        row["eda_pre_log_level"] = pre["eda_log_level"]
+        peripheral.append(row)
+    peripheral = pd.DataFrame(peripheral).drop(columns=["eda_reason"])
+    columns = {k: peripheral[k].to_numpy(dtype=float) for k in peripheral}
+    columns.update(_resp(resp, resp_fs, onsets))
+    columns.update(_sympathetic(signals, onsets))
+    return columns
+
+
+def _sympathetic_only(arguments):
+    """Sympathetic features for one recording, reading three channels only."""
+    raw_dir, trials = arguments
+    onsets = np.array([float(t["onset_s"]) for t in trials])
+    signals = _read_body(Path(raw_dir) / trials[0]["recording"])
+    return pd.DataFrame(
+        {"trial_id": [physical_id(t) for t in trials], **_sympathetic(signals, onsets)}
+    )
+
+
 def _recording_features(arguments):
     raw_dir, trials = arguments
     curated = Path(raw_dir) / trials[0]["recording"]
@@ -292,37 +350,11 @@ def _recording_features(arguments):
         except (OSError, ValueError) as error:
             print(f"EEG read failed for {path.name}: {error}", flush=True)
     columns["eeg_source"] = [source] * len(trials)
-    with pyedflib.EdfReader(str(Path(raw_dir) / trials[0]["recording"])) as reader:
-        ecg, ecg_fs, _ = _channel(reader, "ECG")
-        resp, resp_fs, _ = _channel(reader, "Resp")
-        names = reader.getSignalLabels()
-        eda, eda_fs, eda_unit, bounds = None, 0.0, "", None
-        if "GSR" in names:
-            i = names.index("GSR")
-            eda, eda_fs = reader.readSignal(i), float(reader.getSampleFrequency(i))
-            eda_unit = reader.getPhysicalDimension(i)
-            low, high = reader.getPhysicalMinimum(i), reader.getPhysicalMaximum(i)
-            step = (high - low) / (
-                reader.getDigitalMaximum(i) - reader.getDigitalMinimum(i)
-            )
-            bounds = (low, high, step)
-    peripheral = []
-    for onset in onsets:
-        row = _ecg_features(ecg, ecg_fs, onset, VIDEO_S)
-        row.update(_eda_features(eda, eda_fs, eda_unit, bounds, onset, VIDEO_S))
-        pre = _eda_features(eda, eda_fs, eda_unit, bounds, onset - PRE_S, PRE_S)
-        row["eda_pre_log_level"] = pre["eda_log_level"]
-        peripheral.append(row)
-    peripheral = pd.DataFrame(peripheral).drop(columns=["eda_reason"])
-    columns.update({k: peripheral[k].to_numpy(dtype=float) for k in peripheral})
-    columns.update(_resp(resp, resp_fs, onsets))
-    columns.update(_cardiac(ecg, ecg_fs, onsets))
-    columns.update(_phasic(eda, eda_fs, eda_unit, onsets))
-    columns.update(_breathing(resp, resp_fs, onsets))
+    columns.update(_body_columns(raw_dir, trials, onsets))
     return pd.DataFrame(columns)
 
 
-def extract(trials, raw_dir, *, workers):
+def extract(trials, raw_dir, *, workers, worker=_recording_features):
     """Return one feature row per audited trial, in the input order."""
     trials = trials.assign(trial_id=[physical_id(r) for r in trials.to_dict("records")])
     if trials["trial_id"].duplicated().any():
@@ -334,7 +366,7 @@ def extract(trials, raw_dir, *, workers):
     parts = []
     context = multiprocessing.get_context("spawn")
     with ProcessPoolExecutor(max_workers=workers, mp_context=context) as pool:
-        for index, part in enumerate(pool.map(_recording_features, jobs), 1):
+        for index, part in enumerate(pool.map(worker, jobs), 1):
             parts.append(part)
             if index % 25 == 0:
                 print(f"Recordings: {index}/{len(jobs)}", flush=True)
@@ -357,6 +389,16 @@ def main():
     trials = trials.merge(people[["participant_id", "age"]], how="left", validate="m:1")
     workers = min(16, os.cpu_count() or 4)
     warnings.filterwarnings("ignore", category=RuntimeWarning)
+    if json.loads(Path("run_config.json").read_text())["stage"] == "body_features":
+        table = extract(trials, raw_dir, workers=workers, worker=_sympathetic_only)
+        table = table[[c for c in table if c == "trial_id" or c.startswith(BODY)]]
+        (out / "features").mkdir(parents=True, exist_ok=True)
+        table.to_parquet(out / "features" / "body.parquet", compression="zstd")
+        coverage = {c: float(table[c].notna().mean()) for c in table if c != "trial_id"}
+        (out / "public").mkdir(parents=True, exist_ok=True)
+        (out / "public" / "body.json").write_text(json.dumps(coverage, indent=2))
+        print(json.dumps({"rows": len(table), "coverage": coverage}, indent=2))
+        return
     table = extract(trials, raw_dir, workers=workers)
     numeric = table.select_dtypes("number").columns
     table[numeric] = table[numeric].astype("float32")

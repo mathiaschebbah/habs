@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from decoding.extract import COV, _erp, extract
+from decoding.extract import COV, _erp, _sympathetic_only, extract
 
 SAMPLE = Path(__file__).resolve().parents[1] / "sample"
 STEM = "P001_day-1_task-{}_multimodal"
@@ -67,3 +67,25 @@ def test_erp_with_non_integer_rate():
     x = np.r_[np.zeros(round(5 * fs)), np.ones(round(5 * fs))]
     erp = _erp(x, fs, np.array([5.0]))
     assert erp.shape == (1, 5) and np.allclose(erp, 1.0, atol=0.01)
+
+
+def test_sympathetic_only_matches_full_extraction(tmp_path):
+    """The three-channel pass reproduces the full pass's body features."""
+    _as_video_segment(tmp_path)
+    trial = {"participant_id": "P001", "recorded_day": 1, "start_marker": 1}
+    recording = f"CURATED/P001/{STEM.format('emotion-video')}.bdf"
+    trials = [{**trial, "onset_s": 8.0, "recording": recording}]
+    fast = _sympathetic_only((str(tmp_path), trials))
+    full = extract(
+        pd.DataFrame(trials).assign(
+            **{c: 0 for c in ("cohort", "event_order", "video", "video_theme")},
+            **{c: 0 for c in ("default_emotion_label", "rating_valence")},
+            **{c: 0 for c in ("rating_arousal", "rating_dominance", "age", "gender")},
+        ),
+        tmp_path,
+        workers=1,
+    )
+    columns = [c for c in fast if c != "trial_id"]
+    assert np.allclose(
+        fast[columns].to_numpy(), full[columns].to_numpy(), equal_nan=True
+    )

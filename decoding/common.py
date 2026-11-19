@@ -89,11 +89,15 @@ def assign_splits(table, salt):
     )
 
 
-def load(salt, path=None):
-    """Read ``$TRIAL_DATA/trials.parquet`` and attach the study's splits."""
-    if path is None:
-        path = Path(os.environ["TRIAL_DATA"]) / "trials.parquet"
-    return assign_splits(pd.read_parquet(path), salt)
+def load(salt, folder=None):
+    """Read ``trials.parquet`` (plus ``body.parquet`` if present) and split."""
+    folder = Path(folder or os.environ["TRIAL_DATA"])
+    table = pd.read_parquet(folder / "trials.parquet")
+    if (folder / "body.parquet").is_file():
+        body = pd.read_parquet(folder / "body.parquet")
+        table = table.drop(columns=[c for c in body if c != "trial_id" and c in table])
+        table = table.merge(body, on="trial_id", how="left", validate="1:1")
+    return assign_splits(table, salt)
 
 
 def visible(frame):
