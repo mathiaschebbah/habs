@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
-from sklearn.neural_network import MLPRegressor
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -32,17 +32,11 @@ VIEWS = (regional_view,)
 
 
 def ridge(x_train, y, x_test):
-    """Median-impute, standardise, then a small MLP."""
+    """Median-impute, standardise, then k nearest neighbours."""
     model = make_pipeline(
         SimpleImputer(strategy="median"),
         StandardScaler(),
-        MLPRegressor(
-            hidden_layer_sizes=(32,),
-            alpha=1.0,
-            early_stopping=True,
-            max_iter=300,
-            random_state=0,
-        ),
+        KNeighborsRegressor(n_neighbors=200, weights="distance"),
     )
     return model.fit(x_train, y).predict(x_test)
 
