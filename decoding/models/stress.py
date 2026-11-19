@@ -20,7 +20,19 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    return body  # ablation: heart, skin and breathing only
+    pre = regional(frame, "bp_pre")
+    return pd.concat(
+        [body, power, (power - total).add_prefix("rel_"), power - pre.to_numpy()],
+        axis=1,
+    ).set_axis(
+        [
+            *body.columns,
+            *power.columns,
+            *("rel_" + power.columns),
+            *("d_" + power.columns),
+        ],
+        axis=1,
+    )
 
 
 def channel_view(frame):
