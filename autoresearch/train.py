@@ -57,7 +57,7 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=[1e3]),
+            RidgeCV(alphas=[1e2]),
         )
         model.fit(x_train, y)
         out[target] = model.predict(x_test)
