@@ -16,7 +16,8 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return x
+    # label-free: remove each person's own feature means
+    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
 
 def fit_predict(train, test):
@@ -24,8 +25,9 @@ def fit_predict(train, test):
     x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
-        # within-person percentile rank: matches the rank-based metric
-        y = train.groupby("participant_id")[target].rank(pct=True) - 0.5
+        y = train[target] - train[target].groupby(train["participant_id"]).transform(
+            "mean"
+        )
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
