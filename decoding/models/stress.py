@@ -28,7 +28,7 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (channel_view,)
+VIEWS = (regional_view, channel_view)
 
 
 def ridge(x_train, y, x_test):
