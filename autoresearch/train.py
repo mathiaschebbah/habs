@@ -43,8 +43,7 @@ def features(frame):
     power = regional(frame)
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
-    x = pd.concat([x, power, (power - total).add_prefix("rel_")], axis=1)
-    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+    return pd.concat([x, (power - total).add_prefix("rel_")], axis=1)
 
 
 def fit_predict(train, test):
