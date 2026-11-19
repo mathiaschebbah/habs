@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.cross_decomposition import PLSRegression
+from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -20,7 +20,16 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
+    pairs = (("F3", "F4"), ("F7", "F8"), ("AF3", "AF4"), ("FC5", "FC6"))
+    asym = {
+        f"asym_{left}_{right}_{band}": frame[f"bp_vid_{right}_{band}"]
+        - frame[f"bp_vid_{left}_{band}"]
+        for left, right in pairs
+        for band in ("theta", "alpha", "beta")
+    }
+    return pd.concat(
+        [body, power, (power - total).add_prefix("rel_"), pd.DataFrame(asym)], axis=1
+    )
 
 
 def channel_view(frame):
@@ -44,11 +53,9 @@ VIEWS = (person_centred(regional_view),)
 def ridge(x_train, y, x_test):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
-        SimpleImputer(strategy="median"),
-        StandardScaler(),
-        PLSRegression(n_components=8),
+        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=ALPHAS)
     )
-    return model.fit(x_train, y).predict(x_test).ravel()
+    return model.fit(x_train, y).predict(x_test)
 
 
 def centred(values, people):
