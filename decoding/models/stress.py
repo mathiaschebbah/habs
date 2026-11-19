@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.pipeline import make_pipeline
+from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
@@ -57,8 +57,8 @@ def target(train):
 
 
 def CLASSIFIER():  # noqa: N802
-    """Shrinkage LDA, a standard EEG classifier."""
-    return LinearDiscriminantAnalysis(solver="lsqr", shrinkage="auto")
+    """Linear SVM with balanced classes."""
+    return LinearSVC(C=0.001, class_weight="balanced", max_iter=5000)
 
 
 def fit_predict(train, test):
