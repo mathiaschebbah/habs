@@ -16,15 +16,12 @@ def person_z(x, people):
     return (x - groups.transform("mean")) / groups.transform("std").replace(0, np.nan)
 
 
-PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
+PREFIXES = ("bp_vid_", "bp_pre_", "erp_", "cov_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
     """Selected feature groups, z-scored within person."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    vid = x.filter(like="bp_vid_")
-    pre = frame[[c.replace("bp_vid_", "bp_pre_") for c in vid]].to_numpy()
-    x = pd.concat([x, (vid - pre).add_prefix("d_")], axis=1)
     return person_z(x, frame["participant_id"])
 
 
