@@ -1,0 +1,6 @@
+# The only packages model files may import (pins match the root requirements.txt).
+numpy==2.4.6
+pandas==3.0.1
+scipy==1.17.1
+scikit-learn==1.9.1
+pyarrow==26.0.1

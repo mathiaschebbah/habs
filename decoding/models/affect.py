@@ -1,7 +1,6 @@
-"""The one file the autoresearch loop edits. Rules: autoresearch/program.md.
+"""Study 03 final model (search commit b800330).
 
-Final model of run ``autoresearch/nov19`` (commit b800330): two ridge
-regressions on person-centred ratings, one on regional absolute and relative
+Two ridge regressions on person-centred ratings, one on regional absolute and relative
 band power, one on channel-level band power, both with cardiac, skin and
 respiratory summaries; their standardised predictions are averaged.
 """
@@ -13,33 +12,12 @@ from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
+from decoding.common import PERIPHERAL, regional
+
 TARGETS = ("rating_valence", "rating_arousal")
-PREFIXES = ("ecg_", "eda_", "resp_")
+PREFIXES = PERIPHERAL
 
-REGIONS = {
-    "frontal": ("Fp1", "Fp2", "AF3", "AF4", "AF7", "AF8", "F1", "F2", "F3", "F4", "Fz"),
-    "left_temporal": ("F7", "FT7", "T7", "TP7", "F9", "T9", "P9"),
-    "right_temporal": ("F8", "FT8", "T8", "TP8", "F10", "T10", "P10"),
-    "central": ("FC1", "FC2", "FCz", "C1", "C2", "C3", "C4", "CP1", "CP2"),
-    "parietal": ("P1", "P2", "P3", "P4", "Pz", "P5", "P6", "P7", "P8", "CP3", "CP4"),
-    "occipital": ("O1", "O2", "PO3", "PO4", "PO7", "PO8", "POz", "PO5", "PO6"),
-}
-BANDS = ("delta", "theta", "alpha", "beta", "gamma")
 ALPHAS = np.logspace(0, 4, 9)
-
-
-def regional(frame, kind="bp_vid", bands=BANDS):
-    """Mean over the channels of each region, per band (or evoked bin)."""
-    return pd.DataFrame(
-        {
-            f"{kind}_{region}_{band}": frame[
-                [f"{kind}_{ch}_{band}" for ch in chs if f"{kind}_{ch}_{band}" in frame]
-            ].mean(axis=1)
-            for region, chs in REGIONS.items()
-            for band in bands
-        },
-        index=frame.index,
-    )
 
 
 def features(frame):

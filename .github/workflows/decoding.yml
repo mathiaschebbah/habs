@@ -1,22 +1,26 @@
-name: Autoresearch
+name: Decoding
 
-# One dispatch scores one or more experiment commits. The harness (prepare.py,
-# data, metric) always comes from main; only autoresearch/train.py is taken from
-# each experiment commit, so an experiment cannot change how it is scored.
+# One dispatch scores one or more experiment commits for one study. The scoring
+# code always comes from main; only decoding/models/<study>.py is taken from each
+# experiment commit, so an experiment cannot change how it is scored.
 # Logs and artifacts carry aggregate metrics only; trial rows stay on the runner.
 on:
   workflow_dispatch:
     inputs:
+      study:
+        type: choice
+        options: [affect, stress]
+        default: stress
       refs:
         description: "Space-separated experiment commit SHAs"
         required: true
       split:
         type: choice
-        options: [dev, test]
+        options: [dev, test, correlates]
         default: dev
-        description: "dev = loop objective; test = one-time sealed evaluation of all refs together"
+        description: "dev = search objective; test = one-time sealed evaluation of all refs together; correlates = stress feature differences on dev"
       source_job:
-        description: "Completed HABS job holding autoresearch/trials.parquet"
+        description: "Completed HABS job holding features/trials.parquet"
         required: true
 
 permissions:
@@ -27,7 +31,7 @@ env:
   HABS_KEY: "1f4d7f20-8ba2-4697-91cc-b898558a458c"
   HABS_STORAGE: sthabshackweu
   HABS_TENANT_ID: 6fc0e479-449c-4700-b89c-7c4848058e30
-  AUTORESEARCH_DATA: /tmp/autoresearch
+  TRIAL_DATA: /tmp/trials
   SOURCE_JOB: ${{ inputs.source_job }}
   OMP_NUM_THREADS: "4"
 
@@ -43,8 +47,8 @@ jobs:
           SPLIT: ${{ inputs.split }}
         run: |
           for ref in $REFS; do [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || exit 1; done
-          # test scores all refs in one job so they are compared on the same fit
-          if [ "$SPLIT" = test ]; then
+          # test and correlates score all refs in one job
+          if [ "$SPLIT" != dev ]; then
             echo "refs=$(jq -cn --arg r "$REFS" '[$r]')" >> "$GITHUB_OUTPUT"
           else
             echo "refs=$(jq -cn --arg r "$REFS" '$r | split(" ") | map(select(. != ""))')" >> "$GITHUB_OUTPUT"
@@ -63,12 +67,13 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Take train.py from each experiment commit
+      - name: Take the model file from each experiment commit
         env:
           REFS: ${{ matrix.ref }}
+          STUDY: ${{ inputs.study }}
         run: |
           mkdir -p candidates
-          for ref in $REFS; do git show "$ref:autoresearch/train.py" > "candidates/$ref.py"; done
+          for ref in $REFS; do git show "$ref:decoding/models/$STUDY.py" > "candidates/$ref.py"; done
           ls candidates
       - uses: azure/login@v2
         with:
@@ -79,20 +84,21 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: autoresearch/requirements.txt
-      - run: pip install --quiet -r autoresearch/requirements.txt "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
+          cache-dependency-path: decoding/requirements.txt
+      - run: pip install --quiet -r decoding/requirements.txt "habs-hack[storage] @ git+https://github.com/HABS-BRAIN/habs-hack@main"
       - run: pip install --quiet --no-deps -e .
-      - run: python tools/fetch_autoresearch_table.py
+      - run: python tools/fetch_trial_table.py
       - name: Score
         env:
           REFS: ${{ matrix.ref }}
           SPLIT: ${{ inputs.split }}
+          STUDY: ${{ inputs.study }}
         run: |
           files=""; for ref in $REFS; do files="$files candidates/$ref.py"; done
-          python -m autoresearch.prepare --split "$SPLIT" --train $files --out results 2>&1 | tee run.log
-          { echo '```'; grep -E '^(score|valence|arousal|fit_seconds)' run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          python -m "decoding.$STUDY" --split "$SPLIT" --model $files --out results 2>&1 | tee run.log
+          { echo '```'; grep -E '^[a-z_]+: ' run.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
-          name: metrics-${{ inputs.split }}-${{ strategy.job-index }}
+          name: metrics-${{ inputs.study }}-${{ inputs.split }}-${{ strategy.job-index }}
           path: results/*_metrics.json
           retention-days: 30

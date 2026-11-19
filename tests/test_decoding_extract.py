@@ -1,4 +1,4 @@
-"""Run the autoresearch feature extractor on the real P001 sample recording."""
+"""Run the feature extractor on the real P001 sample recording."""
 
 import json
 import shutil
@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from autoresearch.extract import COV, _erp, extract
+from decoding.extract import COV, _erp, extract
 
 SAMPLE = Path(__file__).resolve().parents[1] / "sample"
 STEM = "P001_day-1_task-{}_multimodal"

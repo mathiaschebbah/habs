@@ -1,4 +1,4 @@
-"""Download the private autoresearch trial table into an ephemeral CI runner."""
+"""Download the private trial table into an ephemeral CI runner."""
 
 import os
 import re
@@ -10,7 +10,7 @@ MAX_BYTES = 300e6  # HABS confirmed 300 MB outputs are fine; habs get caps at 25
 
 
 def main():
-    """Copy ``autoresearch/trials.parquet`` of a completed job to $AUTORESEARCH_DATA.
+    """Copy ``features/trials.parquet`` of a completed job to $TRIAL_DATA.
 
     Raises
     ------
@@ -22,13 +22,11 @@ def main():
         raise ValueError("Invalid completed-job suffix.")
     team = os.environ["HABS_KEY"]
     container = BlobStore(os.environ["HABS_STORAGE"]).service.get_container_client(team)
-    blob = container.get_blob_client(
-        f"out/{team}--{suffix}/autoresearch/trials.parquet"
-    )
+    blob = container.get_blob_client(f"out/{team}--{suffix}/features/trials.parquet")
     size = blob.get_blob_properties().size
     if size > MAX_BYTES:
         raise ValueError("The trial table exceeds the agreed transfer size.")
-    destination = Path(os.environ["AUTORESEARCH_DATA"])
+    destination = Path(os.environ["TRIAL_DATA"])
     destination.mkdir(parents=True, exist_ok=True)
     (destination / "trials.parquet").write_bytes(blob.download_blob().readall())
     print(f"Restored the trial table, {size / 1e6:.1f} MB.")

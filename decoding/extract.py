@@ -1,4 +1,4 @@
-"""Build the fixed, label-free trial feature table used by the autoresearch loop.
+"""Build the fixed, label-free trial feature table used by the decoding studies.
 
 Runs once on the HABS backend, where the dataset is mounted. It reads the audited
 trial grid (``data/aligned_trials.csv.gz`` from the annotation audit) and writes
@@ -259,8 +259,8 @@ def main():
     table = extract(trials, raw_dir, workers=workers)
     numeric = table.select_dtypes("number").columns
     table[numeric] = table[numeric].astype("float32")
-    (out / "autoresearch").mkdir(parents=True, exist_ok=True)
-    table.to_parquet(out / "autoresearch" / "trials.parquet", compression="zstd")
+    (out / "features").mkdir(parents=True, exist_ok=True)
+    table.to_parquet(out / "features" / "trials.parquet", compression="zstd")
     groups = {}
     for column in table.columns:
         group = column.split("_")[0]
@@ -280,9 +280,7 @@ def main():
         "workers": workers,
     }
     (out / "public").mkdir(parents=True, exist_ok=True)
-    (out / "public" / "autoresearch_features.json").write_text(
-        json.dumps(manifest, indent=2)
-    )
+    (out / "public" / "features.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps(manifest, indent=2), flush=True)
 
 

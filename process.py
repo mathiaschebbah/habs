@@ -89,8 +89,8 @@ def process(data_dir: Path, out_dir: Path) -> None:
         print("Sample audit complete; no labelled study is possible on this sample.")
         return
     stage = json.loads((root / "run_config.json").read_text())["stage"]
-    if stage == "autoresearch_features":
-        module = "autoresearch.extract"
+    if stage == "features":
+        module = "decoding.extract"
     elif temporal:
         module = "experiments.02_emotional_carryover"
     else:
