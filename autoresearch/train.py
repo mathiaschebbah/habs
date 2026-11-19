@@ -16,7 +16,7 @@ PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    return x[[c for c in x if c.endswith("_gamma")]]
+    return x.drop(columns=[c for c in x if c.endswith("_gamma")])
 
 
 def fit_predict(train, test):
