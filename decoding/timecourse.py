@@ -274,6 +274,35 @@ def explore(table):
     return out
 
 
+def ocular(table):
+    """Exploratory: per-channel delta/theta/alpha effect sizes on development.
+
+    Eye blinks and movements load mostly on frontopolar channels, so an effect
+    that peaks at Fp1/Fp2 and fades towards the back is likely partly ocular.
+    """
+    dev = table[table["split"] == "dev"]
+    people = dev["participant_id"].to_numpy()
+    out = {}
+    for name in ("stress", "vs_excitement"):
+        positive, negative = (m.to_numpy() for m in contrasts(dev)[name])
+        out[name] = {}
+        for band in ("delta", "theta", "alpha"):
+            columns = [
+                c for c in dev if c.startswith("bp_vid_") and c.endswith(f"_{band}")
+            ]
+            d, _ = _person_d(dev[columns].to_numpy(float), positive, negative, people)
+            mean, low, high = _summary(d)
+            out[name][band] = {
+                c.split("_")[2]: [
+                    round(float(m), 4),
+                    round(float(lo), 4),
+                    round(float(hi), 4),
+                ]
+                for c, m, lo, hi in zip(columns, mean, low, high, strict=True)
+            }
+    return out
+
+
 def emotions(table):
     """Heart and skin curves of stress trials by reported emotion, per person."""
     out = {}
@@ -421,6 +450,7 @@ def main():
         "latency_test",
         "latency_dev",
         "explore",
+        "ocular",
         "emotions",
         "habituation",
         "hrv",
