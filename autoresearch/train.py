@@ -10,7 +10,7 @@ from sklearn.preprocessing import StandardScaler
 TARGETS = ("rating_valence", "rating_arousal")
 
 
-PREFIXES = ("bp_vid_", "bp_pre_", "erp_", "cov_", "ecg_", "eda_", "resp_")
+PREFIXES = ("bp_vid_", "ecg_", "eda_", "resp_")
 
 
 def features(frame):
@@ -24,9 +24,8 @@ def fit_predict(train, test):
     x_train, x_test = features(train), features(test)
     out = {}
     for target in TARGETS:
-        y = train[target] - train[target].groupby(train["participant_id"]).transform(
-            "mean"
-        )
+        # within-person percentile rank: matches the rank-based metric
+        y = train.groupby("participant_id")[target].rank(pct=True) - 0.5
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
