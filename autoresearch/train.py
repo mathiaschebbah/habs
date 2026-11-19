@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import StandardScaler
 
 TARGETS = ("rating_valence", "rating_arousal")
 
@@ -54,7 +54,7 @@ def channels(frame):
 def ridge(x_train, y, x_test, alphas=np.logspace(0, 4, 9)):
     """Median-impute, standardise, ridge with GCV-chosen penalty."""
     model = make_pipeline(
-        SimpleImputer(strategy="median"), RobustScaler(), RidgeCV(alphas=alphas)
+        SimpleImputer(strategy="median"), StandardScaler(), RidgeCV(alphas=alphas)
     )
     return model.fit(x_train, y).predict(x_test)
 
@@ -64,6 +64,11 @@ def centred(frame, target):
     return frame[target] - frame[target].groupby(frame["participant_id"]).transform(
         "mean"
     )
+
+
+def impute_by_person(x, frame):
+    """Fill gaps with the person's own median (label-free)."""
+    return x.fillna(x.groupby(frame["participant_id"].to_numpy()).transform("median"))
 
 
 VIEWS = (
@@ -77,6 +82,13 @@ def fit_predict(train, test):
     out = {}
     for target in TARGETS:
         y = centred(train, target)
-        preds = [ridge(view(train), y, view(test)) for view in VIEWS]
+        preds = [
+            ridge(
+                impute_by_person(view(train), train),
+                y,
+                impute_by_person(view(test), test),
+            )
+            for view in VIEWS
+        ]
         out[target] = sum(p / p.std() for p in preds) / len(preds)
     return pd.DataFrame(out, index=test.index)
