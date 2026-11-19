@@ -151,6 +151,16 @@ def extra_splits(name, table):
             }
             for column in d
         }
+    body = [c for c in features if c.startswith(PERIPHERAL + SYMPATHETIC)]
+    out["coverage"] = {c: float(features[c].notna().mean()) for c in body}
+    if {"hrv_rr_mean", "ecg_hr"} <= set(features):
+        both = features[["hrv_rr_mean", "ecg_hr"]].dropna()
+        out["hr_agreement"] = {
+            "pearson": float(
+                np.corrcoef(60 / both["hrv_rr_mean"], both["ecg_hr"])[0, 1]
+            ),
+            "trials": len(both),
+        }
     return out
 
 
