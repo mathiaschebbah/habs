@@ -8,7 +8,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from decoding.common import PERIPHERAL, regional
-from decoding.stress import SYMPATHETIC, label
+from decoding.stress import SYMPATHETIC
 
 BODY = PERIPHERAL + SYMPATHETIC
 ALPHAS = np.logspace(0, 4, 9)
@@ -51,13 +51,14 @@ def ensemble(train, y, test):
 
 
 def target(train):
-    """Person-centred stress label."""
-    return centred(label(train).astype(float), train["participant_id"])
+    """Person-centred aversive score: negativity times activation, in [0, 1]."""
+    negative = ((5 - train["rating_valence"]) / 4).clip(lower=0)
+    activation = (train["rating_arousal"] - 1) / 8
+    return centred(negative * activation, train["participant_id"])
 
 
 def fit_predict(train, test):
-    """Predict valence and arousal, then score distress as arousal minus valence."""
-    people = train["participant_id"]
-    valence = ensemble(train, centred(train["rating_valence"], people), test)
-    arousal = ensemble(train, centred(train["rating_arousal"], people), test)
-    return pd.DataFrame({"stress": arousal - valence}, index=test.index)
+    """Return a stress score per ``test`` row (higher means more likely)."""
+    return pd.DataFrame(
+        {"stress": ensemble(train, target(train), test)}, index=test.index
+    )
