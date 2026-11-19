@@ -40,13 +40,8 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    power = regional(frame)
-    asym = {
-        f"asym_{band}": power[f"bp_vid_right_temporal_{band}"]
-        - power[f"bp_vid_left_temporal_{band}"]
-        for band in BANDS
-    }
-    return pd.concat([x, power, pd.DataFrame(asym, index=frame.index)], axis=1)
+    video, pre = regional(frame), regional(frame, "bp_pre")
+    return pd.concat([x, video, (video - pre.to_numpy()).add_prefix("d_")], axis=1)
 
 
 def fit_predict(train, test):
