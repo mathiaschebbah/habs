@@ -7,10 +7,10 @@ from sklearn.linear_model import RidgeCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from decoding.common import PERIPHERAL, regional
-from decoding.stress import SYMPATHETIC, label
+from decoding.common import regional
+from decoding.stress import label
 
-BODY = PERIPHERAL + SYMPATHETIC
+BODY = ()  # ablation: EEG only
 ALPHAS = np.logspace(0, 4, 9)
 
 
@@ -20,8 +20,7 @@ def regional_view(frame):
     region = power.columns.str.rsplit("_", n=1).str[0]
     total = np.log10((10**power).T.groupby(region).transform("sum").T)
     body = frame[[c for c in frame if c.startswith(BODY)]]
-    x = pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
-    return x[[c for c in x if c.endswith("_gamma")]]  # ablation
+    return pd.concat([body, power, (power - total).add_prefix("rel_")], axis=1)
 
 
 def channel_view(frame):
