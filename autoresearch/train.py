@@ -40,8 +40,13 @@ def regional(frame, kind="bp_vid", bands=BANDS):
 def features(frame):
     """Selected feature groups."""
     x = frame[[c for c in frame if c.startswith(PREFIXES)]]
-    x = pd.concat([x, regional(frame)], axis=1)
-    return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+    power = regional(frame)
+    asym = {
+        f"asym_{band}": power[f"bp_vid_right_temporal_{band}"]
+        - power[f"bp_vid_left_temporal_{band}"]
+        for band in BANDS
+    }
+    return pd.concat([x, power, pd.DataFrame(asym, index=frame.index)], axis=1)
 
 
 def fit_predict(train, test):
