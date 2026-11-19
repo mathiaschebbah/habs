@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import RidgeCV
+from sklearn.linear_model import ElasticNetCV
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -57,10 +57,8 @@ def fit_predict(train, test):
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
-            RidgeCV(alphas=np.logspace(0, 4, 9)),
+            ElasticNetCV(l1_ratio=0.5, alphas=20, cv=3, random_state=0),
         )
-        # every person counts equally, as in the metric
-        weight = 1 / train.groupby("participant_id")[target].transform("size")
-        model.fit(x_train, y, ridgecv__sample_weight=weight)
+        model.fit(x_train, y)
         out[target] = model.predict(x_test)
     return pd.DataFrame(out, index=test.index)
