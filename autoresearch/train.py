@@ -54,8 +54,7 @@ def fit_predict(train, test):
         y = train[target] - train[target].groupby(train["participant_id"]).transform(
             "mean"
         )
-        # denoise: how the training population rated this video, person-centred
-        y = y.groupby(train["video"]).transform("mean")
+        y = 0.5 * y + 0.5 * y.groupby(train["video"]).transform("mean")
         model = make_pipeline(
             SimpleImputer(strategy="median"),
             StandardScaler(),
