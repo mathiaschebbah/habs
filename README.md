@@ -6,15 +6,14 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
-**Latest completed study (03, autoresearch):** [results](docs/research/autoresearch/RESULTS.md),
-[four-page paper](docs/research/autoresearch/paper.pdf), and the
-[log of all 72 experiments](autoresearch/results.tsv). Following
-[karpathy/autoresearch](https://github.com/karpathy/autoresearch), an agent edited only
-`autoresearch/train.py` against a fixed scorer and kept changes that beat the best score by
-at least 0.005. Every scored prediction concerns a new person watching a new video theme.
-On the sealed test (55 people, 21 themes, scored once), within-person ρ between predicted and
-reported ratings went from 0.083 for the starting model to 0.139 [0.083, 0.196]; paired gain
-+0.056 [+0.012, +0.101]. To run the loop, see [`autoresearch/program.md`](autoresearch/program.md).
+**Study 04, stress detection (in progress):** [protocol](journal/04_stress_detection.md).
+
+**Study 03, rating prediction for new viewers and new videos:**
+[results](docs/research/affect/RESULTS.md), [four-page paper](docs/research/affect/paper.pdf),
+[all 72 experiments](docs/research/affect/experiments.tsv). Every scored prediction concerns a
+person and a video theme the model never saw. On the sealed test (55 people, 21 themes, opened
+once), within-person ρ between predicted and reported ratings went from 0.083 for the starting
+model to 0.139 [0.083, 0.196]; paired gain +0.056 [+0.012, +0.101]. Code in [`decoding/`](decoding).
 
 **Study 02:** [subjective–EEG carryover results](docs/research/carryover/RESULTS.md),
 [five-page paper](docs/research/carryover/manuscript.pdf), and

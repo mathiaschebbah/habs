@@ -1,6 +1,6 @@
 """Draw the paper figures from the run log and the sealed-test aggregates.
 
-Inputs are public aggregates only: ``autoresearch/results.tsv`` and
+Inputs are public aggregates only: ``docs/research/affect/experiments.tsv`` and
 ``results/sealed_test.json``. Run from the repository root.
 """
 
@@ -173,7 +173,7 @@ def modalities(log, results):
 
 def main():
     """Write the three figures."""
-    log = pd.read_csv(Path("autoresearch/results.tsv"), sep="\t", dtype={"commit": str})
+    log = pd.read_csv(Path("docs/research/affect/experiments.tsv"), sep="\t", dtype={"commit": str})
     short = {
         "ed5ec4d": "baseline",
         "abc371d": "person-centred ratings",

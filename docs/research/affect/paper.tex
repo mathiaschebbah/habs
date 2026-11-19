@@ -10,128 +10,121 @@
 \captionsetup{font=small,labelfont=bf}
 \setlength{\parskip}{3pt}
 
-\title{Autoresearch on EEG emotion decoding:\\
-seventy agent-run experiments scored on new people and new videos}
-\author{Mathias Chebbah\\\small HABS Neuro-AI Hackathon, Universit\'e Paris-Saclay, November 2026}
+\title{Can physiology tell how a new viewer rates a new video?\\
+A 72-step model search checked on a sealed test}
+\author{Mathias Chebbah, Team 12\\\small HABS Neuro-AI Hackathon, Universit\'e Paris-Saclay, November 2026}
 \date{}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-We applied the autoresearch loop of Karpathy (2026) to the HABS multimodal
-dataset. An agent edited one model file, scored each version on a fixed
-objective, and kept a change only when it beat the current best by at least
-0.005. The objective is the within-person Spearman correlation between
-predicted and reported valence and arousal, measured only for people and
-video themes absent from training. Over 72 experiments on 13,388
-development trials, the score rose from 0.030 to 0.105 through four kept changes. They were
-training on person-centred ratings, averaging EEG power over six regions,
-adding relative band power, and averaging a regional and a channel-level
-ridge regression. On a sealed test scored once (55 new people,
-21 new themes, 1,174 trials) the final model reached 0.139 (95\% interval
-0.083 to 0.196), against 0.083 for the starting model. The paired gain was
-+0.056 (+0.012 to +0.101). The development score did not overstate the test
-score. Two ablations locate the signal. EEG carried valence and peripheral
-signals carried most of the arousal information in development. A model
-fitted only on video-averaged physiology scored 0.010, so the information that
-transfers to new videos comes from each viewer's trial-level response, not
-from a stimulus signature shared across viewers. The effect is small. Pooled
-AUCs stay between 0.52 and 0.56.
+We tried to predict how much a participant liked a 10-second video (valence)
+and how activated it made them (arousal) from their EEG, heart, skin and
+breathing, for people and video themes the model had never seen. We scored
+each prediction by the correlation between predicted and reported ratings
+inside each person. We improved a simple model step by step: 72 variants, each
+one scored the same way, and we kept a change only when it beat the best score
+by at least 0.005. Four changes survived and took the development score from
+0.030 to 0.105: centring each person's ratings, averaging EEG power over six
+brain regions, adding relative band power, and averaging two ridge
+regressions. On a test set we opened once at the end (55 new people, 21 new
+themes) the final model reached 0.139 (95\% interval 0.083 to 0.196), against
+0.083 for the starting model, a paired gain of +0.056 (+0.012 to +0.101). EEG
+carried most of the valence information and the heart, skin and breathing
+signals most of the arousal information. A model trained on physiology
+averaged over everyone who watched a video scored at chance, so what
+transfers to new videos is each person's own reaction. The effect is real but
+small.
 \end{abstract}
 
-\section{Question}
+\section{Why we asked this}
 
-The HABS release pairs 64-channel EEG, ECG, skin conductance and respiration
-with ratings of 10-second emotional videos. Another hackathon team reported
-AUCs of 0.58 for arousal and 0.593 for valence on a high/low split (Slack,
-10 November). The dataset guide warns that videos recur across people. With a
-split by person only, a model can score by recognising a video it has seen in
-training. Our earlier study on the same data found that physiology added nothing measurable
-to stimulus context and personal calibration when predicting an aversive
-rating score. We asked whether physiology predicts a viewer's
-rating of a video when both the viewer and the video theme are new to the
-model, and how far an automated search can raise that number before it overfits
-its own validation set.
+The HABS dataset records 64-channel EEG, ECG, skin conductance and breathing
+while people watch short emotional videos and rate them. Another team posted
+AUCs around 0.58 for high versus low ratings on Slack. The dataset guide warns
+that the same videos come back for many participants. If you only split by
+person, a model can do well by recognising a video it already saw in
+training, which says little about reading someone's emotion. Our first study
+on this data also found that the video itself explains most of the ratings.
+So we wanted a cleaner question. Does physiology predict a viewer's rating
+when both the viewer and the video theme are new to the model? And how far can
+we push that number by iterating on the model without fooling ourselves?
 
-\section{Method}
+\section{What we did}
 
-\paragraph{Data.} We used every audited trial: 22,974 trials from 314
-participant IDs, 84 themes and 5 cohorts. A single job on the HABS GPU
-backend computed 1,180 label-free feature columns per trial (\texttt{extract.py}):
-log band power in five bands (1 to 45 Hz) for each EEG channel during the
-video and the 2 s before it, five 200-ms evoked bins, a 20-channel covariance,
-heart rate and its change, skin-conductance level, slope and variability,
-and respiratory amplitude and rate. EEG came from the released ICA-cleaned
-files for 22,898 trials. We excluded eye tracking, which the organisers
-reported as misaligned.
+\paragraph{Data.} We used all 22,974 audited trials (314 participants, 84
+themes, 5 cohorts). One job on the HABS GPU servers computed 1,180 features
+per trial without looking at the ratings (\texttt{decoding/extract.py}): log
+band power in five bands between 1 and 45 Hz for every EEG channel, during the
+video and in the 2 s before it, five 200-ms evoked-response bins, a
+20-channel covariance, heart rate and its change, skin conductance level,
+slope and variability, and breathing amplitude and rate. For 22,898 trials
+the EEG came from the released ICA-cleaned files. We left out eye tracking
+because the organisers told us it was misaligned.
 
-\paragraph{Splits.} A SHA-256 hash places each participant and each theme in
-one of five buckets. Bucket 0 of both forms the sealed test (new person, new
-theme). Two further test sets share one bucket: test people with other themes
-(new person, seen theme) and other people with test themes (seen person, new
-theme). The remaining 13,388 trials (259 people, 63 themes) form the
-development set. A $3\times3$ blocked cross-fit scores it. Each block of
-people fold $p$ and theme fold $t$ is predicted by a model trained on the
-other people folds and the other theme folds. Every development prediction
-therefore concerns an unseen person watching an unseen theme. The model never
-sees the video name, theme, intended emotion or start marker of a row it
-predicts, because the marker code also encodes the intended emotion.
+\paragraph{Splits.} We hash every participant and every theme into five
+buckets. Bucket 0 of both is the sealed test (new person, new theme). Two
+other test sets overlap with it: test people with the other themes (new
+person, seen theme), and the other people with the test themes (seen person,
+new theme). The remaining 13,388 trials (259 people, 63 themes) are our
+development set. We score it with a $3\times3$ cross-fit. Each block of people
+fold $p$ and theme fold $t$ is predicted by a model trained on the other people
+folds and the other theme folds, so every development prediction is about a
+person and a theme the model never saw. The model also never sees the video
+name, theme, intended emotion or start marker of the rows it predicts. We hid
+the start marker too, because its code gives away the intended emotion.
 
-\paragraph{Objective.} For each person with at least five varied trials, we
-compute Spearman's $\rho$ between predicted and reported rating. The score is
-the mean over people, averaged over valence and arousal. Chance is 0. A
-person's offset or scale use cannot raise it. We also report pooled AUC for
-ratings above 5, for comparison with other teams.
+\paragraph{Score.} For each person with at least five varied trials we compute
+Spearman's $\rho$ between predicted and reported rating, then average over
+people and over valence and arousal. Chance is 0. Since it is computed inside
+each person, how someone uses the rating scale cannot inflate it. We also
+report pooled AUC for ratings above 5, to compare with the other team.
 
-\paragraph{Loop.} Following Karpathy's design, \texttt{prepare.py} (data,
-splits, metric, a 420-s fitting budget) is fixed, and \texttt{train.py} is the
-only file the agent edits. A GitHub Actions workflow takes \texttt{train.py}
-from the experiment commit and every other file from \texttt{main}, so an
-experiment cannot change how it is scored. Runs print aggregates only and
-trial rows never leave the ephemeral runner. The agent (Claude, directed by
-\texttt{program.md}) wrote batches of 2 to 11 variants of the current best,
-scored them in parallel, and kept a variant when its gain was at least 0.005,
-about half the bootstrap standard error of the score. Ablations and
-references were logged but never kept. All 72 experiment commits stay on the
-branch \texttt{autoresearch/nov19}. We froze the protocol in the journal
-before reading any score. The sealed test ran once, after the search ended,
-for the starting model, the final model, two ablations of the final model and
-a session-position reference, with 5,000 bootstrap resamples of test people.
+\paragraph{Model search.} The scoring code stays fixed and we only edit one
+model file. A GitHub Actions job takes the model file from each experiment
+commit and the rest from \texttt{main}, so a variant cannot change how it is
+scored. Runs print only aggregate numbers, and trial rows never leave the
+temporary runner. We wrote variants in small batches of 2 to 11, scored them
+in parallel, and kept one only if it beat the best score by at least 0.005,
+about half the standard error of the score. Ablations were logged but never
+kept. All 72 commits are on the branch \texttt{experiments/affect}, and we
+wrote the protocol in our journal before reading any score. The test set was
+opened once, after the search, for five models at the same time, with 5,000
+bootstrap resamples of test people.
 
 \section{Results}
 
-\paragraph{Search.} Figure~\ref{fig:progress} shows the development score of
-every experiment. Training on ratings centred on each person's mean gave the
-largest step, from 0.030 to 0.085, which matches the within-person objective.
-Averaging channels over six regions raised it to 0.090 with fewer features,
-relative band power to 0.097, and averaging a regional and a channel-level
-ridge to 0.105. A rewrite with identical output became the final model. Many
-ideas lowered the score: z-scoring features within person, gradient boosting
-(0.051 to 0.076), kernel and quadratic expansions (0.037 to 0.056), the
-evoked bins, the covariance tangent space, pre-onset baselines and
-hemispheric asymmetry. Wider feature sets lost to narrower ones. Three
-batches in a row produced no kept change, and the search stopped there.
+\paragraph{The search.} Figure~\ref{fig:progress} shows every experiment.
+Training on ratings centred on each person's mean gave the biggest jump, from
+0.030 to 0.085, which makes sense since the score is computed inside each
+person. Averaging the channels over six regions brought it to 0.090 with fewer
+features. Adding relative band power gave 0.097, and averaging a regional and a
+channel-level ridge gave 0.105. A cleaner rewrite with the same output became
+the final model. A lot of ideas made things worse. Z-scoring features per
+person, gradient boosting (0.051 to 0.076), kernels and quadratic terms (0.037
+to 0.056), the evoked bins, a covariance tangent space, pre-video baselines and
+hemispheric asymmetry all lost. Bigger feature sets kept losing to smaller
+ones. After three batches in a row with nothing kept, we stopped.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/progress.png}
-\caption{Development score of the 72 experiments in order. Blue points are
-kept changes; the line is the running best. Open orange circles are
-ablations and references, never kept.}
+\caption{Development score of the 72 experiments in the order we ran them.
+Blue points are kept changes and the line is the best score so far. Open
+orange circles are ablations and references, which we never kept.}
 \label{fig:progress}
 \end{figure}
 
-\paragraph{Sealed test.} Table~\ref{tab:test} and Figure~\ref{fig:test}
-give the sealed results. In the primary regime the final model scored 0.139
-(0.083 to 0.196), against 0.083 (0.031 to 0.136) for the starting model.
-The paired gain of +0.056 (+0.012 to +0.101) excludes zero. Its development
-counterpart was +0.075, so roughly a quarter of the gain did not carry over,
-but the final model's own development score (0.105) sat below its test score.
-With 55 test people and 21 test themes, the intervals are wide. The gain also
-held for the two other regimes, at +0.035 (+0.009 to +0.061) for new people
-with seen themes and +0.038 (+0.019 to +0.056) for seen people with new
-themes.
+\paragraph{The sealed test.} Table~\ref{tab:test} and Figure~\ref{fig:test}
+show the results. For new people with new themes, the final model scored 0.139
+(0.083 to 0.196) and the starting model 0.083 (0.031 to 0.136). The paired gain
+is +0.056 (+0.012 to +0.101), so it does not cross zero. In development the
+gain was +0.075, so about a quarter of it did not carry over. The final
+model's development score (0.105) was still lower than its test score. With
+only 55 test people and 21 test themes, the intervals are wide. The gain also
+held for new people with seen themes, at +0.035 (+0.009 to +0.061), and for
+seen people with new themes, at +0.038 (+0.019 to +0.056).
 
 \begin{table}[t]
 \centering
@@ -150,92 +143,89 @@ Session position only & 0.048 [$-$0.015, 0.108] & 0.027 [$-$0.019, 0.071] & 0.04
 Final, pooled AUC (V/A) & 0.523 / 0.530 & 0.562 / 0.541 & 0.534 / 0.552\\
 \bottomrule
 \end{tabular}
-\caption{Sealed-test score (within-person $\rho$, mean of valence and
-arousal) with 95\% person-bootstrap intervals. All models were fitted once on
-the 13,388 development trials.}
+\caption{Sealed-test score (within-person $\rho$, mean of valence and arousal)
+with 95\% intervals from resampling people. Every model was fitted once on the
+13,388 development trials.}
 \label{tab:test}
 \end{table}
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/sealed_test.png}
-\caption{Sealed-test scores with 95\% person-bootstrap intervals.}
+\caption{Sealed-test scores with 95\% intervals from resampling people.}
 \label{fig:test}
 \end{figure}
 
-\paragraph{Seen versus new videos.} For the final model, new people with seen
-themes scored 0.152 and new people with new themes 0.139; for the starting
-model, 0.117 and 0.083. These sets share the same 55 people, so the
-difference is descriptive. Seeing the themes in training helped little once
-ratings were centred per person. A stronger test came from development. A
-model fitted on video means of person-centred features and ratings, which keeps
-only the physiology common to all viewers of a video, scored 0.010 (interval
-$-$0.007 to 0.026). What transfers to new themes is the individual response
-to a trial.
+\paragraph{Seen versus new videos.} With the final model, new people scored
+0.152 on seen themes and 0.139 on new themes. With the starting model they
+scored 0.117 and 0.083. Both sets contain the same 55 people, so we only read
+this descriptively. Once ratings are centred per person, having seen the theme
+in training helps little. Development gave us a sharper test. We trained a
+model on video averages of the person-centred features and ratings, which only
+keeps the physiology that everyone watching a video shares. It scored 0.010
+(interval $-$0.007 to 0.026), basically chance. What transfers to new themes is
+each person's own reaction to a trial.
 
-\paragraph{Signals.} In development, the EEG-only version of the final model
-predicted valence as well as the full model ($\rho$ = 0.108 versus 0.110)
-but arousal poorly (0.053 versus 0.101). The peripheral-only version predicted
-arousal (0.081) but not valence (0.017) (Figure~\ref{fig:signals}). On the
-sealed test, peripheral signals alone also reached 0.095 for valence, an
-estimate from 55 people that we read as noise around the development figure.
-Gamma power alone scored 0.024 in development and removing it cost 0.004, so
-facial muscle activity, which concentrates above 30 Hz, does not explain the
-decoding. Session position alone scored 0.009 in development and 0.048 in the
-primary test regime, with an interval that includes zero.
+\paragraph{Which signals.} In development, the EEG-only version of the final
+model predicted valence as well as the full model ($\rho$ = 0.108 versus 0.110)
+but arousal much worse (0.053 versus 0.101). The heart, skin and breathing
+version predicted arousal (0.081) but not valence (0.017), as
+Figure~\ref{fig:signals} shows. On the test set the peripheral-only model also
+reached 0.095 for valence. That estimate rests on 55 people, and we read it as
+noise around the development value. Gamma power alone scored 0.024, and
+removing it cost 0.004. Face muscle activity shows up mostly above 30 Hz, so it
+does not explain the decoding. Session position alone scored 0.009 in
+development and 0.048 on the main test regime, with an interval that includes
+zero.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{figures/modalities.png}
-\caption{Within-person $\rho$ per rating for the final model and its two
-ablations. Open circles: development cross-fit. Filled circles: sealed test,
-new person and new theme.}
+\caption{Within-person $\rho$ for each rating, for the final model and its two
+ablations. Open circles are the development cross-fit. Filled circles are the
+sealed test with new people and new themes.}
 \label{fig:signals}
 \end{figure}
 
-\section{Discussion}
+\section{What we take from it}
 
-The search produced a model that a held-out test confirmed, with a gain whose
-interval excludes zero. The changes that survived are simple. They centre the
-target on the person, pool channels, add relative power and average two
-linear models. More flexible models lost every comparison. The signal is weak and
-mostly linear, and with about 6,000 training trials per fold, variance
-dominates.
+The search found a model that the sealed test confirmed, and the gain's
+interval does not cross zero. The changes that survived are simple. They centre
+the target on the person, pool channels into regions, add relative power and
+average two linear models. Every more flexible model lost. The signal is weak
+and mostly linear, and with about 6,000 training trials per fold, variance is
+the main problem.
 
-The effect is small. A within-person
-correlation of 0.14 means the model orders a new viewer's trials slightly
-better than chance. The pooled AUCs of 0.52 to 0.56 are lower than the 0.58
-reported by another team, but the two numbers do not measure the same thing:
-our predictions carry no person offset by construction, and that team's
-split is unknown.
+The effect is small. A within-person correlation of 0.14 means the model ranks
+a new viewer's trials a little better than chance. Our pooled AUCs (0.52 to
+0.56) are lower than the 0.58 the other team posted, but they measure something
+else. Our predictions carry no per-person offset on purpose, and we do not know
+how that team split its data.
 
-The sealed test addressed the main risk of autoresearch, selection on a
-reused validation set. Seventy-two scored variants on the same development
-blocks did not inflate the final development score above the test score,
-although the gain shrank from 0.075 to 0.056. Two parts of the design may
-explain why the optimism stayed small. The keep threshold rejected 57 changes, and the blocked
-cross-fit scored every development trial with a model blind to its person
-and theme.
+What worried us most was overfitting the development set by trying so many
+variants on the same blocks. That did not show up. The final development score
+stayed below the test score, even though the gain shrank from 0.075 to 0.056.
+Two things probably helped. The 0.005 threshold rejected 57 changes, and the
+cross-fit scored every development trial with a model that had never seen its
+person or its theme.
 
-\paragraph{Limitations.} The test set is one split of 55 people and 21
-themes, and its intervals span about 0.11. The features are fixed. The agent
-could not change extraction, so window length, filtering and time-resolved
-features are untested. The final model scales each regression's output by
-its spread over the predicted batch, which assumes a batch of trials from the
-new person, without labels. Ratings are coarse 1 to 9 integers, and 76 trials
-used non-ICA EEG. The agent wrote the variants in parallel batches, not one
-at a time as in the original loop, and a human chose the objective, the
-threshold and when to stop.
+\paragraph{Limitations.} We have one test split of 55 people and 21 themes, and
+its intervals are about 0.11 wide. The features were fixed before the search,
+so we never tried other window lengths, filters or time-resolved features. The
+final model rescales each regression's output over the batch it predicts,
+which assumes we have several unlabelled trials from the new person. Ratings
+are 1 to 9 integers, and 76 trials used EEG without ICA cleaning. We also wrote
+variants in parallel batches rather than strictly one after the other, and we
+chose ourselves when to stop.
 
-\paragraph{Reproducibility.} \texttt{autoresearch/} holds the extractor,
-the fixed scorer, the final model and \texttt{program.md}.
-\texttt{results.tsv} lists all 72 experiments with commit, score and
-decision. The sealed metrics are in
-\nolinkurl{docs/research/autoresearch/results/sealed_test.json} (GitHub Actions
-run 44598712146). The repository publishes only aggregate numbers.
+\paragraph{Reproducibility.} The \texttt{decoding/} folder holds the
+extractor, the scoring code and the final model.
+\nolinkurl{docs/research/affect/experiments.tsv} lists all 72 experiments with
+their commit, score and decision, and the sealed numbers are in
+\nolinkurl{docs/research/affect/results/sealed_test.json}. The repository only
+publishes aggregate numbers.
 
-\paragraph{References.} A.~Karpathy, \emph{autoresearch},
-github.com/karpathy/autoresearch, 2026. HABS team, dataset paper and
-\texttt{DATASET.md}, HABS Neuro-AI Hackathon, 2026.
+\paragraph{References.} HABS team, dataset paper and \texttt{DATASET.md}, HABS
+Neuro-AI Hackathon, 2026.
 
 \end{document}
