@@ -9,14 +9,14 @@ on:
     inputs:
       study:
         type: choice
-        options: [affect, stress]
+        options: [affect, stress, timecourse]
         default: stress
       refs:
         description: "Space-separated experiment commit SHAs"
         required: true
       split:
         type: choice
-        options: [dev, test, correlates]
+        options: [dev, test, correlates, curves, latency_test, latency_dev, emotions, habituation, hrv]
         default: dev
         description: "dev = search objective; test = one-time sealed evaluation of all refs together; correlates = stress feature differences on dev"
       source_job:
@@ -57,7 +57,7 @@ jobs:
   score:
     needs: plan
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       max-parallel: 10
@@ -73,6 +73,7 @@ jobs:
           STUDY: ${{ inputs.study }}
         run: |
           mkdir -p candidates
+          [ "$STUDY" = timecourse ] && exit 0  # analyses only, no model file
           for ref in $REFS; do git show "$ref:decoding/models/$STUDY.py" > "candidates/$ref.py"; done
           ls candidates
       - uses: azure/login@v2
