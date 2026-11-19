@@ -28,7 +28,17 @@ def channel_view(frame):
     return frame[[c for c in frame if c.startswith(("bp_vid_",) + BODY)]]
 
 
-VIEWS = (regional_view, channel_view)
+def person_centred(view):
+    """The same view minus each person's own feature means (label-free)."""
+
+    def transformed(frame):
+        x = view(frame)
+        return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
+
+    return transformed
+
+
+VIEWS = (person_centred(regional_view), person_centred(channel_view))
 
 
 def ridge(x_train, y, x_test):
@@ -60,12 +70,4 @@ def fit_predict(train, test):
     people = train["participant_id"]
     valence = ensemble(train, centred(train["rating_valence"], people), test)
     arousal = ensemble(train, centred(train["rating_arousal"], people), test)
-    negative = ((5 - train["rating_valence"]) / 4).clip(lower=0)
-    aversive = ensemble(
-        train, centred(negative * (train["rating_arousal"] - 1) / 8, people), test
-    )
-    circumplex = arousal - valence
-    return pd.DataFrame(
-        {"stress": circumplex / circumplex.std() + aversive / aversive.std()},
-        index=test.index,
-    )
+    return pd.DataFrame({"stress": arousal - valence}, index=test.index)
