@@ -1,0 +1,396 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=1.75cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[english,french]{babel}
+\frenchsetup{SmallCapsFigTabCaptions=false}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parskip}{2pt}
+\graphicspath{{../research/timecourse/figures/}{../research/person/figures/}}
+\definecolor{boxline}{HTML}{2a78d6}
+\newcommand{\questionbox}[1]{\par\smallskip\noindent\fcolorbox{boxline}{white}{%
+\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{#1}}\par\smallskip}
+
+\title{Réactions de stress aigu chez 314 spectateurs : ce que montrent le cerveau
+et le corps, à quel moment, et si cela reflète la personne ou la situation}
+\author{Équipe 12 : Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo\\
+\small HABS Neuro-AI Hackathon, Université Paris-Saclay, novembre 2026}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent Nous avons cherché ce que montrent le cerveau et le corps pendant une
+réaction de stress aigu, à quel moment chaque signal change, et si ce
+changement reflète la personne ou seulement la situation qu'elle vit. La
+question vient des métiers sous forte pression, comme la chirurgie, où l'on dit
+rarement qu'on est stressé. Dans le jeu de données HABS (314 personnes, 22\,974
+vidéos de 10 secondes notées, avec EEG, ECG, conductance cutanée et
+respiration), un essai comptait comme une réaction de stress quand la personne
+jugeait la vidéo négative et activante. La puissance EEG lente (delta) montait
+dès la première seconde, le cœur ralentissait dès 1 s, la respiration devenait
+plus superficielle dès 2 s et la conductance cutanée montait dès 4 s. Le cœur
+et la respiration suivaient le caractère désagréable de la vidéo, la peau son
+intensité. La réponse du cerveau à chaque battement cardiaque ne changeait pas
+($d = 0{,}039$, intervalle à 95\,\% de $-$0,002 à 0,078). Chacune des 252 vidéos
+a été vue par 13 à 234 personnes : nous avons donc séparé chaque note et chaque
+réponse en une part partagée avec les autres spectateurs de la même vidéo et une
+part propre à la personne. Le cœur et la respiration ne suivaient que la part
+partagée (cœur, part propre 0,004, de $-$0,015 à 0,021), alors que la part
+propre des notes était réelle : elle prédisait l'émotion choisie par chacun (AUC
+de 0,90 entre spectateurs d'une même vidéo). Entre ces spectateurs, la
+physiologie disait qui était stressé à peine mieux que le hasard (AUC 0,517),
+alors que les notes des autres spectateurs le prédisaient avec une AUC de 0,92.
+D'une vidéo à l'autre, la détection chez des personnes nouvelles était précoce
+mais faible (AUC 0,52 dès la première seconde, 0,55 à 0,64 sur toute la vidéo).
+La physiologie reflète surtout la situation. Nous proposons de comparer des
+personnes exposées au même stimulus comme contrôle standard des détecteurs de
+stress.
+\end{abstract}
+
+\section{Introduction}
+
+\paragraph{D'où vient la question.} Deux d'entre nous sont en médecine, un en
+science des données. Nous sommes partis de situations comme le bloc opératoire,
+où le stress aigu monte, où on le dit rarement, et où une erreur peut coûter
+cher. Notre première idée était le \og point de rupture \fg{} : le moment où les
+signaux du cerveau et du corps changent avant que l'attention décroche et
+qu'une erreur soit commise. Les données HABS ne permettent pas d'y répondre.
+Les participants regardent des vidéos de 10 secondes et les notent, sans tâche,
+sans performance et sans erreur, et il n'y a ni questionnaire de stress ni
+cortisol. Nous avons gardé ce que les données permettent : la réaction de
+stress aigu elle-même, définie comme chez Giannakakis et al.\
+\cite{giannakakis2015} à partir des notes de chaque spectateur.
+
+Trois remarques du lancement et des mentors ont orienté la suite. Le label est
+subjectif : la même vidéo de saut en parachute fait peur aux uns et plaisir
+aux autres, si bien que choisir le \og vrai \fg{} état est une question de
+recherche en soi. Les signaux n'ont pas la même échelle de temps : l'EEG change
+en quelques millisecondes, la conductance cutanée quelques secondes plus tard,
+la respiration sur des cycles de plusieurs secondes. Et la variabilité
+cardiaque sur des fenêtres de moins de 30 s restait une question ouverte pour
+des extraits de 10 s. Un préprint de HABS a ensuite montré que les
+classifieurs d'émotions par EEG, sur un autre jeu de données, reconnaissent
+surtout le stimulus plutôt que l'émotion \cite{gerster2026}. Comme les mêmes
+vidéos reviennent d'un participant à l'autre, une vidéo stressante pourrait
+changer le corps de tout le monde par ses images et son son autant que par ce
+que chacun ressent. Des travaux antérieurs ont mesuré l'accord entre vécu et
+physiologie chez une même personne \cite{mauss2005,brown2020} et la
+synchronisation des réponses autonomes de spectateurs d'un même film
+\cite{golland2014}, mais pas la part du lien entre vécu et physiologie qui est
+partagée entre spectateurs et celle qui appartient à chacun. Les organisateurs
+ont demandé de ne pas utiliser l'oculométrie, qui est mal synchronisée ; le
+cœur et la respiration portent une bonne part de l'information sympathique de
+la pupille. Enfin, un cours sur les réseaux de la conscience (B. Hermann, 2024)
+a ajouté un angle cerveau--corps : la réponse corticale à chaque battement
+cardiaque \cite{park2014,candia2021}.
+
+\questionbox{\textbf{Question de recherche.} Quand quelqu'un vit une réaction
+de stress aigu, qu'est-ce que son cerveau et son corps montrent, à quel moment,
+et est-ce que cela reflète la personne ou seulement la situation qu'elle
+vit ?\\[2pt]
+\textbf{Q1, quoi et quand.} Quels signaux changent, dans quel ordre, et
+suivent-ils le caractère désagréable ou l'intensité de la réaction ? La réponse
+du cerveau aux battements cardiaques change-t-elle ?\\
+\textbf{Q2, la personne ou la situation.} Chaque signal suit-il la réaction
+propre de la personne, au-delà de ce qu'ont ressenti les autres spectateurs de
+la même vidéo ?\\
+\textbf{Q3, la détection.} Dès quand et à quel point un modèle figé détecte-t-il
+la réaction chez des personnes qu'il n'a jamais vues ?}
+
+\section{Méthodes}
+
+\paragraph{Données et label.} Nous avons utilisé tous les essais audités :
+22\,974 vidéos notées par 314 participants de 5 cohortes, avec un EEG à 64 voies
+(nettoyé par ICA, sans EOG), un ECG, la conductance cutanée et une ceinture
+respiratoire. Un essai est une \emph{réaction de stress} quand la valence vaut
+au plus 4 et l'arousal au moins 6 sur des échelles de 1 à 9 (24\,\% des
+essais). Deux contrastes de contrôle ont été fixés à l'avance : stress contre
+excitation (même arousal, valence opposée) et stress contre négatif calme (même
+valence, arousal plus bas).
+
+\paragraph{Signaux.} Des jobs sur les serveurs HABS, sans accès aux notes, ont
+calculé pour chaque seconde, de 3 s avant à 12 s après le début de la vidéo :
+la fréquence cardiaque à partir des pics R, la conductance cutanée, l'amplitude
+respiratoire et la puissance EEG (log) dans cinq bandes sur six régions du
+scalp, chaque valeur moins celle des 3 s précédant le début de l'essai. Un
+troisième job a moyenné l'EEG calé sur chaque pic R (de $-$200 à $+$600 ms,
+0,5--30 Hz, époques au-dessus de 100\,$\mu$V rejetées) sur les battements de
+chaque vidéo, et l'ECG de la même façon.
+
+\paragraph{La personne ou la situation (Q2).} Pour une note ou une réponse de
+la personne $p$ devant la vidéo $v$, nous la centrons sur la moyenne de la
+personne. Sa \emph{part partagée} est la moyenne des valeurs centrées des autres
+spectateurs de $v$ (au moins 9). Sa \emph{part propre} est le reste. Dans
+chaque personne (au moins 10 essais), nous régressons une réponse sur les parts
+partagée et propre d'une note, toutes centrées-réduites, puis moyennons les
+deux coefficients sur les personnes. Une réponse qui ne suit que la vidéo a un
+coefficient propre nul. Les réponses sont des changements moyens sur des
+fenêtres tirées de l'analyse temporelle : cœur 1--8 s, peau 4--10 s,
+respiration 2--6 s, delta 0--2 s, alpha 0--10 s. Nous calculons aussi l'AUC sur
+toutes les paires formées d'un spectateur stressé et d'un non stressé devant la
+\emph{même} vidéo (140 vidéos, 265\,019 paires). La vidéo est identique dans
+chaque paire, donc cette AUC ne peut venir que de la personne. Pour vérifier
+que la part propre d'une note n'est pas du simple bruit de notation, nous
+avons utilisé une seconde déclaration : la première émotion choisie par chaque
+spectateur (cohortes 2 à 5).
+
+\paragraph{Détection (Q3) et statistiques.} La détection utilise l'AUC ROC
+intra-personne (personnes avec au moins 3 essais de chaque type, moyenne sur
+les personnes, hasard à 0,5). Les modèles sont ajustés sur d'autres personnes
+\emph{et} d'autres thèmes de vidéos, sans jamais voir l'identité de la vidéo.
+Un modèle figé (régression logistique sur les secondes centrées par personne,
+du début jusqu'à la seconde $t$) n'est jamais réglé ; une recherche séparée de
+43 variantes de modèles avait son propre test scellé, ouvert une seule fois.
+Les intervalles sont des intervalles bootstrap à 95\,\% sur les personnes, ou
+sur les vidéos pour les AUC \og même vidéo \fg{} \cite{varoquaux2018}. Chaque
+protocole a été commité dans notre journal de projet avant le calcul de son
+résultat, et les analyses post hoc sont signalées comme telles.
+
+\section{Résultats}
+
+\subsection{Ce qui change, et quand (Q1)}
+
+Sur les données de développement (235 personnes), la puissance EEG lente
+montait dès la première seconde ($d$ de $+$0,11 à $+$0,14), la fréquence
+cardiaque baissait dès 1 s (jusqu'à $-$0,12 à 7 s), l'amplitude respiratoire
+baissait de 2 à 6 s et la conductance cutanée montait dès 4 s
+(figure~\ref{fig:curves}). Chez 52 personnes tenues à l'écart, la réponse de la
+peau se retrouvait avec le même délai (jusqu'à $+$0,25), et les courbes du cœur
+et de la respiration avaient la même forme. Cet ordre correspond aux études sur
+des images : décélération cardiaque dans les 2 s \cite{bradley2009}, réponses
+cutanées plus tardives \cite{benedek2010}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{curves_fr.png}
+\caption{Taille d'effet intra-personne du stress contre les autres essais,
+seconde par seconde autour du début de la vidéo. Bleu : données de
+développement (bande : intervalle à 95\,\%). Orange en tirets : personnes de
+test tenues à l'écart. Chaque seconde est rapportée aux 3 s précédant le début
+de l'essai.}
+\label{fig:curves}
+\end{figure}
+
+Les contrastes de contrôle montrent ce que suit chaque signal. Contre
+l'excitation (même arousal), le cœur ralentissait encore ($d$ moyen de 1 à
+8 s : $-$0,075 ; $-$0,14 à 6 s chez les personnes de test, de $-$0,23 à
+$-$0,04) et la respiration restait plus superficielle ($-$0,078). Contre les
+essais négatifs calmes (même valence), aucun des deux ne bougeait ($+$0,001,
+$-$0,009). La peau faisait l'inverse : elle séparait le stress des essais
+négatifs calmes ($+$0,13 à 6 s, de $+$0,02 à $+$0,24) mais pas de l'excitation.
+Le cœur et la respiration suivent le caractère désagréable, la peau
+l'intensité, comme chez Lang et al.\ \cite{lang1993}. Le cœur ralentissait
+autant pour la peur, le dégoût et la tristesse ($-$0,70 à $-$0,90 bpm) que pour
+la colère ($-$0,51, de $-$1,06 à $+$0,03), ce qui correspond mieux à une
+réponse d'orientation commune \cite{bradley2009} qu'à des profils propres à
+chaque émotion \cite{siegel2018}. L'effet delta était aussi grand en Pz
+($+$0,16) qu'en Fp1 ($+$0,16) : ce n'est donc pas un simple artefact oculaire
+\cite{hagemann2001}.
+
+La réponse du cerveau à chaque battement ne suivait pas le ralentissement du
+cœur (figure~\ref{fig:hep}). Moyenné sur les 13 battements d'une vidéo typique,
+l'EEG de 250 à 600 ms après chaque pic R, sur les régions frontale et centrale,
+ne différait pas pendant les réactions de stress : $d = 0{,}039$ (de $-$0,002 à
+0,078, 287 personnes), sans changement avec l'amplitude de l'ECG et l'intervalle
+RR en covariables (0,039, de $-$0,002 à 0,081). Ce contrôle compte, car le champ
+électrique du cœur atteint lui-même le scalp \cite{parkblanke2019}. Ici, la
+forme de l'ECG ne différait pas ($d = -0{,}009$) alors que l'intervalle RR
+s'allongeait ($d = +0{,}087$, de 0,042 à 0,132). Avec 287 personnes, un effet
+supérieur à environ $d = 0{,}08$ est exclu.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.88\linewidth]{hep_fr.png}
+\caption{Taille d'effet du stress contre les autres essais sur l'EEG et l'ECG
+moyennés autour de chaque pic R pendant la vidéo (287 personnes ; bande :
+intervalle à 95\,\%). La fenêtre testée va de 250 à 600 ms sur les régions
+frontale et centrale.}
+\label{fig:hep}
+\end{figure}
+
+\subsection{La personne ou la situation (Q2)}
+
+Le lien du cœur avec la valence passait entièrement par la part partagée
+(figure~\ref{fig:coupling}) : partagée 0,049 (de 0,029 à 0,068), propre 0,004
+(de $-$0,015 à 0,021), 313 personnes. La respiration se comportait de même
+(partagée 0,049, propre 0,001). Quand une personne trouvait une vidéo plus
+désagréable que les autres spectateurs, ni son cœur ni sa respiration ne le
+montraient. La peau suivait l'arousal par les deux parts, mais la part
+partagée était cinq fois plus grande (0,106 contre 0,023, de 0,003 à 0,043). La
+puissance alpha ne suivait que la part partagée de l'arousal. Le delta précoce
+était le seul signal avec une part propre nette (0,029, de 0,010 à 0,047, pour
+l'arousal).
+
+\begin{figure}[t]
+\centering
+\begin{minipage}[b]{0.64\linewidth}
+\includegraphics[width=\linewidth]{coupling_fr.png}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.34\linewidth}
+\includegraphics[width=\linewidth]{room_fr.png}
+\end{minipage}
+\caption{À gauche : coefficients intra-personne de chaque réponse sur la part
+de la note partagée avec les autres spectateurs de la même vidéo (bleu) et sur
+la part propre de la personne (orange), 274 à 314 personnes. À droite : AUC des
+réactions de stress entre les vidéos d'une même personne (bleu) et entre
+personnes devant la même vidéo (orange). Le taux de stress des autres
+spectateurs pour la vidéo donne à lui seul une AUC intra-personne de 0,917,
+hors échelle. Barres : intervalles à 95\,\%.}
+\label{fig:coupling}
+\end{figure}
+
+Le test direct va dans le même sens. Entre les vidéos d'une même personne, le
+modèle figé atteignait une AUC de 0,549 (de 0,537 à 0,561) ; entre spectateurs
+de la même vidéo, elle tombait à 0,517 (de 0,503 à 0,531). Aucun signal seul ne
+faisait mieux (cœur 0,513, peau 0,514, delta 0,523, respiration 0,493, alpha
+0,484). Le taux de stress des autres spectateurs pour la vidéo donnait à lui
+seul 0,917 (de 0,911 à 0,923). En post hoc, le même modèle réentraîné sur la
+seule part propre de chaque variable ne détectait rien (0,505 entre spectateurs
+de la même vidéo). Les liens partagés du cœur et de la peau se retrouvaient dans
+chacun des trois groupes de cohortes. Le lien propre de la peau et l'AUC
+\og même vidéo \fg{} ne tenaient que dans la cohorte 1 (0,545, de 0,521 à 0,570).
+Moyennée sur les spectateurs, la physiologie distinguait bien les vidéos
+stressantes : la réponse cutanée moyenne d'une moitié des personnes corrélait à
+$r = 0{,}26$ (de 0,17 à 0,36) avec le taux de stress de l'autre moitié (post
+hoc).
+
+La part propre d'une note n'est-elle que du bruit ? Dans ce cas, aucun signal
+ne pourrait la suivre. La part propre de la valence corrélait avec la part
+propre du choix d'une émotion négative ($r = -0{,}45$, de $-$0,48 à $-$0,42, 208
+personnes) et, entre spectateurs de la même vidéo, disait qui en avait choisi
+une avec une AUC de 0,897 (de 0,873 à 0,921). Dans la régression utilisée pour
+le cœur, l'émotion choisie suivait la part propre de la valence avec un
+coefficient de $-$0,257, le cœur avec 0,004. Les spectateurs vivent donc la même
+vidéo différemment et le déclarent de façon cohérente ; leur cœur ne suit pas.
+Une réserve demeure. Dans le pire cas permis par la théorie classique des tests
+(fiabilité égale à $r^2$), le coefficient propre du cœur corrigé du bruit de
+notation pourrait atteindre 0,047 sur toutes les personnes et 0,076 sur les
+cohortes 2 à 5, cette seconde valeur dépassant la part partagée de 0,049.
+
+\subsection{Dès quand et à quel point on peut la détecter (Q3)}
+
+Avec le modèle figé (257 personnes, chaque prédiction portant sur une personne
+et un thème nouveaux), tous les signaux battaient le hasard dès la première
+seconde (AUC 0,517, de 0,504 à 0,531) et atteignaient 0,546 vers 8 s
+(figure~\ref{fig:latency}). L'EEG était fiable dès 2 s, le cœur, la peau et la
+respiration ensemble dès 4 s. Chez des personnes nouvelles (51 éligibles), le
+modèle était fiable dès 3 s et atteignait 0,570 ; sur des thèmes tenus à
+l'écart (35 éligibles), il atteignait 0,642 (de 0,586 à 0,700). La cellule
+scellée principale ne comptait que 9 personnes éligibles et est rapportée comme
+un découpage raté. Les 3 s précédant la vidéo donnaient 0,483. Sur toute la
+vidéo, la recherche de modèles faisait passer l'AUC de développement de 0,537 à
+0,585, mais sur son test scellé (60 personnes, 18 thèmes) le modèle final
+obtenait 0,605 (de 0,544 à 0,668) contre 0,634 (de 0,570 à 0,699) pour la
+régression logistique de départ ; onze familles de scikit-learn n'ont jamais
+battu un modèle linéaire. Le stress contre l'excitation restait entre 0,45 et
+0,59. Pour la question des mentors sur la variabilité cardiaque, la fréquence
+cardiaque sur 10 s concordait avec la même fenêtre de 60 s ($r = 0{,}94$,
+limites de $\pm$7,3 bpm), la RMSSD non ($r = 0{,}75$, contre 0,85 au repos
+\cite{munoz2015}). Aucune réponse ne s'atténuait au fil d'une séance ou d'un
+jour à l'autre.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\linewidth]{latency_fr.png}
+\caption{AUC intra-personne du modèle figé n'utilisant que les $t$ premières
+secondes de chaque vidéo. À gauche : validation croisée de développement. À
+droite : test scellé, thèmes tenus à l'écart. Bandes : intervalles à 95\,\%.}
+\label{fig:latency}
+\end{figure}
+
+\section{Discussion}
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l X l@{}}
+\toprule
+Question & Ce que nous avons trouvé & Chiffre clé\\
+\midrule
+Q1, ordre & EEG avant 1 s, cœur 1 s, respiration 2 s, peau 4 s & peau jusqu'à $d = +0{,}25$ (test)\\
+Q1, dimensions & Cœur et respiration suivent le désagréable, la peau l'intensité & cœur contre excitation $-$0,075\\
+Q1, cerveau--cœur & La réponse corticale aux battements ne change pas & $d = 0{,}039$ ($-$0,002 ; 0,078)\\
+Q2, cœur & Ne suit que la situation & propre 0,004, partagée 0,049\\
+Q2, peau & Surtout la situation, un peu la personne & propre 0,023, partagée 0,106\\
+Q2, même salle & La physiologie dit à peine qui est stressé & AUC 0,517 contre 0,917\\
+Q2, bruit de notation & La part propre des notes est réelle & AUC 0,897 pour l'émotion choisie\\
+Q3, détection & Précoce mais faible chez des personnes nouvelles & AUC 0,517 à 1 s, 0,55--0,64 à 10 s\\
+\bottomrule
+\end{tabularx}
+\caption{Ce que nous avons demandé et ce que nous avons trouvé. Intervalles et
+effectifs dans le texte.}
+\label{tab:summary}
+\end{table}
+
+Le tableau~\ref{tab:summary} répond à notre question. Pendant une réaction de
+stress aigu, le cerveau et le corps changent dans un ordre fixe : le cerveau
+d'abord, puis le cœur et la respiration, puis la peau. Mais l'essentiel du
+changement appartient à la situation. Le cœur et la respiration suivent le
+caractère désagréable d'une vidéo pour les spectateurs en général, pas pour ce
+spectateur-là, alors même que les spectateurs déclarent cette différence de
+façon cohérente. La peau ne suit que faiblement l'arousal propre de la
+personne.
+
+\paragraph{Retour au bloc opératoire.} Un moniteur de stress physiologique
+dirait surtout qu'il se passe quelque chose de difficile, pas que ce
+chirurgien-là le vit mal. Un événement aversif bref ralentit le cœur : un
+moniteur qui ne cherche qu'une accélération le raterait, et la RMSSD sur 10 s
+n'est pas fiable pendant une stimulation. Étudier le point de rupture avant
+l'erreur demande des données avec une tâche, une performance et des erreurs :
+c'est la suite naturelle.
+
+\paragraph{Un contrôle pour les détecteurs de stress.} Tenir à l'écart des
+personnes et des vidéos, comme nous et la plupart des études le faisons,
+empêche de mémoriser une vidéo, mais un modèle peut quand même apprendre ce
+que les vidéos stressantes font à tout le monde, et son AUC mesure alors le
+stimulus. Comparer des personnes exposées au même stimulus isole la personne.
+Ce contrôle ne coûte rien dans les jeux de données où les stimuli sont
+partagés, et nous proposons de le rapporter à côté de l'AUC habituelle. Côté
+méthode, une recherche de modèles qui gagnait 0,048 en développement n'a rien
+donné sur son test scellé : sans ce test, nous aurions annoncé un meilleur
+modèle.
+
+\paragraph{Limites.} Le label est une auto-évaluation d'une vidéo de 10
+secondes par des volontaires sains, pas un stress clinique. Les effets sont
+petits ($|d| \le 0{,}25$). La part partagée mélange le contenu émotionnel avec
+l'image et le son. Le bruit de notation n'est pas entièrement exclu pour le
+lien propre du cœur dans les cohortes 2 à 5 ; des notes répétées
+trancheraient. Le delta précoce, seul signal avec une part
+propre, peut refléter un sursaut ou un mouvement, ce qu'on ne peut exclure sans
+EOG. Quatre tests principaux partagent un même seuil à 95\,\%.
+
+\paragraph{Reproductibilité.} Le dépôt contient les extracteurs et les analyses
+figées (\texttt{decoding/}), les protocoles (\texttt{journal/}), les résultats
+agrégés et les scripts des figures (\texttt{docs/research/}). Seuls des
+chiffres agrégés quittent les serveurs de HABS.
+
+\begin{otherlanguage*}{english}
+\begin{thebibliography}{99}\footnotesize
+\bibitem{giannakakis2015} G. Giannakakis, D. Grigoriadis, M. Tsiknakis. Detection of stress/anxiety state from EEG features during video watching. IEEE EMBC 2015, 6034--6037.
+\bibitem{gerster2026} M. Gerster et al. Stimulus identity rather than emotion drives EEG classification on the FACED dataset. bioRxiv 2026, doi:10.64898/2026.06.12.731889.
+\bibitem{mauss2005} I. B. Mauss et al. The tie that binds? Coherence among emotion experience, behavior, and physiology. Emotion 5 (2005) 175--190.
+\bibitem{brown2020} C. L. Brown et al. Coherence between subjective experience and physiology in emotion: individual differences and implications for well-being. Emotion 20 (2020) 818--829.
+\bibitem{golland2014} Y. Golland, K. Keissar, N. Levit-Binnun. Studying the dynamics of autonomic activity during emotional experience. Psychophysiology 51 (2014) 1101--1111.
+\bibitem{park2014} H.-D. Park, S. Correia, A. Ducorps, C. Tallon-Baudry. Spontaneous fluctuations in neural responses to heartbeats predict visual detection. Nat. Neurosci. 17 (2014) 612--618.
+\bibitem{candia2021} D. Candia-Rivera et al. Neural responses to heartbeats detect residual signs of consciousness during resting state in postcomatose patients. J. Neurosci. 41 (2021) 5251--5262.
+\bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
+\bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
+\bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.
+\bibitem{lang1993} P. J. Lang, M. K. Greenwald, M. M. Bradley, A. O. Hamm. Looking at pictures: affective, facial, visceral, and behavioral reactions. Psychophysiology 30 (1993) 261--273.
+\bibitem{siegel2018} E. H. Siegel et al. Emotion fingerprints or emotion populations? A meta-analytic investigation of autonomic features of emotion categories. Psychol. Bull. 144 (2018) 343--393.
+\bibitem{hagemann2001} D. Hagemann, E. Naumann. The effects of ocular artifacts on (lateralized) broadband power in the EEG. Clin. Neurophysiol. 112 (2001) 215--231.
+\bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: underlying mechanisms, functional roles, and methodological considerations. NeuroImage 197 (2019) 502--511.
+\bibitem{munoz2015} M. L. Munoz et al. Validity of (ultra-)short recordings for heart rate variability measurements. PLoS ONE 10 (2015) e0138921.
+\end{thebibliography}
+\end{otherlanguage*}
+
+\end{document}

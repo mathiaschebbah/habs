@@ -1,18 +1,24 @@
 \documentclass[10pt]{article}
-\usepackage[a4paper,margin=1.9cm]{geometry}
+\usepackage[a4paper,margin=1.75cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
+\usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{tabularx}
 \usepackage{amsmath}
+\usepackage{xcolor}
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
-\setlength{\parskip}{3pt}
-\graphicspath{{../research/stress/figures/}{../research/timecourse/figures/}{../research/person/figures/}}
+\setlength{\parskip}{2pt}
+\graphicspath{{../research/timecourse/figures/}{../research/person/figures/}}
+\definecolor{boxline}{HTML}{2a78d6}
+\newcommand{\questionbox}[1]{\par\smallskip\noindent\fcolorbox{boxline}{white}{%
+\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{#1}}\par\smallskip}
 
-\title{Whose stress is it? The body mostly follows the video, not the viewer,\\
-during acute stress reactions to short videos}
+\title{Acute stress reactions in 314 viewers: what the brain and body show,\\
+when, and whether it reflects the person or the situation}
 \author{Team 12: Mathias Chebbah, Aur\'elien Saint-Gr\'egoire, Ashley Russo\\
 \small HABS Neuro-AI Hackathon, Universit\'e Paris-Saclay, November 2026}
 \date{}
@@ -21,142 +27,180 @@ during acute stress reactions to short videos}
 \maketitle
 
 \begin{abstract}
-A stress monitor has to read the person, not what the person is looking at. We
-tested whether physiology does that in HABS (314 people, 22,974 rated
-10-second videos). A trial counted as a stress reaction when its viewer rated
-it negative and activating. Second by second, stressful videos raised slow
-(delta) EEG power within the first second, slowed the heart from 1 s, made
-breathing shallower from 2 s and raised skin conductance from 4 s. The heart
-and breathing tracked how unpleasant a video was, and the skin how intense.
-Each of the 252 videos was watched by 13 to 234 people. For every rating and
-every response we separated the part shared with the other viewers of the same
-video from the part that is the person's own. The heart and breathing followed
-only the shared part: their link with the person's own valence was zero (heart:
-0.004, 95\% interval $-0.015$ to 0.021, in within-person standard deviations).
-The skin followed the person's own arousal, but at a fifth of its link with the
-video (0.023 against 0.106), and in one of three cohorts only. Among people
-watching the same video, a fixed model told who felt stressed barely above
-chance (AUC 0.517, 0.503 to 0.531). Knowing how the other viewers rated the video
-predicted a person's stress reaction with AUC 0.92. The person's own part of
-valence is not rating noise: it told which viewers of the same video chose a
-negative emotion with AUC 0.90. The brain's response to
-each heartbeat did not change measurably during stress reactions ($d = 0.039$,
-$-0.002$ to 0.078, 287 people), although the heart slowed. Across
-videos the detection is weak but early: within-person AUC 0.517 from the first
-second and 0.55 to 0.64 over the whole video in new people, and a 43-variant
-model search did not beat logistic regression on a sealed test. Physiological
-stress detectors tested across different videos mostly read what a video does to
-everyone. We propose comparing viewers of the same stimulus as a standard check.
+\noindent We asked what the brain and body show when someone has an acute
+stress reaction, when each signal changes, and whether the change reflects the
+person or only the situation they are in. The question came from high-pressure
+work such as surgery, where people rarely say they are stressed. In the HABS
+dataset (314 people, 22,974 rated 10-second videos, with EEG, ECG, skin
+conductance and breathing), a trial counted as a stress reaction when its
+viewer rated it negative and activating. Slow (delta) EEG power rose within the
+first second, the heart slowed from 1 s, breathing became shallower from 2 s
+and skin conductance rose from 4 s. The heart and breathing tracked how
+unpleasant a video was, the skin how intense. The brain's response to each
+heartbeat did not change ($d = 0.039$, 95\% interval $-0.002$ to 0.078). Each of
+the 252 videos was seen by 13 to 234 people, so we split every rating and
+response into the part shared with the other viewers of the same video and the
+person's own part. The heart and breathing followed only the shared part
+(heart, own part 0.004, $-0.015$ to 0.021), although the own part of the
+ratings was real: it predicted the emotion each viewer chose (AUC 0.90 among
+viewers of the same video). Among those viewers, physiology told who was
+stressed barely above chance (AUC 0.517), while the other viewers' ratings
+predicted it with AUC 0.92. Across videos, detection in new people was early
+but weak (AUC 0.52 from the first second, 0.55 to 0.64 over the whole video).
+Physiology mostly reflects the situation. We propose comparing people exposed to
+the same stimulus as a standard check for stress detectors.
 \end{abstract}
 
-\section{Why we asked this}
+\section{Introduction}
 
-Two of us train in medicine and one in data science. Our question came from
-the operating room: can you read an acute stress reaction from someone's
-physiology, early, without calibrating on them? HABS has no stress measure,
-so, like Giannakakis et al.\ \cite{giannakakis2015}, we used self-ratings of
-videos. That raised a problem we had underestimated. The same videos come back
-across participants, and a HABS preprint showed that EEG emotion decoders on
-another dataset mostly recognise the stimulus \cite{gerster2026}. A video that
-frightens most viewers changes everyone's body, partly through its images and
-sound, whatever each viewer feels. Earlier work measured how well experience
-and physiology agree inside a person \cite{mauss2005,brown2020} and how
-synchronised autonomic responses to films are across viewers
-\cite{golland2014}, but not how much of the experience--physiology link is
-shared and how much is personal. We asked three questions: what changes, and
-when; whose reaction the body follows, the video's or the viewer's; and how
-early and how well a model detects the reaction in new people. A course on
-brain networks of consciousness (B. Hermann, 2024) added a fourth: does the
-brain's response to each heartbeat \cite{park2014,candia2021} change too?
+\paragraph{Where the question came from.} Two of us train in medicine and one
+in data science. We started from settings such as the operating room, where
+acute stress builds up, people rarely report it, and a lapse can be costly. Our
+first idea was the ``breaking point'': the moment brain and body signals change
+before attention drops and an error is made. The HABS data cannot answer that.
+Participants watch 10-second videos and rate them, with no task, no
+performance and no errors, and there is no stress questionnaire or cortisol. We
+kept what the data allow, the acute stress reaction itself, defined as
+Giannakakis et al.\ did \cite{giannakakis2015} from each viewer's own ratings.
 
-\section{What we did}
+Three remarks from the kick-off and the mentors shaped the rest. The label is
+subjective: the same parachute video frightens some viewers and delights
+others, so what counts as the true state is a research question in itself.
+Signals live on different time scales: EEG changes within milliseconds, skin
+conductance seconds later, breathing over cycles of several seconds. And heart
+rate variability on windows shorter than 30 s was an open question for 10-second
+clips. A HABS preprint then showed that EEG emotion classifiers on another
+dataset mostly recognise the stimulus rather than the emotion \cite{gerster2026}.
+Since the same videos come back across our participants, a stressful video
+could change everyone's body through its images and sound as much as through
+what each viewer feels. Earlier work measured how well experience and
+physiology agree inside a person \cite{mauss2005,brown2020} and how synchronised
+autonomic responses to films are across viewers \cite{golland2014}, but not how
+much of the experience--physiology link is shared between viewers and how much
+belongs to the individual. The organisers asked teams not to use eye tracking,
+which is misaligned; heart and breathing carry much of the same sympathetic
+information as the pupil. Finally, a course on brain networks of consciousness
+(B. Hermann, 2024) added a brain--body angle: the cortical response to each
+heartbeat \cite{park2014,candia2021}.
 
-\paragraph{Data and labels.} We used every audited trial: 22,974 videos rated
+\questionbox{\textbf{Research question.} When someone has an acute stress
+reaction, what do their brain and body show, when, and does it reflect the
+person or only the situation they are in?\\[2pt]
+\textbf{Q1, what and when.} Which signals change, in what order, and do they
+follow how unpleasant or how intense the reaction is? Does the brain's
+response to heartbeats change?\\
+\textbf{Q2, person or situation.} Does each signal follow the person's own
+reaction, beyond what the other viewers of the same video felt?\\
+\textbf{Q3, detection.} How early and how well can a fixed model detect the
+reaction in people it has never seen?}
+
+\section{Methods}
+
+\paragraph{Data and label.} We used every audited trial: 22,974 videos rated
 by 314 participants in 5 cohorts, with 64-channel EEG (ICA-cleaned, no EOG),
-ECG, skin conductance and a breathing belt. The organisers asked teams not to
-use eye tracking, which is misaligned. A trial is a \emph{stress reaction}
-when valence $\le 4$ and arousal $\ge 6$ on 1 to 9 (24\% of trials). Control
-contrasts, fixed in advance: stress versus excitement (same arousal, opposite
-valence) and stress versus calm negative (same valence, lower arousal).
+ECG, skin conductance and a breathing belt. A trial is a \emph{stress reaction}
+when valence $\le 4$ and arousal $\ge 6$ on scales of 1 to 9 (24\% of trials).
+Two control contrasts were fixed in advance: stress versus excitement (same
+arousal, opposite valence) and stress versus calm negative trials (same
+valence, lower arousal).
 
-\paragraph{Features.} Jobs on the HABS servers computed, blind to ratings,
-per second from 3 s before to 12 s after onset: heart rate (from R peaks),
-skin conductance, breathing amplitude and log power in five EEG bands over six
-regions, each minus the trial's own 3 s before onset. A third job averaged the
-EEG locked to each R peak ($-200$ to $+600$ ms, 0.5--30 Hz, epochs above
-100\,$\mu$V rejected) over the beats of each video, and the ECG the same way.
+\paragraph{Signals.} Jobs on the HABS servers, blind to ratings, computed per
+second from 3 s before to 12 s after video onset: heart rate from R peaks, skin
+conductance, breathing amplitude, and log power in five EEG bands over six
+scalp regions, each minus the trial's own 3 s before onset. A third job
+averaged the EEG locked to each R peak ($-200$ to $+600$ ms, 0.5--30 Hz, epochs
+above 100\,$\mu$V rejected) over the beats of each video, and the ECG the same
+way.
 
-\paragraph{Shared and own parts.} For a rating or a response of person $p$ on
-video $v$, we centre it on the person's mean. Its \emph{shared part} is the
-mean centred value of the other viewers of $v$ (at least 9). Its \emph{own
+\paragraph{Person or situation (Q2).} For a rating or a response of person
+$p$ on video $v$, we centre it on the person's mean. Its \emph{shared part} is
+the mean centred value of the other viewers of $v$ (at least 9). Its \emph{own
 part} is the rest. Within each person (at least 10 trials), we regress a
 response on the shared and own parts of a rating, all z-scored, and average the
-two coefficients over people. A response that only follows the video has a
-zero own coefficient. Responses are mean changes over windows taken from the
-time-course study: heart 1--8 s, skin 4--10 s, breathing 2--6 s, delta 0--2 s,
-alpha 0--10 s. We also compute the AUC over all pairs of a stressed and a
-non-stressed viewer of the \emph{same} video (140 videos, 265,019 pairs). The
-video is identical inside each pair, so this AUC can only come from the
-person.
+two coefficients over people. A response that follows only the video has a zero
+own coefficient. Responses are mean changes over windows taken from the
+time-course analysis: heart 1--8 s, skin 4--10 s, breathing 2--6 s, delta
+0--2 s, alpha 0--10 s. We also compute the AUC over all pairs of a stressed and
+a non-stressed viewer of the \emph{same} video (140 videos, 265,019 pairs).
+The video is identical inside each pair, so this AUC can only come from the
+person. To check that the own part of a rating is not just rating noise, we
+used a second report: the first emotion each viewer picked (cohorts 2 to 5).
 
-\paragraph{Evaluation.} All intervals are 95\% bootstrap intervals over people
-(over videos for same-video AUCs) \cite{varoquaux2018}. Detection uses
-within-person ROC AUC (at least 3 trials of each kind, averaged over people,
-chance 0.5). Its models are fitted on other people \emph{and} other video
-themes, never see video identity, and one fixed model (logistic regression on
-person-centred bins from onset to second $t$) is never tuned. The whole-video
-model search had its own sealed test (new people, new themes), opened once.
-Every protocol was committed to our journal before we read its outcome; we
-label post hoc analyses as such.
+\paragraph{Detection (Q3) and statistics.} Detection uses the within-person
+ROC AUC (people with at least 3 trials of each kind, averaged over people,
+chance 0.5). Models are fitted on other people \emph{and} other video themes
+and never see video identity. One fixed model (logistic regression on
+person-centred bins from onset to second $t$) is never tuned; a separate
+43-variant model search had its own sealed test, opened once. Intervals are 95\%
+bootstrap intervals over people, or over videos for same-video AUCs
+\cite{varoquaux2018}. Every protocol was committed to our project journal before
+we computed its outcome, and post hoc analyses are labelled as such.
 
 \section{Results}
 
-\subsection{What changes, and when}
+\subsection{What changes, and when (Q1)}
 
-In development (235 people), slow EEG power rose from the first second
+In development data (235 people), slow EEG power rose from the first second
 ($d = +0.11$ to $+0.14$), heart rate fell from 1 s (to $-0.12$ at 7 s),
 breathing amplitude dipped from 2 to 6 s and skin conductance rose from 4 s
 (Figure~\ref{fig:curves}). In 52 held-out people the skin response replicated
-with the same onset (up to $+0.25$); heart and breathing had the same shape but
-crossed significance only briefly. The order matches picture-viewing studies:
-cardiac deceleration within 2 s \cite{bradley2009}, skin responses later
-\cite{benedek2010}. Against excitement the heart still slowed (mean $d$ 1--8 s
-$-0.075$; $-0.14$ at 6 s in test people, $-0.23$ to $-0.04$) and breathing
-stayed shallower ($-0.078$). Against calm negative trials neither moved
-($+0.001$, $-0.009$). The skin did the opposite: it separated stress from calm
-negative ($+0.13$ at 6 s, $+0.02$ to $+0.24$) but not from excitement. The heart
-and breathing follow unpleasantness, the skin intensity, as in Lang et al.\
-\cite{lang1993}. The heart slowed for fear, disgust and sadness alike ($-0.70$
-to $-0.90$ bpm), and for anger ($-0.51$, $-1.06$ to $+0.03$), which fits a
-shared orienting response \cite{bradley2009} better than emotion-specific
-patterns \cite{siegel2018}. The delta effect was as large at Pz ($+0.16$) as
-at Fp1 ($+0.16$), so it is not a purely ocular artefact \cite{hagemann2001}.
+with the same onset (up to $+0.25$), and the heart and breathing curves had the
+same shape. The order matches picture-viewing studies: cardiac deceleration
+within 2 s \cite{bradley2009}, skin responses later \cite{benedek2010}.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{curves.png}
 \caption{Within-person effect size of stress versus other trials, second by
-second around video onset. Blue: development (band: 95\% interval). Orange
-dashed: held-out test people. Each bin is relative to the trial's 3 s before
-onset.}
+second around video onset. Blue: development data (band: 95\% interval).
+Orange dashed: held-out test people. Each bin is relative to the trial's 3 s
+before onset.}
 \label{fig:curves}
 \end{figure}
 
-\subsection{Whose reaction: the video's or the viewer's?}
+The control contrasts show what each signal follows. Against excitement (same
+arousal) the heart still slowed (mean $d$ from 1 to 8 s: $-0.075$; $-0.14$ at
+6 s in test people, $-0.23$ to $-0.04$) and breathing stayed shallower
+($-0.078$). Against calm negative trials (same valence) neither moved ($+0.001$,
+$-0.009$). The skin did the opposite: it separated stress from calm negative
+trials ($+0.13$ at 6 s, $+0.02$ to $+0.24$) but not from excitement. The heart and
+breathing follow unpleasantness and the skin follows intensity, as in Lang et
+al.\ \cite{lang1993}. The heart slowed for fear, disgust and sadness alike
+($-0.70$ to $-0.90$ bpm) and for anger ($-0.51$, $-1.06$ to $+0.03$), which fits a
+shared orienting response \cite{bradley2009} better than emotion-specific
+patterns \cite{siegel2018}. The delta effect was as large at Pz ($+0.16$) as at
+Fp1 ($+0.16$), so it is not a purely ocular artefact \cite{hagemann2001}.
 
-Figure~\ref{fig:coupling} gives the answer per signal. The heart's link with
-valence came entirely from the shared part: shared 0.049 (0.029 to 0.068), own
-0.004 ($-0.015$ to 0.021), 313 people. Breathing was the same (shared 0.049,
-own 0.001, $-0.017$ to 0.018). When a person found a video more unpleasant than
-the other viewers did, neither their heart nor their breathing showed it. The
-skin followed arousal through both parts, but the shared part was five times
-larger (0.106, 0.083 to 0.129, against 0.023, 0.003 to 0.043). Alpha power
-followed only the shared part of arousal ($-0.062$ against $-0.007$). Only
-early delta power followed the person more than the video: own part 0.029
-(0.010 to 0.047) for arousal and $-0.025$ ($-0.042$ to $-0.008$) for valence.
-Each response is also only loosely tied to the video itself: its within-person
-correlation with the other viewers' mean response to the same video ranged from
-0.09 (heart) to 0.19 (skin).
+The brain's response to each heartbeat did not follow the slower heart
+(Figure~\ref{fig:hep}). Averaged over the 13 beats of a typical video, the EEG
+250--600 ms after each R peak over frontal and central sites did not differ in
+stress reactions: $d = 0.039$ ($-0.002$ to 0.078, 287 people), unchanged with the
+ECG amplitude and the RR interval as covariates (0.039, $-0.002$ to 0.081). This
+control matters because the heart's own electric field reaches the scalp
+\cite{parkblanke2019}. Here the ECG waveform did not differ ($d = -0.009$) while
+the RR interval lengthened ($d = +0.087$, 0.042 to 0.132). With 287 people,
+effects larger than about $d = 0.08$ are ruled out.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{hep.png}
+\caption{Effect size of stress versus other trials on the EEG and the ECG
+averaged around each R peak during the video (287 people; band: 95\%
+interval). The tested window is 250--600 ms over frontal and central sites.}
+\label{fig:hep}
+\end{figure}
+
+\subsection{The person or the situation (Q2)}
+
+The heart's link with valence came entirely from the shared part
+(Figure~\ref{fig:coupling}): shared 0.049 (0.029 to 0.068), own 0.004
+($-0.015$ to 0.021), 313 people. Breathing behaved the same (shared 0.049, own
+0.001). When a person found a video more unpleasant than the other viewers did,
+neither their heart nor their breathing showed it. The skin followed arousal
+through both parts, but the shared part was five times larger (0.106 against
+0.023, 0.003 to 0.043). Alpha power followed only the shared part of arousal.
+Early delta power was the only signal with a clear own part (0.029, 0.010 to
+0.047, for arousal).
 
 \begin{figure}[t]
 \centering
@@ -168,148 +212,122 @@ correlation with the other viewers' mean response to the same video ranged from
 \end{minipage}
 \caption{Left: within-person coefficients of each response on the part of the
 rating shared with the other viewers of the same video (blue) and on the
-person's own part (orange), 274 to 314 people. Right: AUC of each score for
-stress reactions across the same person's videos (blue) and across people
-watching the same video (orange). Knowing the other viewers' stress rate for
-the video gives a within-person AUC of 0.917 (off the scale). Bars: 95\%
-intervals.}
+person's own part (orange), 274 to 314 people. Right: AUC for stress reactions
+across the same person's videos (blue) and across people watching the same
+video (orange). The other viewers' stress rate for the video alone gives a
+within-person AUC of 0.917, off the scale. Bars: 95\% intervals.}
 \label{fig:coupling}
 \end{figure}
 
-The direct test agrees (Figure~\ref{fig:coupling}, right). Across a person's
-videos the fixed model reached AUC 0.549 (0.537 to 0.561). Across viewers of
-the same video it fell to 0.517 (0.503 to 0.531). Single signals did no better:
-heart 0.513, skin 0.514, delta 0.523 (0.510 to 0.535), breathing 0.493, and
-alpha 0.484 (0.472 to 0.497), below chance. The other viewers' stress rate for
-the video alone gave a within-person AUC of 0.917 (0.911 to 0.923). Post hoc, we
-retrained the same model on the own part of every feature (each feature minus
-the other viewers' mean for that video). It detected nothing: AUC 0.498 across
-a person's videos and 0.505 (0.493 to 0.518) across viewers of the same video.
+The direct test agrees. Across a person's videos the fixed model reached AUC
+0.549 (0.537 to 0.561); across viewers of the same video it fell to 0.517 (0.503
+to 0.531). Single signals did no better (heart 0.513, skin 0.514, delta 0.523,
+breathing 0.493, alpha 0.484). The other viewers' stress rate for the video
+alone gave 0.917 (0.911 to 0.923). Post hoc, the same model retrained on the own
+part of every feature detected nothing (0.505 across viewers of the same
+video). The shared links of the heart and the skin replicated in each of three
+cohort groups. The skin's own link and the same-video AUC held only in cohort 1
+(0.545, 0.521 to 0.570). Averaged over viewers, physiology did tell stressful
+videos apart: the mean skin response of half of the people correlated
+$r = 0.26$ (0.17 to 0.36) with the other half's stress rate (post hoc).
 
-Across the three cohort groups, the shared links of the heart (0.040 to 0.058)
-and of the skin (0.103 to 0.113) replicated every time; the heart's own link
-never differed from zero. The skin's own link held only in cohort 1 (0.053,
-0.014 to 0.090), and so did the same-video AUC (0.545, 0.521 to 0.570; cohort 2:
-0.496; cohorts 3--5: 0.521; both intervals include 0.5). Post hoc, averaged over
-viewers, physiology did separate stressful from other videos: the mean skin
-response of one half of the people correlated $r = 0.26$ (0.17 to 0.36) with
-the other half's stress rate, delta $0.26$, heart $-0.19$ ($-0.29$ to $-0.08$).
+Is the own part of a rating just noise? Then no signal could follow it. The
+own part of valence correlated with the own part of choosing a negative emotion
+($r = -0.45$, $-0.48$ to $-0.42$, 208 people) and, among viewers of the same
+video, told who chose one with AUC 0.897 (0.873 to 0.921). In the regression
+used for the heart, the chosen emotion followed the own part of valence with a
+coefficient of $-0.257$, the heart with 0.004. Viewers do experience the same
+video differently and report it consistently; their heart does not follow. One
+reservation remains. In the worst case allowed by classical test theory
+(reliability $r^2$), the heart's own coefficient corrected for rating noise
+could reach 0.047 on all people and 0.076 in cohorts 2 to 5, the second value
+above the shared 0.049.
 
-Is the own part of a rating just noise? If it were, no signal could follow it.
-We tested this before reading the result, with a second report: the first
-emotion each viewer picked, available in cohorts 2 to 5. The own part of
-valence correlated with the own part of choosing a negative emotion
-($r = -0.45$, $-0.48$ to $-0.42$, 208 people). Among viewers of the same video
-it told who chose a negative emotion with AUC 0.897 (0.873 to 0.921), where
-physiology reached 0.517. In the regression used for the heart, the chosen
-emotion followed the own part of valence with a coefficient of $-0.257$, the
-heart with $0.004$. So viewers do differ in how they experience the same video,
-and they report it consistently; the heart does not follow. One caveat
-remains. If the own part's reliability is only $r^2$, the worst case under
-classical test theory, the heart's own coefficient corrected for rating noise
-could reach 0.047 (all people) or 0.076 (cohorts 2 to 5, where the observed
-value is 0.015, $-0.004$ to 0.034). The second limit exceeds the
-heart's shared coefficient (0.049), so rating noise alone cannot be fully ruled
-out as the reason the heart looks blind to the person.
+\subsection{How early and how well it can be detected (Q3)}
 
-\subsection{The brain's response to heartbeats}
-
-Averaged over the 13 beats of a typical video, the EEG response 250--600 ms
-after each R peak, over frontal and central sites, was not reliably different
-in stress reactions: $d = 0.039$ ($-0.002$ to 0.078, 287 people;
-Figure~\ref{fig:hep}). Adding the ECG amplitude in the same window and the mean
-RR interval as covariates did not change it (0.039, $-0.002$ to 0.081). This
-check matters because the heart's own electrical field reaches the scalp
-\cite{parkblanke2019}. Here the ECG waveform did not differ ($d = -0.009$), while
-the RR interval did lengthen ($d = +0.087$, 0.042 to 0.132): the heart slowed,
-but the brain's response to each beat did not measurably change. The response
-followed neither the shared nor the own part of valence or arousal (all
-coefficients within $\pm 0.011$). Frontal sites alone leaned positive (up to
-$d = 0.05$ near 300 to 500 ms), a post hoc observation that a future study
-could test in advance. With 287 people we can rule out effects larger than
-about $d = 0.08$.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{hep.png}
-\caption{Within-person effect size of stress versus other trials on the EEG
-and the ECG averaged around each R peak during the video (287 people; band:
-95\% interval). The tested window is 250--600 ms over frontal and central
-sites.}
-\label{fig:hep}
-\end{figure}
-
-\subsection{How early and how well we can detect it}
-
-With the frozen model and development cross-fit (257 people, new person and
-new theme for every prediction), all signals beat chance from the first second
-(AUC 0.517, 0.504 to 0.531) and reached 0.546 by 8 s (Figure~\ref{fig:latency}).
-EEG alone was reliable from 2 s, heart, skin and breathing together from 4 s.
-On new people (51 eligible) all signals were reliable from 3 s and reached
-0.570 at 9 s; on held-out themes (35 eligible), from 4 s, up to 0.642 (0.586 to
-0.700). Our primary sealed cell drew 13 themes and 9 eligible people, too few
-for any conclusion; we report it as a failed split. The 3 s before onset alone
-gave 0.483. Over the whole video, a 43-variant search raised the development
-AUC from 0.537 to 0.585, but on its sealed test (60 people, 18 themes) the final
-model scored 0.605 (0.544 to 0.668) against 0.634 (0.570 to 0.699) for the
-starting logistic regression; eleven scikit-learn families never beat a linear
-model. Stress versus relaxed reached 0.61 to 0.63, stress versus excitement
-0.45 to 0.59.
+With the frozen model (257 people, each prediction about a new person and a new
+theme), all signals beat chance from the first second (AUC 0.517, 0.504 to
+0.531) and reached 0.546 by 8 s (Figure~\ref{fig:latency}). EEG was reliable
+from 2 s, heart, skin and breathing together from 4 s. On new people (51
+eligible) the model was reliable from 3 s and reached 0.570; on held-out themes
+(35 eligible) it reached 0.642 (0.586 to 0.700). The primary sealed cell held
+only 9 eligible people and is reported as a failed split. The 3 s before onset
+gave 0.483. Over the whole video, the model search raised the development AUC
+from 0.537 to 0.585, but on its sealed test (60 people, 18 themes) the final
+model scored 0.605 (0.544 to 0.668) against 0.634 (0.570 to 0.699) for the starting
+logistic regression; eleven scikit-learn families never beat a linear model.
+Stress against excitement stayed between 0.45 and 0.59. For the mentors' heart
+rate variability question, heart rate on 10 s agreed with the same 60-second
+window ($r = 0.94$, limits $\pm 7.3$ bpm), RMSSD did not ($r = 0.75$, against 0.85
+at rest \cite{munoz2015}). No response faded over a session or between days.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{latency.png}
 \caption{Within-person AUC of the frozen model using only the first $t$
 seconds of each video. Left: development cross-fit. Right: sealed test,
-held-out themes. Bands are 95\% intervals.}
+held-out themes. Bands: 95\% intervals.}
 \label{fig:latency}
 \end{figure}
 
-Two side results answer questions from the mentors. Heart rate on 10 s agreed
-with the same 60-second window ($r = 0.94$, limits $\pm 7.3$ bpm), RMSSD did
-not ($r = 0.75$ at 10 s, 0.92 at 30 s; within recordings 0.43 at 10 s), unlike
-at rest \cite{munoz2015}. And neither the heart nor the skin response shrank
-across a session or from day 1 to day 2.
+\section{Discussion}
 
-\section{What we take from it}
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l X l@{}}
+\toprule
+Question & What we found & Key number\\
+\midrule
+Q1, order & EEG within 1 s, heart 1 s, breathing 2 s, skin 4 s & skin up to $d = +0.25$ (test)\\
+Q1, dimensions & Heart and breathing follow unpleasantness, skin intensity & heart vs excitement $-0.075$\\
+Q1, brain--heart & The cortical response to heartbeats does not change & $d = 0.039$ ($-0.002$, 0.078)\\
+Q2, heart & Follows the situation only & own 0.004 vs shared 0.049\\
+Q2, skin & Mostly the situation, a little the person & own 0.023 vs shared 0.106\\
+Q2, same room & Physiology barely tells who is stressed & AUC 0.517 vs 0.917\\
+Q2, rating noise & The own part of ratings is real & AUC 0.897 for the chosen emotion\\
+Q3, detection & Early but weak in new people & AUC 0.517 at 1 s, 0.55--0.64 at 10 s\\
+\bottomrule
+\end{tabularx}
+\caption{What we asked and what we found. Intervals and sample sizes are in
+the text.}
+\label{tab:summary}
+\end{table}
 
-Physiology shows acute stress reactions to short videos in a consistent order:
-slow EEG within a second, a slower heart and shallower breathing within 2 s,
-the skin from 4 s. But most of what it shows belongs to the video. The heart
-and breathing follow how unpleasant a video is for viewers in general, not how
-unpleasant it was for this viewer, and the skin follows the person's own
-arousal only weakly. Inside a room of people watching the same clip, physiology
-barely tells who is stressed, while knowing what the clip does to others
-predicts it very well. The heart slows, but the cortical response to each
-heartbeat does not visibly follow.
+Table~\ref{tab:summary} answers our question. During an acute stress reaction,
+the brain and body change in a fixed order, the brain first, then the heart and
+breathing, then the skin. But most of the change belongs to the situation. The
+heart and breathing follow how unpleasant a video is for viewers in general,
+not how unpleasant it was for this viewer, even though viewers report that
+difference consistently. The skin follows the person's own arousal only weakly.
 
-This changes how stress detectors should be validated. Holding out people and
-videos, as we and most studies do, prevents memorising a video, but a model can
-still learn what stressful videos do to everyone, and its AUC then measures
-the stimulus. Comparing viewers of the same stimulus isolates the person. It
-costs nothing in datasets where stimuli are shared, and we suggest reporting it
-next to the usual AUC. Early delta power was the one signal with a personal
-part. It may reflect a startle or a movement rather than a cortical state;
-without EOG we cannot tell.
+\paragraph{Back to the operating room.} A physiological stress monitor would
+mostly say that something hard is happening, not that this surgeon is living
+it badly. A short aversive event slows the heart, so a monitor that only looks
+for a faster heart would miss it, and 10-second RMSSD should not be trusted
+during stimulation. Studying the breaking point before an error needs data with
+a task, performance and errors; this is the natural next step.
 
-On method: a model search that gained 0.048 in development gave nothing on its
-sealed test, and a hash split left one sealed cell too small to conclude. A
-power check on eligible people before freezing a split would have caught it;
-we ran one for this last study.
+\paragraph{A check for stress detectors.} Holding out people and videos, as we
+and most studies do, prevents memorising a video, but a model can still learn
+what stressful videos do to everyone, and its AUC then measures the stimulus.
+Comparing people exposed to the same stimulus isolates the person. It costs
+nothing in datasets where stimuli are shared, and we suggest reporting it next
+to the usual AUC. On method, a model search that gained 0.048 in development
+gave nothing on its sealed test; without that test we would have claimed a
+better model.
 
 \paragraph{Limitations.} The label is a self-report about a 10-second video in
-healthy volunteers, not clinical stress. A person's own part of a rating also
-contains rating noise, which shrinks every own coefficient. A second report
-shows that part is mostly real, but our worst-case bound on the heart's
-corrected own coefficient (0.076 in cohorts 2 to 5) still reaches its shared
-one; a repeated-rating design would settle it. The shared part mixes emotional
-content with images and sound. Effects are small ($|d| \le 0.25$), and four
+healthy volunteers, not clinical stress. Effects are small ($|d| \le 0.25$). The
+shared part mixes emotional content with images and sound. Rating noise is not
+fully excluded for the heart's own link in cohorts 2 to 5; repeated ratings of
+the same videos would settle it. Early delta, the one signal with an own part,
+may reflect a startle or a movement, which we cannot exclude without EOG. Four
 primary tests share one 95\% threshold.
 
-\paragraph{Reproducibility.} \texttt{decoding/} holds the three feature
-extractors and the fixed analyses, \texttt{journal/} the frozen protocols,
-and \texttt{docs/research/} every aggregate result and figure script. Only
-aggregate numbers leave the HABS servers.
+\paragraph{Reproducibility.} The repository holds the three feature
+extractors and the fixed analyses (\texttt{decoding/}), the frozen protocols
+(\texttt{journal/}), and every aggregate result and figure script
+(\texttt{docs/research/}). Only aggregate numbers leave the HABS servers.
 
 \begin{thebibliography}{99}\small
 \bibitem{giannakakis2015} G. Giannakakis, D. Grigoriadis, M. Tsiknakis. Detection of stress/anxiety state from EEG features during video watching. IEEE EMBC 2015, 6034--6037.
@@ -319,13 +337,13 @@ aggregate numbers leave the HABS servers.
 \bibitem{golland2014} Y. Golland, K. Keissar, N. Levit-Binnun. Studying the dynamics of autonomic activity during emotional experience. Psychophysiology 51 (2014) 1101--1111.
 \bibitem{park2014} H.-D. Park, S. Correia, A. Ducorps, C. Tallon-Baudry. Spontaneous fluctuations in neural responses to heartbeats predict visual detection. Nat. Neurosci. 17 (2014) 612--618.
 \bibitem{candia2021} D. Candia-Rivera et al. Neural responses to heartbeats detect residual signs of consciousness during resting state in postcomatose patients. J. Neurosci. 41 (2021) 5251--5262.
-\bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: underlying mechanisms, functional roles, and methodological considerations. NeuroImage 197 (2019) 502--511.
 \bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
 \bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
 \bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.
 \bibitem{lang1993} P. J. Lang, M. K. Greenwald, M. M. Bradley, A. O. Hamm. Looking at pictures: affective, facial, visceral, and behavioral reactions. Psychophysiology 30 (1993) 261--273.
 \bibitem{siegel2018} E. H. Siegel et al. Emotion fingerprints or emotion populations? A meta-analytic investigation of autonomic features of emotion categories. Psychol. Bull. 144 (2018) 343--393.
 \bibitem{hagemann2001} D. Hagemann, E. Naumann. The effects of ocular artifacts on (lateralized) broadband power in the EEG. Clin. Neurophysiol. 112 (2001) 215--231.
+\bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: underlying mechanisms, functional roles, and methodological considerations. NeuroImage 197 (2019) 502--511.
 \bibitem{munoz2015} M. L. Munoz et al. Validity of (ultra-)short recordings for heart rate variability measurements. PLoS ONE 10 (2015) e0138921.
 \end{thebibliography}
 

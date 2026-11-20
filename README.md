@@ -6,9 +6,9 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
-**Submission paper:** [Whose stress is it? The body mostly follows the video, not the viewer, during
-acute stress reactions to short videos](docs/paper/paper.pdf) (studies 04 to 06,
-[literature](docs/research/stress/LITERATURE.md)). Stressful videos change slow EEG power within the first
+**Submission paper:** [Acute stress reactions in 314 viewers: what the brain and body show, when, and
+whether it reflects the person or the situation](docs/paper/paper.pdf), also
+[in French](docs/paper/paper_fr.pdf) (studies 04 to 06, [literature](docs/research/stress/LITERATURE.md)). Stressful videos change slow EEG power within the first
 second, slow the heart from 1 s, make breathing shallower from 2 s and raise skin conductance from 4 s. The
 heart and breathing follow how unpleasant a video is for viewers in general: their link with the viewer's
 own valence, beyond what the other viewers of the same video reported, is zero. Among people watching the

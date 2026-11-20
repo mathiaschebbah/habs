@@ -1,15 +1,60 @@
 """Draw the study-05 figures from public aggregates in ``results/``.
 
-Run from the repository root after the six analyses have been saved.
+Run from the repository root after the six analyses have been saved. With
+the argument ``fr``, the two figures of the paper get French labels and files
+ending in ``_fr.png``.
 """
 
 import json
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import FuncFormatter
 
 HERE = Path(__file__).parent
+FR = "fr" in sys.argv[1:]
+SUFFIX = "_fr" if FR else ""
+FRENCH = {
+    "Heart rate": "Fréquence cardiaque",
+    "Skin conductance": "Conductance cutanée",
+    "Breathing amplitude": "Amplitude respiratoire",
+    "Frontal delta power": "Delta frontal (EEG)",
+    "Development": "Développement",
+    "Test people": "Personnes de test",
+    "Seconds from video onset (grey: video playing)": (
+        "Secondes depuis le début de la vidéo (gris : vidéo en cours)"
+    ),
+    "Effect size d\n(stress vs other)": "Taille d'effet d\n(stress contre autres)",
+    "All signals": "Tous les signaux",
+    "Heart, skin, breathing": "Cœur, peau, respiration",
+    "Development cross-fit (new person, new theme)": (
+        "Validation croisée (personne et thème nouveaux)"
+    ),
+    "Sealed test (known person, new theme)": (
+        "Test scellé (personne connue, thème nouveau)"
+    ),
+    "Seconds of video used": "Secondes de vidéo utilisées",
+    "Within-person AUC": "AUC intra-personne",
+}
+
+
+def _(text):
+    """Return the French label in French mode."""
+    return FRENCH.get(text, text) if FR else text
+
+
+def _decimal_comma(fig):
+    """French y tick labels: decimal comma and a true minus sign."""
+    if FR:
+        comma = FuncFormatter(
+            lambda v, _p: f"{v:g}".replace(".", ",").replace("-", "\u2212")
+        )
+        for ax in fig.axes:
+            ax.yaxis.set_major_formatter(comma)
+
+
 BLUE, ORANGE, AQUA, YELLOW = "#2a78d6", "#eb6834", "#1baf7a", "#eda100"
 MAGENTA, GRAY, INK, MUTED = "#e87ba4", "#a3a29c", "#0b0b0b", "#52514e"
 SECONDS = np.arange(15) - 3 + 0.5  # bin centres
@@ -53,7 +98,11 @@ def curves():
         test = data["test_people"]["stress"][signal]
         ax.fill_between(SECONDS, dev["low"], dev["high"], color=BLUE, alpha=0.2, lw=0)
         ax.plot(
-            SECONDS, dev["d"], color=BLUE, lw=2, label=f"Development ({dev['people']})"
+            SECONDS,
+            dev["d"],
+            color=BLUE,
+            lw=2,
+            label=f"{_('Development')} ({dev['people']})",
         )
         ax.plot(
             SECONDS,
@@ -61,14 +110,15 @@ def curves():
             color=ORANGE,
             lw=1.4,
             ls="--",
-            label=f"Test people ({test['people']})",
+            label=f"{_('Test people')} ({test['people']})",
         )
-        ax.set_title(title, fontsize=7.5, color=INK)
-    fig.supxlabel("Seconds from video onset (grey: video playing)", fontsize=7.5)
-    axes[0].set_ylabel("Effect size d\n(stress vs other)")
+        ax.set_title(_(title), fontsize=7.5, color=INK)
+    fig.supxlabel(_("Seconds from video onset (grey: video playing)"), fontsize=7.5)
+    axes[0].set_ylabel(_("Effect size d\n(stress vs other)"))
+    _decimal_comma(fig)
     axes[0].legend(frameon=False, fontsize=6, loc="lower left")
     fig.tight_layout()
-    fig.savefig(HERE / "figures" / "curves.png")
+    fig.savefig(HERE / "figures" / f"curves{SUFFIX}.png")
 
 
 def latency():
@@ -87,7 +137,7 @@ def latency():
         low = [dev[family][str(s)]["ci95"][0] for s in t]
         high = [dev[family][str(s)]["ci95"][1] for s in t]
         axes[0].fill_between(t, low, high, color=color, alpha=0.18, lw=0)
-        axes[0].plot(t, auc, color=color, lw=2, marker="o", ms=3, label=label)
+        axes[0].plot(t, auc, color=color, lw=2, marker="o", ms=3, label=_(label))
         regime = [test[family][str(s)]["test_new_video"] for s in t]
         axes[1].fill_between(
             t,
@@ -98,17 +148,18 @@ def latency():
             lw=0,
         )
         axes[1].plot(t, [r["auc"] for r in regime], color=color, lw=2, marker="o", ms=3)
-    axes[0].set_title("Development cross-fit (new person, new theme)", fontsize=7.5)
-    axes[1].set_title("Sealed test (known person, new theme)", fontsize=7.5)
+    axes[0].set_title(_("Development cross-fit (new person, new theme)"), fontsize=7.5)
+    axes[1].set_title(_("Sealed test (known person, new theme)"), fontsize=7.5)
     for ax in axes:
         ax.axhline(0.5, color=MUTED, lw=0.8)
         ax.grid(True, axis="y", color="#e6e5e0", lw=0.6)
-        ax.set_xlabel("Seconds of video used")
+        ax.set_xlabel(_("Seconds of video used"))
         ax.set_xticks(t)
-    axes[0].set_ylabel("Within-person AUC")
+    axes[0].set_ylabel(_("Within-person AUC"))
+    _decimal_comma(fig)
     axes[0].legend(frameon=False, fontsize=6.5, loc="upper left")
     fig.tight_layout()
-    fig.savefig(HERE / "figures" / "latency.png")
+    fig.savefig(HERE / "figures" / f"latency{SUFFIX}.png")
 
 
 def emotions():
@@ -173,7 +224,7 @@ def hrv():
 
 if __name__ == "__main__":
     curves()
-    emotions()
-    hrv()
-    if (HERE / "results" / "latency_dev.json").is_file():
-        latency()
+    latency()
+    if not FR:
+        emotions()
+        hrv()
