@@ -90,6 +90,7 @@ jobs:
       - run: pip install --quiet --no-deps -e .
       - run: python tools/fetch_trial_table.py
       - name: Score
+        shell: bash  # adds pipefail, so a failing analysis fails the job despite tee
         env:
           REFS: ${{ matrix.ref }}
           SPLIT: ${{ inputs.split }}

@@ -322,7 +322,8 @@ def audit(frame):
         .astype("string")
         .str.strip()
         .str.lower()
-        .value_counts(dropna=False)
+        .fillna("missing")
+        .value_counts()
         .to_dict(),
     }
 
