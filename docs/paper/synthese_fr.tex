@@ -1,0 +1,99 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=1.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[english,french]{babel}
+\frenchsetup{SmallCapsFigTabCaptions=false}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\setlist{nosep,leftmargin=1.2em}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\pagestyle{empty}
+\graphicspath{{../research/person/figures/}}
+\definecolor{boxline}{HTML}{2a78d6}
+
+\begin{document}
+
+{\Large\bfseries Stress aigu : ce que montrent le cerveau et le corps, quand, et pour qui}\\[2pt]
+{\small Équipe 12 (Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo), HABS Neuro-AI Hackathon, novembre 2026}
+
+\medskip
+\noindent\fcolorbox{boxline}{white}{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+\textbf{Question.} Quand quelqu'un vit une réaction de stress aigu, qu'est-ce que
+son cerveau et son corps montrent, à quel moment, et est-ce que cela reflète la
+personne ou seulement la situation qu'elle vit ?}}
+
+\textbf{Méthode}
+\begin{itemize}
+\item Données HABS : 314 personnes, 22\,974 vidéos de 10 s notées, avec EEG
+64 voies, ECG, conductance cutanée et respiration.
+\item Réaction de stress = vidéo jugée négative (valence $\le 4$) et activante
+(arousal $\ge 6$), soit 24\,\% des essais. Pas de tâche ni d'erreurs dans les
+données, donc pas de \og point de rupture \fg{} étudiable.
+\item Signaux seconde par seconde, de 3 s avant à 12 s après le début de la
+vidéo, et réponse EEG calée sur chaque battement cardiaque.
+\item Chaque vidéo a été vue par 13 à 234 personnes. On compare chaque
+spectateur aux autres devant la même vidéo : part \emph{partagée} (ce que la
+vidéo fait à tout le monde) et part \emph{propre} (ce que la personne vit en plus).
+\item Détection par une régression logistique figée à l'avance, testée sur des
+personnes et des vidéos jamais vues. Chaque protocole est figé avant le calcul.
+\end{itemize}
+
+\textbf{Résultats}
+
+\smallskip
+{\small
+\begin{tabularx}{\linewidth}{@{}l X l@{}}
+\toprule
+& Ce qu'on trouve & Chiffre clé\\
+\midrule
+Ordre & EEG lent avant 1 s, cœur dès 1 s, respiration dès 2 s, peau dès 4 s & peau répliquée, $d$ jusqu'à 0,25\\
+Ce que suit chaque signal & Le cœur ralentit (il n'accélère pas) et suit le caractère désagréable ; la peau suit l'intensité & cœur contre excitation $-$0,075\\
+Personne ou vidéo & Le cœur et la respiration ne suivent que la vidéo & part propre 0,004, partagée 0,049\\
+& La peau suit un peu la personne, cinq fois moins que la vidéo & 0,023 contre 0,106\\
+Même salle & Entre spectateurs de la même vidéo, la physiologie devine à peine qui est stressé & AUC 0,517\\
+& Les notes des autres spectateurs le prédisent très bien & AUC 0,917\\
+Bruit de notation & L'écart d'une personne aux autres est réel (il prédit l'émotion qu'elle choisit), mais le cœur l'ignore & AUC 0,897\\
+Cerveau--cœur & La réponse du cerveau à chaque battement ne change pas & $d$ = 0,039 ($-$0,002 ; 0,078)\\
+Détection & Précoce mais faible chez des personnes nouvelles ; 43 modèles testés, aucun ne bat la régression logistique & AUC 0,52 à 1 s, 0,55--0,64 à 10 s\\
+VFC courte & Fréquence cardiaque fiable sur 10 s, RMSSD non & $r$ = 0,94 contre 0,75\\
+\bottomrule
+\end{tabularx}}
+
+\smallskip
+\noindent
+\begin{minipage}[b]{0.62\linewidth}
+\includegraphics[width=\linewidth]{coupling_fr.png}
+\end{minipage}\hfill
+\begin{minipage}[b]{0.36\linewidth}
+\includegraphics[width=\linewidth]{room_fr.png}
+\end{minipage}\\[-2pt]
+{\footnotesize À gauche : ce que suit chaque signal, la vidéo (bleu) ou la personne
+(orange). À droite : AUC entre les vidéos d'une même personne (bleu) et entre
+personnes devant la même vidéo (orange). Barres : intervalles à 95\,\%.}
+
+\textbf{Ce que ça veut dire}
+\begin{itemize}
+\item Le corps réagit au stress dans un ordre précis, mais il réagit surtout à
+la situation, pas à la façon dont chacun la vit.
+\item Au bloc, un moniteur physiologique dirait \og il se passe quelque chose de
+dur \fg{} plutôt que \og ce chirurgien-là le vit mal \fg. Un événement aversif bref
+ralentit le cœur : un moniteur qui cherche une accélération le raterait.
+\item Pour valider un détecteur de stress, il faut comparer des personnes
+devant le même stimulus, pas seulement tenir des vidéos à l'écart.
+\end{itemize}
+
+\textbf{Limites.} Stress auto-déclaré sur des vidéos de 10 s, chez des
+volontaires sains. Effets petits ($|d| \le 0{,}25$). Le bruit de notation n'est pas
+entièrement exclu sur les cohortes 2 à 5.
+
+{\small Papier complet (5 pages, français et anglais) et code :
+\url{https://github.com/mathiaschebbah/habs}}
+
+\end{document}
