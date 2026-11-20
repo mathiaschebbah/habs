@@ -209,3 +209,19 @@ away the result. If |r| is near zero, the own part may be mostly noise and we
 weaken the conclusion. Caveat: both reports come from the same person at the
 same moment. Shared response habits would inflate r and make the bound too
 favourable.
+
+## Outcome, rating-noise check (2026-11-20)
+
+Run 44711125344; aggregates in `docs/research/person/results/noise.json`.
+
+- The own part of valence is real: its within-person correlation with the own
+  part of choosing a negative emotion is −0.45 [−0.48, −0.42] (208 people);
+  among viewers of the same video it tells who chose a negative emotion with
+  AUC 0.897 [0.873, 0.921] (56 videos, 19,881 pairs).
+- The chosen emotion follows the own part of valence (coefficient −0.257
+  [−0.277, −0.238]); the heart does not (0.004 [−0.015, 0.021]; 0.015
+  [−0.004, 0.034] in cohorts 2–5).
+- Bound: corrected upper limit of the heart's own coefficient 0.047 on all
+  people (below the shared 0.049) but 0.076 on cohorts 2–5 (above it). By the
+  reading fixed in advance, the first two criteria are met and the third is
+  met on all people only. Rating noise is not fully ruled out.

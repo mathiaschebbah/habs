@@ -37,7 +37,9 @@ The skin followed the person's own arousal, but at a fifth of its link with the
 video (0.023 against 0.106), and in one of three cohorts only. Among people
 watching the same video, a fixed model told who felt stressed barely above
 chance (AUC 0.517, 0.503 to 0.531). Knowing how the other viewers rated the video
-predicted a person's stress reaction with AUC 0.92. The brain's response to
+predicted a person's stress reaction with AUC 0.92. The person's own part of
+valence is not rating noise: it told which viewers of the same video chose a
+negative emotion with AUC 0.90. The brain's response to
 each heartbeat did not change measurably during stress reactions ($d = 0.039$,
 $-0.002$ to 0.078, 287 people), although the heart slowed. Across
 videos the detection is weak but early: within-person AUC 0.517 from the first
@@ -193,6 +195,23 @@ viewers, physiology did separate stressful from other videos: the mean skin
 response of one half of the people correlated $r = 0.26$ (0.17 to 0.36) with
 the other half's stress rate, delta $0.26$, heart $-0.19$ ($-0.29$ to $-0.08$).
 
+Is the own part of a rating just noise? If it were, no signal could follow it.
+We tested this before reading the result, with a second report: the first
+emotion each viewer picked, available in cohorts 2 to 5. The own part of
+valence correlated with the own part of choosing a negative emotion
+($r = -0.45$, $-0.48$ to $-0.42$, 208 people). Among viewers of the same video
+it told who chose a negative emotion with AUC 0.897 (0.873 to 0.921), where
+physiology reached 0.517. In the regression used for the heart, the chosen
+emotion followed the own part of valence with a coefficient of $-0.257$, the
+heart with $0.004$. So viewers do differ in how they experience the same video,
+and they report it consistently; the heart does not follow. One caveat
+remains. If the own part's reliability is only $r^2$, the worst case under
+classical test theory, the heart's own coefficient corrected for rating noise
+could reach 0.047 (all people) or 0.076 (cohorts 2 to 5, where the observed
+value is 0.015, $-0.004$ to 0.034). The second limit exceeds the
+heart's shared coefficient (0.049), so rating noise alone cannot be fully ruled
+out as the reason the heart looks blind to the person.
+
 \subsection{The brain's response to heartbeats}
 
 Averaged over the 13 beats of a typical video, the EEG response 250--600 ms
@@ -280,9 +299,10 @@ we ran one for this last study.
 
 \paragraph{Limitations.} The label is a self-report about a 10-second video in
 healthy volunteers, not clinical stress. A person's own part of a rating also
-contains rating noise, which shrinks every own coefficient; the nonzero skin
-and delta coefficients show it is not pure noise, but we cannot measure its
-reliability (only 9 person--video pairs repeat). The shared part mixes emotional
+contains rating noise, which shrinks every own coefficient. A second report
+shows that part is mostly real, but our worst-case bound on the heart's
+corrected own coefficient (0.076 in cohorts 2 to 5) still reaches its shared
+one; a repeated-rating design would settle it. The shared part mixes emotional
 content with images and sound. Effects are small ($|d| \le 0.25$), and four
 primary tests share one 95\% threshold.
 

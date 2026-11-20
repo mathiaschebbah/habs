@@ -84,3 +84,18 @@ et on compare les réactions de stress aux autres essais.
 - On peut exclure un effet plus grand que d ≈ 0,08. Les sites frontaux seuls penchent vers le positif
   (d jusqu'à 0,05 vers 300–500 ms) : c'est une observation post hoc, à tester dans une étude figée à
   l'avance.
+
+## Test du bruit de notation
+
+Objection attendue : l'écart entre ta note et celle des autres pourrait n'être que du hasard, et
+alors aucun signal ne pourrait le suivre. On l'a testé avec une seconde déclaration, l'émotion
+choisie par chaque personne (cohortes 2 à 5), avec un protocole figé avant le calcul.
+
+- **L'écart est réel.** La part propre de la valence prédit le choix d'une émotion négative :
+  r = −0,45 [−0,48 ; −0,42] sur 208 personnes. Entre spectateurs d'une même vidéo, elle dit qui a
+  choisi une émotion négative avec une AUC de 0,90, là où la physiologie obtient 0,52.
+- **Le cœur ne le suit pas** : coefficient de 0,004, contre −0,26 pour l'émotion choisie.
+- **Réserve.** Dans le pire cas de la théorie classique des tests, le coefficient propre du cœur,
+  corrigé du bruit, pourrait monter à 0,047 sur tout le monde et à 0,076 sur les cohortes 2 à 5. Il
+  atteindrait alors la part de la vidéo (0,049). Le bruit de notation n'est donc pas totalement
+  exclu. Il faudrait des notes répétées pour trancher.
