@@ -114,3 +114,37 @@ several cohorts. Response coverage: heart 97%, skin 73%, breathing 96%, EEG
   differently during stress reactions. An effect that vanishes with them would
   be the heart's field, not the brain.
 - Four primary tests (A1–A3, B1) at 95%; we report every interval and say so.
+
+## Outcome, part A (2026-11-20)
+
+Run 44652745814 (main), 44652772638 and 44653667161 (exploratory and post hoc).
+Aggregates in `docs/research/person/results/`.
+
+- A1, the heart follows the person's own valence: **no**. Own-part coefficient
+  0.004 [−0.015, 0.021], shared part 0.049 [0.029, 0.068] (313 people).
+  Breathing behaves the same (own 0.001 [−0.017, 0.018], shared 0.049).
+- A2, the skin follows the person's own arousal: **yes, weakly**. Own part
+  0.023 [0.003, 0.043] against a shared part of 0.106 [0.083, 0.129]
+  (274 people). Only cohort 1 shows it on its own (0.053 [0.014, 0.090]).
+- A3, the model tells who felt stressed among viewers of the same video:
+  **barely**. Same-video AUC 0.517 [0.503, 0.531] (140 videos, 265,019 pairs),
+  against 0.549 [0.537, 0.561] across a person's videos. Cohort 1: 0.545
+  [0.521, 0.570]; cohort 2: 0.496; cohorts 3–5: 0.521 (both include 0.5).
+- Benchmark: the other viewers' stress rate for the video gives a within-person
+  AUC of 0.917 [0.911, 0.923].
+- Early delta power is the only response whose own part follows the ratings
+  (arousal 0.029 [0.010, 0.047], valence −0.025 [−0.042, −0.008]); its
+  same-video AUC is 0.523 [0.510, 0.535]. Alpha follows only the shared part of
+  arousal, and its same-video AUC is below chance (0.484 [0.472, 0.497]).
+- Stimulus locking (within-person correlation of a response with the other
+  viewers' mean response to the same video): heart 0.09, delta 0.11,
+  breathing 0.11, alpha 0.12, skin 0.19.
+- Exploratory, perceived control (25 people only): stress trials rated high in
+  control slowed the heart more (−1.56 bpm [−2.99, −0.21]) than those rated low
+  (−0.15 [−0.86, 0.50]); difference 1.41 [0.05, 2.84]. This is the opposite of
+  the freezing prediction and rests on few people.
+- Post hoc, video level: the mean response of one half of the people correlates
+  with the other half's stress rate for skin (0.26 [0.17, 0.36]), delta (0.26
+  [0.16, 0.36]), heart (−0.19 [−0.29, −0.08]) and breathing (−0.14).
+- Post hoc, a model retrained on the own part of every feature detects nothing:
+  AUC 0.498 across a person's videos, 0.505 [0.493, 0.518] in the same video.

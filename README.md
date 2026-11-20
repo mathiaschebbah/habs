@@ -6,13 +6,17 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
-**Submission paper:** [The heart slows down: what physiology shows of acute stress reactions to short
-videos, how fast, and in people the model has never seen](docs/paper/paper.pdf) (studies 04 and 05,
+**Submission paper:** [Whose stress is it? The body mostly follows the video, not the viewer, during
+acute stress reactions to short videos](docs/paper/paper.pdf) (studies 04 to 06,
 [literature](docs/research/stress/LITERATURE.md)). Stressful videos change slow EEG power within the first
-second, slow the heart from 1 s, make breathing shallower from 2 s and raise skin conductance from 4 s. A
-fixed model detects the reaction in new people from the first seconds, weakly (within-person AUC 0.52 to
-0.64). The heart slows for fear, disgust, sadness and anger alike. Heart rate is reliable on 10-second
-windows during videos, RMSSD is not.
+second, slow the heart from 1 s, make breathing shallower from 2 s and raise skin conductance from 4 s. The
+heart and breathing follow how unpleasant a video is for viewers in general: their link with the viewer's
+own valence, beyond what the other viewers of the same video reported, is zero. Among people watching the
+same video, physiology tells who felt stressed barely above chance (AUC 0.517), while the other viewers'
+ratings of the video predict it with AUC 0.92.
+
+**Study 06, the person or the video:** [protocol and outcome](journal/06_person_or_video.md),
+[aggregates](docs/research/person/results), [figures](docs/research/person/figures).
 
 **Study 05, time course:** [protocol and outcome](journal/05_stress_timecourse.md),
 [aggregates](docs/research/timecourse/results).
