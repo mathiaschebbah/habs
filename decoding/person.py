@@ -463,6 +463,12 @@ def noise(frame):
     )
     emotion = _mean_ci(_person_betas(frame, negative, valence))
     heart = _mean_ci(_person_betas(frame, response(frame, "heart"), valence))
+    # cohort 1 has no chosen emotion: same coefficient on the people who do
+    reporters = frame["participant_id"].isin(frame.loc[known, "participant_id"])
+    part = frame[reporters]
+    heart_same = _mean_ci(
+        _person_betas(part, response(part, "heart"), part["rating_valence"])
+    )
     bound = abs(r["r"][0])
     return {
         "coverage": float(known.mean()),
@@ -474,6 +480,12 @@ def noise(frame):
         if bound > 0
         else None,
         "heart_shared": heart["beta_shared"],
+        "heart_on_valence_same_people": heart_same,
+        "heart_own_upper_corrected_same_people": round(
+            heart_same["beta_own"][2] / bound, 4
+        )
+        if bound > 0
+        else None,
     }
 
 

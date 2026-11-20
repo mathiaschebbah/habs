@@ -169,3 +169,43 @@ during the video for 98.6%, median 13 beats per video). Analysis run
   ±0.011, intervals include 0.
 - Post hoc observation: frontal sites alone lean positive (d up to 0.05 near
   300–500 ms, some bins with intervals above 0). Not tested in advance.
+
+## Amendment: rating-noise check (written 2026-11-20, before running it)
+
+**Why.** The own part of a rating is the gap between a person's rating and the
+other viewers' mean. If that gap were mostly random rating noise, no
+physiological signal could follow it, and the heart's own coefficient would be
+near zero whatever the heart does. The shared part, a mean over about 80
+viewers, is far less noisy, so the problem is one-sided.
+
+**Data.** Each viewer also picked a first emotion (`self_reported_emotion_1`),
+a second report made apart from the valence scale. An audit run (44710845264,
+counts only) shows it is missing for all of cohort 1 (5,832 trials). Negative:
+anger, fear, disgust, sadness, guilt (6,351 trials). Positive: joy, excitement,
+relaxation, sensuality (5,480). Neutral, curiosity and surprise are left out
+(5,311).
+
+**Measures** (`decoding/person.py`, `--split noise`):
+
+1. Within-person correlation between the own part of valence and the own part
+   of choosing a negative emotion (people with at least 10 complete trials;
+   mean and person bootstrap).
+2. Same-video AUC: among viewers of the same video, does a lower own valence
+   tell who chose a negative emotion?
+3. The within-person regression used for the heart, with choosing a negative
+   emotion as the outcome: shared and own coefficients of valence.
+4. A bound. Under classical test theory, if both reports measure the same
+   experience with independent errors, the reliability of own valence is at
+   least r². Rating noise can then have shrunk the heart's own coefficient by a
+   factor of at most |r|, so its corrected upper limit is the upper end of its
+   interval divided by |r|. Computed on all people and on the people of
+   cohorts 2–5 only.
+
+**Reading, fixed in advance.** If |r| is clearly above zero and the emotion's
+own coefficient is far from zero while the heart's is not, the own part carries
+the person's experience and the heart ignores it. If the corrected upper limit
+stays below the heart's shared coefficient (0.049), rating noise cannot explain
+away the result. If |r| is near zero, the own part may be mostly noise and we
+weaken the conclusion. Caveat: both reports come from the same person at the
+same moment. Shared response habits would inflate r and make the bound too
+favourable.
