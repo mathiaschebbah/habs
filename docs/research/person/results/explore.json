@@ -1,0 +1,22 @@
+{
+ "explore": {
+  "heart_bpm_by_control": {
+   "low_control": [
+    -0.154,
+    -0.8595,
+    0.5022
+   ],
+   "high_control": [
+    -1.5634,
+    -2.9861,
+    -0.213
+   ],
+   "low_minus_high": [
+    1.4094,
+    0.0515,
+    2.8366
+   ],
+   "people": 25
+  }
+ }
+}

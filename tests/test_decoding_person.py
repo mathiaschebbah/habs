@@ -82,7 +82,9 @@ def test_room_and_audit_run(folder):
     assert set(person.cohorts(table, model)) == {"cohort_1", "cohort_2", "cohorts_3_5"}
     audit = person.audit(table)
     assert audit["people"] == 40 and audit["videos"] == 30
-    assert "heart_bpm_by_control" in person.explore(table)
+    explore = person.explore(table)
+    assert "heart_bpm_by_control" in explore
+    assert explore["video_level"]["skin"]["split_half_reliability"][0] > 0.8
 
 
 def test_heartbeat_locking_recovers_a_template():

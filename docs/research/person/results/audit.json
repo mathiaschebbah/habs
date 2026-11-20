@@ -1,0 +1,37 @@
+{
+ "audit": {
+  "trials": 22974,
+  "people": 314,
+  "videos": 252,
+  "viewers_per_video_quantiles": [
+   13.0,
+   41.1,
+   83.0,
+   156.0,
+   234.0
+  ],
+  "videos_with_enough_others": 252,
+  "trials_with_video_mean": 1.0,
+  "people_with_min_trials": 314,
+  "trials_per_person_median": 79.0,
+  "stressed_fraction": 0.23983633672847568,
+  "videos_eligible_same_video_auc": 140,
+  "stressed_pairs_same_video": 265019,
+  "videos_in_several_cohorts": 252,
+  "trials_by_cohort": {
+   "1.0": 5832,
+   "2.0": 9726,
+   "3.0": 2494,
+   "4.0": 4615,
+   "5.0": 307
+  },
+  "response_coverage": {
+   "heart": 0.9654391921302342,
+   "skin": 0.734613040828763,
+   "breathing": 0.9625228519195612,
+   "delta": 0.9619569948637591,
+   "alpha": 0.9623052145904065
+  },
+  "dominance_coverage": 0.322799686602246
+ }
+}

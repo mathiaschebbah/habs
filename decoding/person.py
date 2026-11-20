@@ -316,7 +316,66 @@ def explore(frame):
                 "high_control": hi.mean() - re.mean(),
                 "low_minus_high": lo.mean() - hi.mean(),
             }
-    return {"heart_bpm_by_control": _mean_ci(pd.DataFrame.from_dict(rows, "index"))}
+    return {
+        "heart_bpm_by_control": _mean_ci(pd.DataFrame.from_dict(rows, "index")),
+        "video_level": video_level(frame),
+    }
+
+
+def video_level(frame):
+    """Post hoc: test whether the crowd's physiology tells stressful videos apart.
+
+    People are split in two halves. For each video, the mean person-centred
+    response of one half is correlated with the stress rate of the other half
+    (both directions averaged), and the two halves' mean responses with each
+    other (split-half reliability). Intervals come from a video bootstrap.
+    """
+    half = common._bucket(frame["participant_id"].astype(str), SALT + "|half", 2)
+    stressed = label(frame).astype(float)
+    out = {}
+    for name in RESPONSES:
+        own, _, _ = components(frame, response(frame, name))
+        means = {}
+        for h in (0, 1):
+            rows = half == h
+            means[h] = pd.DataFrame(
+                {
+                    "response": own[rows].groupby(frame["video"][rows]).mean(),
+                    "stress": stressed[rows].groupby(frame["video"][rows]).mean(),
+                    "n": own[rows].groupby(frame["video"][rows]).count(),
+                }
+            )
+        data = means[0].join(means[1], lsuffix="_a", rsuffix="_b").dropna()
+        data = data[(data["n_a"] >= 5) & (data["n_b"] >= 5)].to_numpy(float)
+        # columns: response_a, stress_a, n_a, response_b, stress_b, n_b
+
+        def stats(d):
+            cross = (
+                np.corrcoef(d[:, 0], d[:, 4])[0, 1]
+                + np.corrcoef(d[:, 3], d[:, 1])[0, 1]
+            ) / 2
+            return cross, np.corrcoef(d[:, 0], d[:, 3])[0, 1]
+
+        rng = np.random.default_rng(0)
+        boot = np.array(
+            [stats(data[rng.integers(0, len(data), len(data))]) for _ in range(DRAWS)]
+        )
+        point = stats(data)
+        low, high = np.nanpercentile(boot, [2.5, 97.5], axis=0)
+        out[name] = {
+            "r_with_other_half_stress_rate": [
+                round(point[0], 4),
+                round(low[0], 4),
+                round(high[0], 4),
+            ],
+            "split_half_reliability": [
+                round(point[1], 4),
+                round(low[1], 4),
+                round(high[1], 4),
+            ],
+            "videos": len(data),
+        }
+    return out
 
 
 HEP_REGIONS = ("frontal", "central")
