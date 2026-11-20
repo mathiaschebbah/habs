@@ -111,22 +111,20 @@ def hep():
         return
     curves = json.loads(path.read_text())["hep"]["curves"]
     t = -200 + 50 * np.arange(16) + 25
-    fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.1), sharex=True)
-    for ax, (key, title, color) in zip(
-        axes,
-        (
-            ("hep_video_central", "EEG locked to heartbeats, central", BLUE),
-            ("ecg_video", "ECG locked to heartbeats", GRAY),
-        ),
-        strict=True,
-    ):
+    panels = (
+        ("hep_video_frontal", "EEG, frontal", BLUE),
+        ("hep_video_central", "EEG, central", BLUE),
+        ("ecg_video", "ECG", GRAY),
+    )
+    fig, axes = plt.subplots(1, 3, figsize=(6.8, 1.9), sharex=True, sharey=True)
+    for ax, (key, title, color) in zip(axes, panels, strict=True):
         c = curves[key]
         ax.axvspan(250, 600, color="#f0efec", zorder=0)
         ax.axhline(0, color=MUTED, lw=0.8)
         ax.fill_between(t, c["low"], c["high"], color=color, alpha=0.2, lw=0)
         ax.plot(t, c["d"], color=color, lw=2)
-        ax.set_title(f"{title} ({c['people']} people)", fontsize=7.5)
-        ax.set_xlabel("ms after the R peak (grey: tested window)")
+        ax.set_title(f"{title}, locked to R peaks", fontsize=7.5)
+    axes[1].set_xlabel("ms after the R peak (grey: tested window)")
     axes[0].set_ylabel("Effect size d\n(stress vs other)")
     fig.tight_layout()
     fig.savefig(HERE / "figures" / "hep.png")

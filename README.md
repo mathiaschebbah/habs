@@ -13,7 +13,8 @@ second, slow the heart from 1 s, make breathing shallower from 2 s and raise ski
 heart and breathing follow how unpleasant a video is for viewers in general: their link with the viewer's
 own valence, beyond what the other viewers of the same video reported, is zero. Among people watching the
 same video, physiology tells who felt stressed barely above chance (AUC 0.517), while the other viewers'
-ratings of the video predict it with AUC 0.92.
+ratings of the video predict it with AUC 0.92. The heart slows, but the EEG response to each heartbeat does
+not measurably change (d = 0.039, 95% interval −0.002 to 0.078).
 
 **Study 06, the person or the video:** [protocol and outcome](journal/06_person_or_video.md),
 [aggregates](docs/research/person/results), [figures](docs/research/person/figures).

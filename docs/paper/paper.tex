@@ -37,12 +37,14 @@ The skin followed the person's own arousal, but at a fifth of its link with the
 video (0.023 against 0.106), and in one of three cohorts only. Among people
 watching the same video, a fixed model told who felt stressed barely above
 chance (AUC 0.517, 0.503 to 0.531). Knowing how the other viewers rated the video
-predicted a person's stress reaction with AUC 0.92. \textbf{XX-HEP}. Across
+predicted a person's stress reaction with AUC 0.92. The brain's response to
+each heartbeat did not change measurably during stress reactions ($d = 0.039$,
+$-0.002$ to 0.078, 287 people), although the heart slowed. Across
 videos the detection is weak but early: within-person AUC 0.517 from the first
 second and 0.55 to 0.64 over the whole video in new people, and a 43-variant
 model search did not beat logistic regression on a sealed test. Physiological
-stress detectors tested across different videos mostly recognise the video. We
-propose comparing viewers of the same stimulus as a standard check.
+stress detectors tested across different videos mostly read what a video does to
+everyone. We propose comparing viewers of the same stimulus as a standard check.
 \end{abstract}
 
 \section{Why we asked this}
@@ -193,7 +195,30 @@ the other half's stress rate, delta $0.26$, heart $-0.19$ ($-0.29$ to $-0.08$).
 
 \subsection{The brain's response to heartbeats}
 
-\textbf{XX-HEP-RESULTS}
+Averaged over the 13 beats of a typical video, the EEG response 250--600 ms
+after each R peak, over frontal and central sites, was not reliably different
+in stress reactions: $d = 0.039$ ($-0.002$ to 0.078, 287 people;
+Figure~\ref{fig:hep}). Adding the ECG amplitude in the same window and the mean
+RR interval as covariates did not change it (0.039, $-0.002$ to 0.081). This
+check matters because the heart's own electrical field reaches the scalp
+\cite{parkblanke2019}. Here the ECG waveform did not differ ($d = -0.009$), while
+the RR interval did lengthen ($d = +0.087$, 0.042 to 0.132): the heart slowed,
+but the brain's response to each beat did not measurably change. The response
+followed neither the shared nor the own part of valence or arousal (all
+coefficients within $\pm 0.011$). Frontal sites alone leaned positive (up to
+$d = 0.05$ near 300 to 500 ms), a post hoc observation that a future study
+could test in advance. With 287 people we can rule out effects larger than
+about $d = 0.08$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{hep.png}
+\caption{Within-person effect size of stress versus other trials on the EEG
+and the ECG averaged around each R peak during the video (287 people; band:
+95\% interval). The tested window is 250--600 ms over frontal and central
+sites.}
+\label{fig:hep}
+\end{figure}
 
 \subsection{How early and how well we can detect it}
 
@@ -236,7 +261,8 @@ and breathing follow how unpleasant a video is for viewers in general, not how
 unpleasant it was for this viewer, and the skin follows the person's own
 arousal only weakly. Inside a room of people watching the same clip, physiology
 barely tells who is stressed, while knowing what the clip does to others
-predicts it very well. \textbf{XX-HEP-TAKE}
+predicts it very well. The heart slows, but the cortical response to each
+heartbeat does not visibly follow.
 
 This changes how stress detectors should be validated. Holding out people and
 videos, as we and most studies do, prevents memorising a video, but a model can
@@ -273,6 +299,7 @@ aggregate numbers leave the HABS servers.
 \bibitem{golland2014} Y. Golland, K. Keissar, N. Levit-Binnun. Studying the dynamics of autonomic activity during emotional experience. Psychophysiology 51 (2014) 1101--1111.
 \bibitem{park2014} H.-D. Park, S. Correia, A. Ducorps, C. Tallon-Baudry. Spontaneous fluctuations in neural responses to heartbeats predict visual detection. Nat. Neurosci. 17 (2014) 612--618.
 \bibitem{candia2021} D. Candia-Rivera et al. Neural responses to heartbeats detect residual signs of consciousness during resting state in postcomatose patients. J. Neurosci. 41 (2021) 5251--5262.
+\bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: underlying mechanisms, functional roles, and methodological considerations. NeuroImage 197 (2019) 502--511.
 \bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
 \bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
 \bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.

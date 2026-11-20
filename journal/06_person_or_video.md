@@ -148,3 +148,24 @@ Aggregates in `docs/research/person/results/`.
   [0.16, 0.36]), heart (−0.19 [−0.29, −0.08]) and breathing (−0.14).
 - Post hoc, a model retrained on the own part of every feature detects nothing:
   AUC 0.498 across a person's videos, 0.505 [0.493, 0.518] in the same video.
+
+## Outcome, part B (2026-11-20)
+
+Extraction job `20261120T011828-0fc03a` (22,974 trials; heartbeat-evoked EEG
+during the video for 98.6%, median 13 beats per video). Analysis run
+44658035457; aggregates in `docs/research/person/results/hep.json`.
+
+- B1, stress changes the heartbeat-evoked response: **not established**.
+  d = 0.039 [−0.002, 0.078] (287 people). Effects larger than about 0.08 are
+  ruled out.
+- B2, with ECG amplitude and RR as covariates: 0.039 [−0.002, 0.081], so the
+  same.
+- Validity checks: the ECG waveform does not differ (d = −0.009
+  [−0.052, 0.035]); the RR interval lengthens (d = 0.087 [0.042, 0.132]), as
+  expected from the slower heart.
+- Control contrasts: versus excitement 0.052 [−0.000, 0.104]; versus calm
+  negative 0.056 [−0.012, 0.126]. Change from pre-onset: 0.005.
+- Coupling with valence and arousal: all shared and own coefficients within
+  ±0.011, intervals include 0.
+- Post hoc observation: frontal sites alone lean positive (d up to 0.05 near
+  300–500 ms, some bins with intervals above 0). Not tested in advance.
