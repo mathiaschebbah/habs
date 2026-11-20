@@ -23,7 +23,7 @@ import pandas as pd
 from joblib import Parallel, delayed
 
 from decoding import common, timecourse
-from decoding.stress import label, person_stats
+from decoding.stress import contrasts, label, person_stats
 
 SALT = "habs-person-2026-11-20"
 MIN_OTHERS = 9  # other viewers needed for a video mean
@@ -319,15 +319,124 @@ def explore(frame):
     return {"heart_bpm_by_control": _mean_ci(pd.DataFrame.from_dict(rows, "index"))}
 
 
+HEP_REGIONS = ("frontal", "central")
+HEP_BINS = slice(9, 16)  # 250 to 600 ms after the R peak (50 ms bins from -200)
+
+
+def load_hep(folder=None):
+    """Trial table joined to the heartbeat-evoked table of part B."""
+    folder = Path(folder or os.environ["TRIAL_DATA"])
+    hep = pd.read_parquet(folder / "hep.parquet")
+    return load(folder).merge(hep, on="trial_id", how="inner", validate="1:1")
+
+
+def _curve(frame, prefix):
+    return frame[[f"{prefix}_{k}" for k in range(16)]].to_numpy(float)
+
+
+def hep_amplitude(frame, window="video"):
+    """Mean frontal and central heartbeat-evoked EEG, 250-600 ms after R."""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        values = np.nanmean(
+            [_curve(frame, f"hep_{window}_{r}") for r in HEP_REGIONS], axis=0
+        )
+    return pd.Series(values[:, HEP_BINS].mean(axis=1), index=frame.index)
+
+
+def _controlled(frame, hep, stressed):
+    """Within-person stress coefficient on the HEP, with and without cardiac terms.
+
+    The heart's own field (ECG amplitude in the same window) and the mean RR
+    interval enter as covariates; all continuous terms are z-scored per person.
+    """
+    ecg = pd.Series(
+        _curve(frame, "ecg_video")[:, HEP_BINS].mean(axis=1), index=frame.index
+    )
+    data = pd.DataFrame(
+        {"hep": hep, "ecg": ecg, "rr": frame["rr_video"], "stress": stressed}
+    )
+    data = data.dropna().assign(person=frame["participant_id"])
+    rows = {}
+    for person, g in data.groupby("person"):
+        if g["stress"].sum() < MIN_EACH or (~g["stress"]).sum() < MIN_EACH:
+            continue
+        z = g[["hep", "ecg", "rr"]].apply(_z)
+        if z.isna().any().any():
+            continue
+        s = g["stress"].astype(float).to_numpy()
+        plain = np.column_stack([np.ones(len(g)), s])
+        full = np.column_stack([plain, z["ecg"], z["rr"]])
+        rows[person] = {
+            "stress_plain": np.linalg.lstsq(plain, z["hep"], rcond=None)[0][1],
+            "stress_controlled": np.linalg.lstsq(full, z["hep"], rcond=None)[0][1],
+        }
+    return _mean_ci(pd.DataFrame.from_dict(rows, orient="index"))
+
+
+def hep(frame):
+    """Part B: heartbeat-evoked EEG in stress reactions (see the protocol)."""
+    people = frame["participant_id"].to_numpy()
+    video, pre = hep_amplitude(frame, "video"), hep_amplitude(frame, "pre")
+    measures = {
+        "hep_video": video,
+        "hep_change": video - pre,
+        "ecg_video": pd.Series(
+            _curve(frame, "ecg_video")[:, HEP_BINS].mean(axis=1), index=frame.index
+        ),
+        "rr_video": frame["rr_video"],
+    }
+    out = {
+        "coverage": float(video.notna().mean()),
+        "beats_video_median": float(frame["beats_video"].median()),
+    }
+    for name in ("stress", "vs_excitement", "vs_calm_negative"):
+        positive, negative = (m.to_numpy() for m in contrasts(frame)[name])
+        out[name] = {}
+        for measure, values in measures.items():
+            d, _ = timecourse._person_d(
+                values.to_numpy(float)[:, None], positive, negative, people
+            )
+            mean, low, high = timecourse._summary(d)
+            out[name][measure] = [
+                round(float(mean[0]), 4),
+                round(float(low[0]), 4),
+                round(float(high[0]), 4),
+                len(d),
+            ]
+    positive, negative = (m.to_numpy() for m in contrasts(frame)["stress"])
+    curves = {f"hep_video_{r}": _curve(frame, f"hep_video_{r}") for r in common.REGIONS}
+    curves["ecg_video"] = _curve(frame, "ecg_video")
+    out["curves"] = {}
+    for name, values in curves.items():
+        d, _ = timecourse._person_d(values, positive, negative, people)
+        mean, low, high = timecourse._summary(d)
+        out["curves"][name] = {
+            "d": mean.round(4).tolist(),
+            "low": low.round(4).tolist(),
+            "high": high.round(4).tolist(),
+            "people": len(d),
+        }
+    out["controlled"] = _controlled(frame, video, label(frame))
+    out["coupling"] = {
+        rating: _mean_ci(_person_betas(frame, video, frame[column]))
+        for rating, column in RATINGS.items()
+    }
+    return out
+
+
 def main():
     """Run one analysis and write aggregate JSON only."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--split", choices=("audit", "main", "explore"), required=True)
+    choices = ("audit", "main", "explore", "hep")
+    parser.add_argument("--split", choices=choices, required=True)
     parser.add_argument("--model", nargs="*")  # accepted for the shared workflow
     parser.add_argument("--out", type=Path)
     args = parser.parse_args()
-    table = load()
-    if args.split == "audit":
+    table = load_hep() if args.split == "hep" else load()
+    if args.split == "hep":
+        result = {"hep": hep(table)}
+    elif args.split == "audit":
         result = {"audit": audit(table)}
     elif args.split == "explore":
         result = {"explore": explore(table)}

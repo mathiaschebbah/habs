@@ -97,3 +97,26 @@ def test_heartbeat_locking_recovers_a_template():
     assert np.argmax(mean) == 10  # bin 10 covers +300 to +350 ms
     assert mean[10] == pytest.approx(5.0)
     assert count == 24
+
+
+def test_hep_finds_a_simulated_difference(folder):
+    """A larger HEP on stressed trials, with an identical ECG, is found and kept."""
+    table = person.load(folder)
+    rng = np.random.default_rng(3)
+    stressed = person.label(table).to_numpy()
+    rows = {"trial_id": table["trial_id"].to_numpy()}
+    for window in ("pre", "video"):
+        for k in range(16):
+            rows[f"ecg_{window}_{k}"] = rng.normal(0, 1, len(table))
+            for region in person.common.REGIONS:
+                bump = 1.0 if (window == "video" and 9 <= k) else 0.0
+                rows[f"hep_{window}_{region}_{k}"] = (
+                    rng.normal(0, 1, len(table)) + bump * stressed
+                )
+        rows[f"beats_{window}"] = np.full(len(table), 10.0)
+        rows[f"rr_{window}"] = rng.normal(0.8, 0.05, len(table))
+    pd.DataFrame(rows).to_parquet(folder / "hep.parquet")
+    out = person.hep(person.load_hep(folder))
+    assert out["stress"]["hep_video"][1] > 0.5
+    assert abs(out["stress"]["ecg_video"][0]) < 0.2
+    assert out["controlled"]["stress_controlled"][1] > 0.5
