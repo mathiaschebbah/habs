@@ -40,7 +40,8 @@ def folder(tmp_path):
                 "hr": 0.8 * own + rng.normal(0, 1),
                 "sc": video_skin[v] + rng.normal(0, 0.3),
             }
-            row = {"trial_id": trial}
+            feeling = "Fear" if valence <= 4 else "Joy" if valence >= 6 else "Surprise"
+            row = {"trial_id": trial, "self_reported_emotion_1": feeling}
             for signal in ("hr", "sc", "resp_amp", "resp_rate", *timecourse.EEG):
                 values = rng.normal(0, 0.1, timecourse.BINS)
                 values[timecourse.ONSET :] += response.get(signal, 0.0)
@@ -122,3 +123,11 @@ def test_hep_finds_a_simulated_difference(folder):
     assert out["stress"]["hep_video"][1] > 0.5
     assert abs(out["stress"]["ecg_video"][0]) < 0.2
     assert out["controlled"]["stress_controlled"][1] > 0.5
+
+
+def test_noise_check_sees_a_real_own_part(folder):
+    """Own valence drives the chosen emotion here, so its own part is not noise."""
+    out = person.noise(person.load(folder))
+    assert out["own_valence_vs_own_emotion_r"]["r"][0] < -0.3
+    assert out["same_video_auc_valence_predicts_emotion"]["auc"] > 0.8
+    assert out["heart_own_upper_corrected"] is not None

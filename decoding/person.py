@@ -156,13 +156,14 @@ def coupling(frame):
     return out
 
 
-def _stratified_auc(frame, score):
+def _stratified_auc(frame, score, positive=None):
     """AUC over stressed/non-stressed pairs that watched the same video.
 
+    ``positive`` replaces the stress label when given (a boolean array).
     Returns the pooled pair-weighted AUC, a 95% interval from a bootstrap over
     videos, and the per-video counts used.
     """
-    stressed = label(frame).to_numpy()
+    stressed = label(frame).to_numpy() if positive is None else positive
     rows = []
     for _, index in frame.groupby("video").indices.items():
         pos, neg = stressed[index], ~stressed[index]
@@ -317,6 +318,12 @@ def audit(frame):
         "trials_by_cohort": frame["cohort"].value_counts().sort_index().to_dict(),
         "response_coverage": responses,
         "dominance_coverage": float(frame["rating_dominance"].notna().mean()),
+        "emotion_1_counts": frame["self_reported_emotion_1"]
+        .astype("string")
+        .str.strip()
+        .str.lower()
+        .value_counts(dropna=False)
+        .to_dict(),
     }
 
 
@@ -410,6 +417,63 @@ def video_level(frame):
             "videos": len(data),
         }
     return out
+
+
+NEGATIVE = ("anger", "fear", "disgust", "sadness", "guilt")
+POSITIVE = ("joy", "excitement", "relaxation", "sensuality")
+
+
+def negativity(frame):
+    """1 if the first chosen emotion is negative, 0 if positive, else NaN."""
+    emotion = frame["self_reported_emotion_1"].astype("string").str.strip().str.lower()
+    return pd.Series(
+        np.where(
+            emotion.isin(NEGATIVE), 1.0, np.where(emotion.isin(POSITIVE), 0.0, np.nan)
+        ),
+        index=frame.index,
+    )
+
+
+def noise(frame):
+    """Test whether the own part of valence is real or rating noise.
+
+    The chosen emotion is a second report made apart from the valence scale.
+    If the own part of valence predicts the own part of choosing a negative
+    emotion, it carries the person's experience. The within-person correlation
+    r of the two own parts bounds the reliability of own valence from below
+    (r squared, under classical test theory), which bounds how much rating noise
+    can have shrunk the heart's own coefficient.
+    """
+    negative = negativity(frame)
+    valence = frame["rating_valence"]
+    own_valence = components(frame, valence)[2]
+    own_negative = components(frame, negative)[2]
+    data = pd.DataFrame({"v": own_valence, "n": own_negative}).dropna()
+    data = data.assign(person=frame["participant_id"])
+    r = {
+        p: {"r": g["v"].corr(g["n"])}
+        for p, g in data.groupby("person")
+        if len(g) >= MIN_TRIALS and g["v"].std() > 0 and g["n"].std() > 0
+    }
+    r = _mean_ci(pd.DataFrame.from_dict(r, orient="index"))
+    known = negative.notna()
+    pairs = _stratified_auc(
+        frame[known], -own_valence[known], negative[known].to_numpy() == 1
+    )
+    emotion = _mean_ci(_person_betas(frame, negative, valence))
+    heart = _mean_ci(_person_betas(frame, response(frame, "heart"), valence))
+    bound = abs(r["r"][0])
+    return {
+        "coverage": float(known.mean()),
+        "own_valence_vs_own_emotion_r": r,
+        "same_video_auc_valence_predicts_emotion": pairs,
+        "emotion_on_valence": emotion,
+        "heart_on_valence": heart,
+        "heart_own_upper_corrected": round(heart["beta_own"][2] / bound, 4)
+        if bound > 0
+        else None,
+        "heart_shared": heart["beta_shared"],
+    }
 
 
 HEP_REGIONS = ("frontal", "central")
@@ -521,7 +585,7 @@ def hep(frame):
 def main():
     """Run one analysis and write aggregate JSON only."""
     parser = argparse.ArgumentParser()
-    choices = ("audit", "main", "explore", "hep")
+    choices = ("audit", "main", "explore", "hep", "noise")
     parser.add_argument("--split", choices=choices, required=True)
     parser.add_argument("--model", nargs="*")  # accepted for the shared workflow
     parser.add_argument("--out", type=Path)
@@ -533,6 +597,8 @@ def main():
         result = {"audit": audit(table)}
     elif args.split == "explore":
         result = {"explore": explore(table)}
+    elif args.split == "noise":
+        result = {"noise": noise(table)}
     else:
         rooms, model = room(table)
         result = {
