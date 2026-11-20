@@ -1,5 +1,5 @@
 {
-  "stage": "timecourse_features",
+  "stage": "hep_features",
   "seed": 20261108,
   "primary_cohort": 2,
   "exploratory_cohorts": [

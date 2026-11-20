@@ -138,6 +138,19 @@ order, brain first, then heart and breathing, then skin, matches what picture
 studies report: cardiac deceleration within 2 s \cite{bradley2009} and skin
 responses starting near 1.3 s and peaking later \cite{benedek2010}.
 
+Which part of the rating does each signal follow? The two control contrasts
+separate them. Against excitement, which has the same arousal but the opposite
+valence, the heart still slowed (mean $d$ from 1 to 8 s: $-0.075$ in
+development; $-0.14$ at 6 s in test people, interval $-0.23$ to $-0.04$) and
+breathing stayed shallower ($-0.078$). Against calm negative trials, which have
+the same valence but lower arousal, neither moved ($+0.001$ and $-0.009$). The
+skin did the opposite: it separated stress from calm negative trials ($+0.13$ at
+6 s, interval $+0.02$ to $+0.24$) but not from excitement (interval $-0.03$ to
+$+0.12$). So the heart and breathing follow how unpleasant the video is, and
+the skin follows how intense it is. This is the split that picture-viewing
+studies report \cite{lang1993}. The skin rises for stress and excitement
+alike, which explains why our detector cannot separate them.
+
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{curves.png}
@@ -214,9 +227,9 @@ scored 0.605 (0.544 to 0.668) against 0.634 (0.570 to 0.699) for the starting
 logistic regression (Table~\ref{tab:test}). None of eleven scikit-learn
 families (random forests, boosting, MLP, kernels, LDA, SVM and others) beat a
 linear model. Stress versus relaxed held at 0.61 to 0.63, while stress versus
-excitement ranged from 0.45 to 0.59 across test sets: the detector mostly reads
-how negative and how intense a reaction is, and the body signals mostly read
-arousal.
+excitement ranged from 0.45 to 0.59 across test sets. The detector reads how
+negative and how intense a reaction is together, and at equal arousal the only
+remaining difference is the small cardiac one described above.
 
 \begin{table}[t]
 \centering
@@ -281,7 +294,7 @@ test sets. We have no performance task, so the "breaking point before an
 error" that motivated us cannot be studied with these data.
 
 \paragraph{Reproducibility.} The repository holds the two feature
-extractors and the fixed scorers in \texttt{decoding/}, the, models, all experiment logs, and the frozen protocols in
+extractors and the fixed scorers in \texttt{decoding/}, the models, all experiment logs, and the frozen protocols in
 \texttt{journal/}. Only aggregate numbers leave the HABS servers.
 
 \begin{thebibliography}{99}\small
@@ -291,6 +304,7 @@ extractors and the fixed scorers in \texttt{decoding/}, the, models, all experim
 \bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
 \bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
 \bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.
+\bibitem{lang1993} P. J. Lang, M. K. Greenwald, M. M. Bradley, A. O. Hamm. Looking at pictures: affective, facial, visceral, and behavioral reactions. Psychophysiology 1993;30(3):261--273. doi:10.1111/j.1469-8986.1993.tb03352.x.
 \bibitem{hagemann2001} D. Hagemann, E. Naumann. The effects of ocular artifacts on (lateralized) broadband power in the EEG. Clin. Neurophysiol. 112 (2001) 215--231.
 \bibitem{siegel2018} E. H. Siegel et al. Emotion fingerprints or emotion populations? A meta-analytic investigation of autonomic features of emotion categories. Psychol. Bull. 144 (2018) 343--393.
 \bibitem{palomba2000} D. Palomba et al. Cardiac responses associated with affective processing of unpleasant film stimuli. Int. J. Psychophysiol. 36 (2000) 45--57.
