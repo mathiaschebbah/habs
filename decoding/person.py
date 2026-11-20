@@ -201,6 +201,31 @@ def _model_scores(frame):
     return pd.concat(parts).loc[frame.index]
 
 
+def _residual_scores(frame):
+    """Post hoc: the same model on features minus the other viewers' mean.
+
+    Every feature keeps only its own part (``components``), so the model is
+    trained on what differs between viewers of the same video. Other viewers'
+    features, never their labels, enter the residuals. Cross-fitted like
+    ``_model_scores``.
+    """
+    x = timecourse._features(frame, "all", 10)
+    x = pd.DataFrame({c: components(frame, x[c])[2] for c in x}, index=frame.index)
+    y = label(frame)
+    blocks = [(p, t) for p in range(3) for t in range(3)]
+
+    def one(p, t):
+        rows = (frame["person_fold"] == p) & (frame["theme_fold"] == t)
+        train = (frame["person_fold"] != p) & (frame["theme_fold"] != t)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            model = timecourse._model().fit(x[train], y[train])
+            return pd.Series(model.decision_function(x[rows]), index=x.index[rows])
+
+    parts = Parallel(n_jobs=-1)(delayed(one)(p, t) for p, t in blocks)
+    return pd.concat(parts).loc[frame.index]
+
+
 def _within_person_auc(frame, score):
     stats = person_stats(frame, score.to_frame("stress"))
     return {
@@ -319,6 +344,15 @@ def explore(frame):
     return {
         "heart_bpm_by_control": _mean_ci(pd.DataFrame.from_dict(rows, "index")),
         "video_level": video_level(frame),
+        "residual_model": _room_scores(frame, _residual_scores(frame)),
+    }
+
+
+def _room_scores(frame, score):
+    keep = score.notna()
+    return {
+        "within_person": _within_person_auc(frame[keep], score[keep]),
+        "same_video": _stratified_auc(frame[keep], score[keep]),
     }
 
 
