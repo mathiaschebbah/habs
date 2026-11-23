@@ -1,0 +1,1753 @@
+{
+ "criterion": {
+  "n_total": 22974,
+  "n_with_emotion_1": 17142,
+  "cohort_emotion_1_coverage": {
+   "1": 0.0,
+   "2": 1.0,
+   "3": 1.0,
+   "4": 1.0,
+   "5": 1.0
+  },
+  "threshold_sweep": {
+   "v_lt5_a_gt5": {
+    "n_trials": 6661,
+    "fraction": 0.2899,
+    "emotion_1": {
+     "n_known": 5089,
+     "counts_ranked": {
+      "anger": 1170,
+      "disgust": 1145,
+      "fear": 1077,
+      "sadness": 775,
+      "surprise": 310,
+      "neutral": 238,
+      "curiosity": 197,
+      "guilt": 99,
+      "excitement": 54,
+      "sensuality": 11,
+      "relaxation": 10,
+      "joy": 3
+     },
+     "pct_ranked": {
+      "anger": 0.2299,
+      "disgust": 0.225,
+      "fear": 0.2116,
+      "sadness": 0.1523,
+      "surprise": 0.0609,
+      "neutral": 0.0468,
+      "curiosity": 0.0387,
+      "guilt": 0.0195,
+      "excitement": 0.0106,
+      "sensuality": 0.0022,
+      "relaxation": 0.002,
+      "joy": 0.0006
+     },
+     "negative_purity": 0.8383,
+     "acute_threat_purity": 0.6665,
+     "sadness_guilt_rate": 0.1717,
+     "surprise_rate": 0.0609,
+     "incoherent_rate": 0.1008,
+     "recall_by_emotion": {
+      "anger": 0.8052,
+      "fear": 0.7558,
+      "disgust": 0.6305,
+      "sadness": 0.5272,
+      "guilt": 0.5294,
+      "surprise": 0.2482
+     }
+    },
+    "final_emotion": {
+     "n_known": 6661,
+     "counts_ranked": {
+      "anger": 1849,
+      "fear": 1610,
+      "disgust": 1465,
+      "sadness": 1012,
+      "guilt": 306,
+      "surprise": 164,
+      "neutral": 154,
+      "curiosity": 72,
+      "excitement": 15,
+      "sensuality": 12,
+      "relaxation": 2
+     },
+     "pct_ranked": {
+      "anger": 0.2776,
+      "fear": 0.2417,
+      "disgust": 0.2199,
+      "sadness": 0.1519,
+      "guilt": 0.0459,
+      "surprise": 0.0246,
+      "neutral": 0.0231,
+      "curiosity": 0.0108,
+      "excitement": 0.0023,
+      "sensuality": 0.0018,
+      "relaxation": 0.0003
+     },
+     "negative_purity": 0.9371,
+     "acute_threat_purity": 0.7392,
+     "sadness_guilt_rate": 0.1979,
+     "surprise_rate": 0.0246,
+     "incoherent_rate": 0.0383,
+     "recall_by_emotion": {
+      "anger": 0.8284,
+      "fear": 0.8202,
+      "disgust": 0.6202,
+      "sadness": 0.4877,
+      "guilt": 0.4474,
+      "surprise": 0.1262
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.1059,
+      -0.148,
+      -0.0639,
+      290
+     ],
+     "skin": [
+      0.1434,
+      0.0892,
+      0.1958,
+      253
+     ],
+     "breathing": [
+      -0.079,
+      -0.1152,
+      -0.0428,
+      291
+     ],
+     "delta": [
+      0.1256,
+      0.0808,
+      0.1715,
+      291
+     ],
+     "alpha": [
+      -0.0199,
+      -0.0595,
+      0.0216,
+      291
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5366,
+     "ci95": [
+      0.5261,
+      0.5476
+     ],
+     "people": 292
+    },
+    "same_video": {
+     "auc_weighted": 0.5157,
+     "ci95_weighted": [
+      0.5022,
+      0.5301
+     ],
+     "auc_unweighted": 0.5189,
+     "ci95_unweighted": [
+      0.505,
+      0.5333
+     ],
+     "d_within_video": [
+      0.0686,
+      0.0189,
+      0.1195,
+      164
+     ],
+     "diff_within_video": [
+      0.021,
+      0.0066,
+      0.0355,
+      164
+     ],
+     "videos": 164,
+     "pairs": 286486
+    }
+   },
+   "v_le4.5_a_ge5.5": {
+    "n_trials": 6217,
+    "fraction": 0.2706,
+    "emotion_1": {
+     "n_known": 4645,
+     "counts_ranked": {
+      "anger": 1132,
+      "disgust": 1073,
+      "fear": 1048,
+      "sadness": 711,
+      "surprise": 277,
+      "curiosity": 153,
+      "neutral": 99,
+      "guilt": 90,
+      "excitement": 48,
+      "relaxation": 7,
+      "sensuality": 4,
+      "joy": 3
+     },
+     "pct_ranked": {
+      "anger": 0.2437,
+      "disgust": 0.231,
+      "fear": 0.2256,
+      "sadness": 0.1531,
+      "surprise": 0.0596,
+      "curiosity": 0.0329,
+      "neutral": 0.0213,
+      "guilt": 0.0194,
+      "excitement": 0.0103,
+      "relaxation": 0.0015,
+      "sensuality": 0.0009,
+      "joy": 0.0006
+     },
+     "negative_purity": 0.8728,
+     "acute_threat_purity": 0.7003,
+     "sadness_guilt_rate": 0.1724,
+     "surprise_rate": 0.0596,
+     "incoherent_rate": 0.0676,
+     "recall_by_emotion": {
+      "anger": 0.7791,
+      "fear": 0.7354,
+      "disgust": 0.5909,
+      "sadness": 0.4837,
+      "guilt": 0.4813,
+      "surprise": 0.2218
+     }
+    },
+    "final_emotion": {
+     "n_known": 6217,
+     "counts_ranked": {
+      "anger": 1820,
+      "fear": 1576,
+      "disgust": 1392,
+      "sadness": 951,
+      "guilt": 266,
+      "surprise": 133,
+      "curiosity": 40,
+      "neutral": 22,
+      "excitement": 11,
+      "sensuality": 5,
+      "relaxation": 1
+     },
+     "pct_ranked": {
+      "anger": 0.2927,
+      "fear": 0.2535,
+      "disgust": 0.2239,
+      "sadness": 0.153,
+      "guilt": 0.0428,
+      "surprise": 0.0214,
+      "curiosity": 0.0064,
+      "neutral": 0.0035,
+      "excitement": 0.0018,
+      "sensuality": 0.0008,
+      "relaxation": 0.0002
+     },
+     "negative_purity": 0.9659,
+     "acute_threat_purity": 0.7701,
+     "sadness_guilt_rate": 0.1958,
+     "surprise_rate": 0.0214,
+     "incoherent_rate": 0.0127,
+     "recall_by_emotion": {
+      "anger": 0.8154,
+      "fear": 0.8029,
+      "disgust": 0.5893,
+      "sadness": 0.4583,
+      "guilt": 0.3889,
+      "surprise": 0.1023
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.1013,
+      -0.1448,
+      -0.0632,
+      288
+     ],
+     "skin": [
+      0.1487,
+      0.0938,
+      0.2038,
+      249
+     ],
+     "breathing": [
+      -0.075,
+      -0.1117,
+      -0.0382,
+      288
+     ],
+     "delta": [
+      0.1369,
+      0.0909,
+      0.1812,
+      288
+     ],
+     "alpha": [
+      -0.0146,
+      -0.0566,
+      0.0281,
+      288
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5375,
+     "ci95": [
+      0.5257,
+      0.5486
+     ],
+     "people": 289
+    },
+    "same_video": {
+     "auc_weighted": 0.5171,
+     "ci95_weighted": [
+      0.5025,
+      0.5322
+     ],
+     "auc_unweighted": 0.5207,
+     "ci95_unweighted": [
+      0.506,
+      0.5361
+     ],
+     "d_within_video": [
+      0.0683,
+      0.0133,
+      0.1289,
+      148
+     ],
+     "diff_within_video": [
+      0.0236,
+      0.0078,
+      0.0411,
+      148
+     ],
+     "videos": 148,
+     "pairs": 269497
+    }
+   },
+   "v_le4_a_ge6": {
+    "n_trials": 5510,
+    "fraction": 0.2398,
+    "emotion_1": {
+     "n_known": 3938,
+     "counts_ranked": {
+      "anger": 1012,
+      "fear": 943,
+      "disgust": 901,
+      "sadness": 585,
+      "surprise": 216,
+      "curiosity": 107,
+      "guilt": 72,
+      "neutral": 53,
+      "excitement": 42,
+      "relaxation": 5,
+      "sensuality": 1,
+      "joy": 1
+     },
+     "pct_ranked": {
+      "anger": 0.257,
+      "fear": 0.2395,
+      "disgust": 0.2288,
+      "sadness": 0.1486,
+      "surprise": 0.0549,
+      "curiosity": 0.0272,
+      "guilt": 0.0183,
+      "neutral": 0.0135,
+      "excitement": 0.0107,
+      "relaxation": 0.0013,
+      "sensuality": 0.0003,
+      "joy": 0.0003
+     },
+     "negative_purity": 0.8921,
+     "acute_threat_purity": 0.7252,
+     "sadness_guilt_rate": 0.1668,
+     "surprise_rate": 0.0549,
+     "incoherent_rate": 0.0531,
+     "recall_by_emotion": {
+      "anger": 0.6965,
+      "fear": 0.6618,
+      "disgust": 0.4961,
+      "sadness": 0.398,
+      "guilt": 0.385,
+      "surprise": 0.1729
+     }
+    },
+    "final_emotion": {
+     "n_known": 5510,
+     "counts_ranked": {
+      "anger": 1690,
+      "fear": 1442,
+      "disgust": 1215,
+      "sadness": 818,
+      "guilt": 224,
+      "surprise": 90,
+      "curiosity": 16,
+      "excitement": 8,
+      "neutral": 6,
+      "sensuality": 1
+     },
+     "pct_ranked": {
+      "anger": 0.3067,
+      "fear": 0.2617,
+      "disgust": 0.2205,
+      "sadness": 0.1485,
+      "guilt": 0.0407,
+      "surprise": 0.0163,
+      "curiosity": 0.0029,
+      "excitement": 0.0015,
+      "neutral": 0.0011,
+      "sensuality": 0.0002
+     },
+     "negative_purity": 0.978,
+     "acute_threat_purity": 0.7889,
+     "sadness_guilt_rate": 0.1891,
+     "surprise_rate": 0.0163,
+     "incoherent_rate": 0.0056,
+     "recall_by_emotion": {
+      "anger": 0.7572,
+      "fear": 0.7346,
+      "disgust": 0.5144,
+      "sadness": 0.3942,
+      "guilt": 0.3275,
+      "surprise": 0.0692
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0984,
+      -0.1414,
+      -0.0554,
+      286
+     ],
+     "skin": [
+      0.1735,
+      0.1106,
+      0.2398,
+      246
+     ],
+     "breathing": [
+      -0.0734,
+      -0.1104,
+      -0.0336,
+      285
+     ],
+     "delta": [
+      0.1438,
+      0.094,
+      0.1892,
+      285
+     ],
+     "alpha": [
+      -0.0062,
+      -0.052,
+      0.042,
+      285
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5397,
+     "ci95": [
+      0.5276,
+      0.551
+     ],
+     "people": 287
+    },
+    "same_video": {
+     "auc_weighted": 0.5201,
+     "ci95_weighted": [
+      0.507,
+      0.5341
+     ],
+     "auc_unweighted": 0.5215,
+     "ci95_unweighted": [
+      0.5054,
+      0.537
+     ],
+     "d_within_video": [
+      0.0748,
+      0.0187,
+      0.1305,
+      140
+     ],
+     "diff_within_video": [
+      0.0275,
+      0.0082,
+      0.0467,
+      140
+     ],
+     "videos": 140,
+     "pairs": 265019
+    }
+   },
+   "v_le3.5_a_ge6.5": {
+    "n_trials": 4020,
+    "fraction": 0.175,
+    "emotion_1": {
+     "n_known": 2977,
+     "counts_ranked": {
+      "anger": 831,
+      "fear": 753,
+      "disgust": 677,
+      "sadness": 402,
+      "surprise": 135,
+      "guilt": 58,
+      "curiosity": 57,
+      "excitement": 31,
+      "neutral": 28,
+      "relaxation": 5
+     },
+     "pct_ranked": {
+      "anger": 0.2791,
+      "fear": 0.2529,
+      "disgust": 0.2274,
+      "sadness": 0.135,
+      "surprise": 0.0453,
+      "guilt": 0.0195,
+      "curiosity": 0.0191,
+      "excitement": 0.0104,
+      "neutral": 0.0094,
+      "relaxation": 0.0017
+     },
+     "negative_purity": 0.914,
+     "acute_threat_purity": 0.7595,
+     "sadness_guilt_rate": 0.1545,
+     "surprise_rate": 0.0453,
+     "incoherent_rate": 0.0406,
+     "recall_by_emotion": {
+      "anger": 0.5719,
+      "fear": 0.5284,
+      "disgust": 0.3728,
+      "sadness": 0.2735,
+      "guilt": 0.3102,
+      "surprise": 0.1081
+     }
+    },
+    "final_emotion": {
+     "n_known": 4020,
+     "counts_ranked": {
+      "anger": 1346,
+      "fear": 1077,
+      "disgust": 896,
+      "sadness": 539,
+      "guilt": 117,
+      "surprise": 34,
+      "curiosity": 7,
+      "excitement": 2,
+      "neutral": 2
+     },
+     "pct_ranked": {
+      "anger": 0.3348,
+      "fear": 0.2679,
+      "disgust": 0.2229,
+      "sadness": 0.1341,
+      "guilt": 0.0291,
+      "surprise": 0.0085,
+      "curiosity": 0.0017,
+      "excitement": 0.0005,
+      "neutral": 0.0005
+     },
+     "negative_purity": 0.9888,
+     "acute_threat_purity": 0.8256,
+     "sadness_guilt_rate": 0.1632,
+     "surprise_rate": 0.0085,
+     "incoherent_rate": 0.0027,
+     "recall_by_emotion": {
+      "anger": 0.603,
+      "fear": 0.5487,
+      "disgust": 0.3793,
+      "sadness": 0.2598,
+      "guilt": 0.1711,
+      "surprise": 0.0262
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0711,
+      -0.1205,
+      -0.0216,
+      267
+     ],
+     "skin": [
+      0.2255,
+      0.1498,
+      0.3032,
+      220
+     ],
+     "breathing": [
+      -0.0424,
+      -0.0863,
+      0.0044,
+      265
+     ],
+     "delta": [
+      0.1736,
+      0.1211,
+      0.2284,
+      265
+     ],
+     "alpha": [
+      -0.0098,
+      -0.0597,
+      0.0403,
+      265
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5432,
+     "ci95": [
+      0.5302,
+      0.5554
+     ],
+     "people": 268
+    },
+    "same_video": {
+     "auc_weighted": 0.5197,
+     "ci95_weighted": [
+      0.5065,
+      0.5329
+     ],
+     "auc_unweighted": 0.5198,
+     "ci95_unweighted": [
+      0.5055,
+      0.5348
+     ],
+     "d_within_video": [
+      0.0648,
+      0.0127,
+      0.1189,
+      134
+     ],
+     "diff_within_video": [
+      0.0328,
+      0.0099,
+      0.0566,
+      134
+     ],
+     "videos": 134,
+     "pairs": 239968
+    }
+   },
+   "v_le3_a_ge7": {
+    "n_trials": 3081,
+    "fraction": 0.1341,
+    "emotion_1": {
+     "n_known": 2038,
+     "counts_ranked": {
+      "anger": 608,
+      "fear": 515,
+      "disgust": 481,
+      "sadness": 249,
+      "surprise": 82,
+      "guilt": 37,
+      "curiosity": 31,
+      "excitement": 21,
+      "neutral": 10,
+      "relaxation": 4
+     },
+     "pct_ranked": {
+      "anger": 0.2983,
+      "fear": 0.2527,
+      "disgust": 0.236,
+      "sadness": 0.1222,
+      "surprise": 0.0402,
+      "guilt": 0.0182,
+      "curiosity": 0.0152,
+      "excitement": 0.0103,
+      "neutral": 0.0049,
+      "relaxation": 0.002
+     },
+     "negative_purity": 0.9274,
+     "acute_threat_purity": 0.787,
+     "sadness_guilt_rate": 0.1403,
+     "surprise_rate": 0.0402,
+     "incoherent_rate": 0.0324,
+     "recall_by_emotion": {
+      "anger": 0.4184,
+      "fear": 0.3614,
+      "disgust": 0.2649,
+      "sadness": 0.1694,
+      "guilt": 0.1979,
+      "surprise": 0.0657
+     }
+    },
+    "final_emotion": {
+     "n_known": 3081,
+     "counts_ranked": {
+      "anger": 1047,
+      "fear": 803,
+      "disgust": 716,
+      "sadness": 398,
+      "guilt": 96,
+      "surprise": 18,
+      "curiosity": 3
+     },
+     "pct_ranked": {
+      "anger": 0.3398,
+      "fear": 0.2606,
+      "disgust": 0.2324,
+      "sadness": 0.1292,
+      "guilt": 0.0312,
+      "surprise": 0.0058,
+      "curiosity": 0.001
+     },
+     "negative_purity": 0.9932,
+     "acute_threat_purity": 0.8328,
+     "sadness_guilt_rate": 0.1603,
+     "surprise_rate": 0.0058,
+     "incoherent_rate": 0.001,
+     "recall_by_emotion": {
+      "anger": 0.4691,
+      "fear": 0.4091,
+      "disgust": 0.3031,
+      "sadness": 0.1918,
+      "guilt": 0.1404,
+      "surprise": 0.0138
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.056,
+      -0.1122,
+      -0.0042,
+      239
+     ],
+     "skin": [
+      0.2779,
+      0.1904,
+      0.3671,
+      195
+     ],
+     "breathing": [
+      -0.0248,
+      -0.0725,
+      0.0262,
+      237
+     ],
+     "delta": [
+      0.1826,
+      0.1172,
+      0.2444,
+      237
+     ],
+     "alpha": [
+      -0.0393,
+      -0.0957,
+      0.0192,
+      237
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5488,
+     "ci95": [
+      0.5352,
+      0.5633
+     ],
+     "people": 241
+    },
+    "same_video": {
+     "auc_weighted": 0.5265,
+     "ci95_weighted": [
+      0.5096,
+      0.5425
+     ],
+     "auc_unweighted": 0.5287,
+     "ci95_unweighted": [
+      0.5117,
+      0.5462
+     ],
+     "d_within_video": [
+      0.0823,
+      0.0217,
+      0.1443,
+      122
+     ],
+     "diff_within_video": [
+      0.0491,
+      0.0171,
+      0.0818,
+      122
+     ],
+     "videos": 122,
+     "pairs": 209870
+    }
+   },
+   "v_le2.5_a_ge7.5": {
+    "n_trials": 1874,
+    "fraction": 0.0816,
+    "emotion_1": {
+     "n_known": 1339,
+     "counts_ranked": {
+      "anger": 416,
+      "fear": 362,
+      "disgust": 312,
+      "sadness": 156,
+      "surprise": 45,
+      "guilt": 22,
+      "excitement": 10,
+      "curiosity": 10,
+      "relaxation": 3,
+      "neutral": 3
+     },
+     "pct_ranked": {
+      "anger": 0.3107,
+      "fear": 0.2704,
+      "disgust": 0.233,
+      "sadness": 0.1165,
+      "surprise": 0.0336,
+      "guilt": 0.0164,
+      "excitement": 0.0075,
+      "curiosity": 0.0075,
+      "relaxation": 0.0022,
+      "neutral": 0.0022
+     },
+     "negative_purity": 0.947,
+     "acute_threat_purity": 0.814,
+     "sadness_guilt_rate": 0.1329,
+     "surprise_rate": 0.0336,
+     "incoherent_rate": 0.0194,
+     "recall_by_emotion": {
+      "anger": 0.2863,
+      "fear": 0.254,
+      "disgust": 0.1718,
+      "sadness": 0.1061,
+      "guilt": 0.1176,
+      "surprise": 0.036
+     }
+    },
+    "final_emotion": {
+     "n_known": 1874,
+     "counts_ranked": {
+      "anger": 675,
+      "fear": 515,
+      "disgust": 444,
+      "sadness": 212,
+      "guilt": 26,
+      "surprise": 2
+     },
+     "pct_ranked": {
+      "anger": 0.3602,
+      "fear": 0.2748,
+      "disgust": 0.2369,
+      "sadness": 0.1131,
+      "guilt": 0.0139,
+      "surprise": 0.0011
+     },
+     "negative_purity": 0.9989,
+     "acute_threat_purity": 0.8719,
+     "sadness_guilt_rate": 0.127,
+     "surprise_rate": 0.0011,
+     "incoherent_rate": 0.0,
+     "recall_by_emotion": {
+      "anger": 0.3024,
+      "fear": 0.2624,
+      "disgust": 0.188,
+      "sadness": 0.1022,
+      "guilt": 0.038,
+      "surprise": 0.0015
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0617,
+      -0.1261,
+      0.0039,
+      168
+     ],
+     "skin": [
+      0.3418,
+      0.2248,
+      0.4596,
+      131
+     ],
+     "breathing": [
+      0.0012,
+      -0.0639,
+      0.0665,
+      168
+     ],
+     "delta": [
+      0.2617,
+      0.1791,
+      0.3507,
+      168
+     ],
+     "alpha": [
+      -0.0132,
+      -0.0951,
+      0.064,
+      168
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.526,
+     "ci95": [
+      0.5074,
+      0.5438
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5115,
+     "ci95_weighted": [
+      0.4969,
+      0.5267
+     ],
+     "auc_unweighted": 0.5087,
+     "ci95_unweighted": [
+      0.4885,
+      0.5293
+     ],
+     "d_within_video": [
+      0.0402,
+      -0.0315,
+      0.1141,
+      109
+     ],
+     "diff_within_video": [
+      0.0302,
+      -0.0195,
+      0.0825,
+      109
+     ],
+     "videos": 109,
+     "pairs": 147689
+    }
+   },
+   "v_le2_a_ge8": {
+    "n_trials": 1351,
+    "fraction": 0.0588,
+    "emotion_1": {
+     "n_known": 816,
+     "counts_ranked": {
+      "anger": 260,
+      "fear": 222,
+      "disgust": 209,
+      "sadness": 73,
+      "surprise": 27,
+      "guilt": 14,
+      "excitement": 5,
+      "curiosity": 4,
+      "neutral": 2
+     },
+     "pct_ranked": {
+      "anger": 0.3186,
+      "fear": 0.2721,
+      "disgust": 0.2561,
+      "sadness": 0.0895,
+      "surprise": 0.0331,
+      "guilt": 0.0172,
+      "excitement": 0.0061,
+      "curiosity": 0.0049,
+      "neutral": 0.0025
+     },
+     "negative_purity": 0.9534,
+     "acute_threat_purity": 0.8468,
+     "sadness_guilt_rate": 0.1066,
+     "surprise_rate": 0.0331,
+     "incoherent_rate": 0.0135,
+     "recall_by_emotion": {
+      "anger": 0.1789,
+      "fear": 0.1558,
+      "disgust": 0.1151,
+      "sadness": 0.0497,
+      "guilt": 0.0749,
+      "surprise": 0.0216
+     }
+    },
+    "final_emotion": {
+     "n_known": 1351,
+     "counts_ranked": {
+      "anger": 485,
+      "fear": 353,
+      "disgust": 345,
+      "sadness": 151,
+      "guilt": 17
+     },
+     "pct_ranked": {
+      "anger": 0.359,
+      "fear": 0.2613,
+      "disgust": 0.2554,
+      "sadness": 0.1118,
+      "guilt": 0.0126
+     },
+     "negative_purity": 1.0,
+     "acute_threat_purity": 0.8756,
+     "sadness_guilt_rate": 0.1244,
+     "surprise_rate": 0.0,
+     "incoherent_rate": 0.0,
+     "recall_by_emotion": {
+      "anger": 0.2173,
+      "fear": 0.1798,
+      "disgust": 0.1461,
+      "sadness": 0.0728,
+      "guilt": 0.0249,
+      "surprise": 0.0
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0409,
+      -0.1253,
+      0.0482,
+      133
+     ],
+     "skin": [
+      0.3271,
+      0.1996,
+      0.4589,
+      101
+     ],
+     "breathing": [
+      -0.0009,
+      -0.0722,
+      0.0673,
+      132
+     ],
+     "delta": [
+      0.3021,
+      0.2056,
+      0.4012,
+      132
+     ],
+     "alpha": [
+      -0.0113,
+      -0.1036,
+      0.0801,
+      132
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5395,
+     "ci95": [
+      0.5179,
+      0.5594
+     ],
+     "people": 137
+    },
+    "same_video": {
+     "auc_weighted": 0.5128,
+     "ci95_weighted": [
+      0.495,
+      0.5288
+     ],
+     "auc_unweighted": 0.5042,
+     "ci95_unweighted": [
+      0.4838,
+      0.5242
+     ],
+     "d_within_video": [
+      0.0211,
+      -0.0598,
+      0.0964,
+      104
+     ],
+     "diff_within_video": [
+      0.0289,
+      -0.0337,
+      0.0871,
+      104
+     ],
+     "videos": 104,
+     "pairs": 113602
+    }
+   },
+   "asym_v4_a5": {
+    "n_trials": 6247,
+    "fraction": 0.2719,
+    "emotion_1": {
+     "n_known": 4675,
+     "counts_ranked": {
+      "anger": 1153,
+      "disgust": 1120,
+      "fear": 1020,
+      "sadness": 757,
+      "surprise": 255,
+      "curiosity": 137,
+      "guilt": 93,
+      "neutral": 89,
+      "excitement": 42,
+      "relaxation": 5,
+      "joy": 3,
+      "sensuality": 1
+     },
+     "pct_ranked": {
+      "anger": 0.2466,
+      "disgust": 0.2396,
+      "fear": 0.2182,
+      "sadness": 0.1619,
+      "surprise": 0.0545,
+      "curiosity": 0.0293,
+      "guilt": 0.0199,
+      "neutral": 0.019,
+      "excitement": 0.009,
+      "relaxation": 0.0011,
+      "joy": 0.0006,
+      "sensuality": 0.0002
+     },
+     "negative_purity": 0.8862,
+     "acute_threat_purity": 0.7044,
+     "sadness_guilt_rate": 0.1818,
+     "surprise_rate": 0.0545,
+     "incoherent_rate": 0.0593,
+     "recall_by_emotion": {
+      "anger": 0.7935,
+      "fear": 0.7158,
+      "disgust": 0.6167,
+      "sadness": 0.515,
+      "guilt": 0.4973,
+      "surprise": 0.2042
+     }
+    },
+    "final_emotion": {
+     "n_known": 6247,
+     "counts_ranked": {
+      "anger": 1839,
+      "fear": 1536,
+      "disgust": 1441,
+      "sadness": 985,
+      "guilt": 293,
+      "surprise": 111,
+      "curiosity": 20,
+      "neutral": 12,
+      "excitement": 8,
+      "sensuality": 2
+     },
+     "pct_ranked": {
+      "anger": 0.2944,
+      "fear": 0.2459,
+      "disgust": 0.2307,
+      "sadness": 0.1577,
+      "guilt": 0.0469,
+      "surprise": 0.0178,
+      "curiosity": 0.0032,
+      "neutral": 0.0019,
+      "excitement": 0.0013,
+      "sensuality": 0.0003
+     },
+     "negative_purity": 0.9755,
+     "acute_threat_purity": 0.7709,
+     "sadness_guilt_rate": 0.2046,
+     "surprise_rate": 0.0178,
+     "incoherent_rate": 0.0067,
+     "recall_by_emotion": {
+      "anger": 0.8239,
+      "fear": 0.7825,
+      "disgust": 0.6101,
+      "sadness": 0.4747,
+      "guilt": 0.4284,
+      "surprise": 0.0854
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0992,
+      -0.1408,
+      -0.059,
+      289
+     ],
+     "skin": [
+      0.1477,
+      0.093,
+      0.2018,
+      250
+     ],
+     "breathing": [
+      -0.0759,
+      -0.1108,
+      -0.0412,
+      289
+     ],
+     "delta": [
+      0.1284,
+      0.0819,
+      0.1747,
+      289
+     ],
+     "alpha": [
+      -0.0168,
+      -0.0607,
+      0.028,
+      289
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.535,
+     "ci95": [
+      0.524,
+      0.5457
+     ],
+     "people": 290
+    },
+    "same_video": {
+     "auc_weighted": 0.5153,
+     "ci95_weighted": [
+      0.5003,
+      0.5303
+     ],
+     "auc_unweighted": 0.5155,
+     "ci95_unweighted": [
+      0.5002,
+      0.5306
+     ],
+     "d_within_video": [
+      0.0512,
+      -0.0034,
+      0.1067,
+      147
+     ],
+     "diff_within_video": [
+      0.018,
+      0.0019,
+      0.034,
+      147
+     ],
+     "videos": 147,
+     "pairs": 264671
+    }
+   },
+   "asym_v4_a7": {
+    "n_trials": 3315,
+    "fraction": 0.1443,
+    "emotion_1": {
+     "n_known": 2216,
+     "counts_ranked": {
+      "anger": 631,
+      "fear": 586,
+      "disgust": 500,
+      "sadness": 259,
+      "surprise": 116,
+      "curiosity": 39,
+      "guilt": 39,
+      "excitement": 28,
+      "neutral": 13,
+      "relaxation": 5
+     },
+     "pct_ranked": {
+      "anger": 0.2847,
+      "fear": 0.2644,
+      "disgust": 0.2256,
+      "sadness": 0.1169,
+      "surprise": 0.0523,
+      "curiosity": 0.0176,
+      "guilt": 0.0176,
+      "excitement": 0.0126,
+      "neutral": 0.0059,
+      "relaxation": 0.0023
+     },
+     "negative_purity": 0.9093,
+     "acute_threat_purity": 0.7748,
+     "sadness_guilt_rate": 0.1345,
+     "surprise_rate": 0.0523,
+     "incoherent_rate": 0.0384,
+     "recall_by_emotion": {
+      "anger": 0.4343,
+      "fear": 0.4112,
+      "disgust": 0.2753,
+      "sadness": 0.1762,
+      "guilt": 0.2086,
+      "surprise": 0.0929
+     }
+    },
+    "final_emotion": {
+     "n_known": 3315,
+     "counts_ranked": {
+      "anger": 1080,
+      "fear": 921,
+      "disgust": 733,
+      "sadness": 415,
+      "guilt": 106,
+      "surprise": 47,
+      "curiosity": 7,
+      "excitement": 6
+     },
+     "pct_ranked": {
+      "anger": 0.3258,
+      "fear": 0.2778,
+      "disgust": 0.2211,
+      "sadness": 0.1252,
+      "guilt": 0.032,
+      "surprise": 0.0142,
+      "curiosity": 0.0021,
+      "excitement": 0.0018
+     },
+     "negative_purity": 0.9819,
+     "acute_threat_purity": 0.8247,
+     "sadness_guilt_rate": 0.1572,
+     "surprise_rate": 0.0142,
+     "incoherent_rate": 0.0039,
+     "recall_by_emotion": {
+      "anger": 0.4839,
+      "fear": 0.4692,
+      "disgust": 0.3103,
+      "sadness": 0.2,
+      "guilt": 0.155,
+      "surprise": 0.0362
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0519,
+      -0.1045,
+      -0.0017,
+      248
+     ],
+     "skin": [
+      0.286,
+      0.2017,
+      0.3712,
+      199
+     ],
+     "breathing": [
+      -0.0358,
+      -0.0859,
+      0.0146,
+      245
+     ],
+     "delta": [
+      0.1718,
+      0.1146,
+      0.2309,
+      245
+     ],
+     "alpha": [
+      -0.0478,
+      -0.1049,
+      0.0096,
+      245
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.547,
+     "ci95": [
+      0.5334,
+      0.5611
+     ],
+     "people": 248
+    },
+    "same_video": {
+     "auc_weighted": 0.5217,
+     "ci95_weighted": [
+      0.5064,
+      0.5369
+     ],
+     "auc_unweighted": 0.5197,
+     "ci95_unweighted": [
+      0.5033,
+      0.5359
+     ],
+     "d_within_video": [
+      0.0626,
+      0.0059,
+      0.1248,
+      128
+     ],
+     "diff_within_video": [
+      0.0352,
+      0.0082,
+      0.0632,
+      128
+     ],
+     "videos": 128,
+     "pairs": 220570
+    }
+   },
+   "asym_v3_a6": {
+    "n_trials": 4675,
+    "fraction": 0.2035,
+    "emotion_1": {
+     "n_known": 3263,
+     "counts_ranked": {
+      "anger": 925,
+      "disgust": 806,
+      "fear": 728,
+      "sadness": 497,
+      "surprise": 128,
+      "guilt": 62,
+      "curiosity": 62,
+      "neutral": 26,
+      "excitement": 25,
+      "relaxation": 4
+     },
+     "pct_ranked": {
+      "anger": 0.2835,
+      "disgust": 0.247,
+      "fear": 0.2231,
+      "sadness": 0.1523,
+      "surprise": 0.0392,
+      "guilt": 0.019,
+      "curiosity": 0.019,
+      "neutral": 0.008,
+      "excitement": 0.0077,
+      "relaxation": 0.0012
+     },
+     "negative_purity": 0.9249,
+     "acute_threat_purity": 0.7536,
+     "sadness_guilt_rate": 0.1713,
+     "surprise_rate": 0.0392,
+     "incoherent_rate": 0.0359,
+     "recall_by_emotion": {
+      "anger": 0.6366,
+      "fear": 0.5109,
+      "disgust": 0.4438,
+      "sadness": 0.3381,
+      "guilt": 0.3316,
+      "surprise": 0.1025
+     }
+    },
+    "final_emotion": {
+     "n_known": 4675,
+     "counts_ranked": {
+      "anger": 1565,
+      "disgust": 1111,
+      "fear": 1102,
+      "sadness": 695,
+      "guilt": 171,
+      "surprise": 23,
+      "curiosity": 6,
+      "neutral": 2
+     },
+     "pct_ranked": {
+      "anger": 0.3348,
+      "disgust": 0.2376,
+      "fear": 0.2357,
+      "sadness": 0.1487,
+      "guilt": 0.0366,
+      "surprise": 0.0049,
+      "curiosity": 0.0013,
+      "neutral": 0.0004
+     },
+     "negative_purity": 0.9934,
+     "acute_threat_purity": 0.8081,
+     "sadness_guilt_rate": 0.1852,
+     "surprise_rate": 0.0049,
+     "incoherent_rate": 0.0017,
+     "recall_by_emotion": {
+      "anger": 0.7012,
+      "fear": 0.5614,
+      "disgust": 0.4704,
+      "sadness": 0.3349,
+      "guilt": 0.25,
+      "surprise": 0.0177
+     }
+    },
+    "effect_d": {
+     "heart": [
+      -0.0814,
+      -0.1264,
+      -0.038,
+      278
+     ],
+     "skin": [
+      0.1835,
+      0.1189,
+      0.252,
+      234
+     ],
+     "breathing": [
+      -0.0615,
+      -0.1004,
+      -0.0215,
+      277
+     ],
+     "delta": [
+      0.1632,
+      0.1159,
+      0.2105,
+      277
+     ],
+     "alpha": [
+      0.0007,
+      -0.0475,
+      0.0476,
+      277
+     ]
+    },
+    "within_person_auc": {
+     "auc": 0.5413,
+     "ci95": [
+      0.5289,
+      0.5535
+     ],
+     "people": 281
+    },
+    "same_video": {
+     "auc_weighted": 0.52,
+     "ci95_weighted": [
+      0.5069,
+      0.5338
+     ],
+     "auc_unweighted": 0.5226,
+     "ci95_unweighted": [
+      0.5069,
+      0.5389
+     ],
+     "d_within_video": [
+      0.0765,
+      0.0217,
+      0.1336,
+      135
+     ],
+     "diff_within_video": [
+      0.0354,
+      0.0136,
+      0.0584,
+      135
+     ],
+     "videos": 135,
+     "pairs": 249968
+    }
+   }
+  },
+  "emotion_1_va_profiles": {
+   "anger": {
+    "n": 1453,
+    "pct_of_known": 0.0848,
+    "valence_mean": 1.957,
+    "valence_sd": 0.943,
+    "valence_q": [
+     1.1,
+     1.75,
+     2.54
+    ],
+    "arousal_mean": 6.399,
+    "arousal_sd": 1.967,
+    "arousal_q": [
+     5.75,
+     6.76,
+     7.7
+    ],
+    "in_v_lt5_a_gt5": 0.8052,
+    "in_v_le4_a_ge6": 0.6965,
+    "in_v_le3_a_ge7": 0.4184
+   },
+   "fear": {
+    "n": 1425,
+    "pct_of_known": 0.0831,
+    "valence_mean": 2.742,
+    "valence_sd": 1.578,
+    "valence_q": [
+     1.48,
+     2.49,
+     3.46
+    ],
+    "arousal_mean": 6.633,
+    "arousal_sd": 1.775,
+    "arousal_q": [
+     6.09,
+     6.89,
+     7.8
+    ],
+    "in_v_lt5_a_gt5": 0.7558,
+    "in_v_le4_a_ge6": 0.6618,
+    "in_v_le3_a_ge7": 0.3614
+   },
+   "disgust": {
+    "n": 1816,
+    "pct_of_known": 0.1059,
+    "valence_mean": 2.166,
+    "valence_sd": 1.137,
+    "valence_q": [
+     1.14,
+     1.94,
+     2.86
+    ],
+    "arousal_mean": 5.57,
+    "arousal_sd": 2.159,
+    "arousal_q": [
+     3.85,
+     6.06,
+     7.15
+    ],
+    "in_v_lt5_a_gt5": 0.6305,
+    "in_v_le4_a_ge6": 0.4961,
+    "in_v_le3_a_ge7": 0.2649
+   },
+   "sadness": {
+    "n": 1470,
+    "pct_of_known": 0.0858,
+    "valence_mean": 2.401,
+    "valence_sd": 1.093,
+    "valence_q": [
+     1.46,
+     2.36,
+     3.14
+    ],
+    "arousal_mean": 5.06,
+    "arousal_sd": 2.047,
+    "arousal_q": [
+     3.42,
+     5.42,
+     6.65
+    ],
+    "in_v_lt5_a_gt5": 0.5272,
+    "in_v_le4_a_ge6": 0.398,
+    "in_v_le3_a_ge7": 0.1694
+   },
+   "guilt": {
+    "n": 187,
+    "pct_of_known": 0.0109,
+    "valence_mean": 2.745,
+    "valence_sd": 1.33,
+    "valence_q": [
+     1.74,
+     2.65,
+     3.48
+    ],
+    "arousal_mean": 5.293,
+    "arousal_sd": 2.068,
+    "arousal_q": [
+     3.56,
+     5.64,
+     6.9
+    ],
+    "in_v_lt5_a_gt5": 0.5294,
+    "in_v_le4_a_ge6": 0.385,
+    "in_v_le3_a_ge7": 0.1979
+   },
+   "surprise": {
+    "n": 1249,
+    "pct_of_known": 0.0729,
+    "valence_mean": 5.585,
+    "valence_sd": 2.158,
+    "valence_q": [
+     3.75,
+     6.09,
+     7.21
+    ],
+    "arousal_mean": 5.689,
+    "arousal_sd": 2.025,
+    "arousal_q": [
+     4.39,
+     6.15,
+     7.08
+    ],
+    "in_v_lt5_a_gt5": 0.2482,
+    "in_v_le4_a_ge6": 0.1729,
+    "in_v_le3_a_ge7": 0.0657
+   },
+   "joy": {
+    "n": 1987,
+    "pct_of_known": 0.1159,
+    "valence_mean": 7.913,
+    "valence_sd": 0.975,
+    "valence_q": [
+     7.22,
+     8.07,
+     8.84
+    ],
+    "arousal_mean": 5.737,
+    "arousal_sd": 2.282,
+    "arousal_q": [
+     3.94,
+     6.33,
+     7.42
+    ],
+    "in_v_lt5_a_gt5": 0.0015,
+    "in_v_le4_a_ge6": 0.0005,
+    "in_v_le3_a_ge7": 0.0
+   },
+   "excitement": {
+    "n": 947,
+    "pct_of_known": 0.0552,
+    "valence_mean": 7.288,
+    "valence_sd": 1.546,
+    "valence_q": [
+     6.52,
+     7.53,
+     8.42
+    ],
+    "arousal_mean": 6.973,
+    "arousal_sd": 1.524,
+    "arousal_q": [
+     6.36,
+     7.14,
+     7.93
+    ],
+    "in_v_lt5_a_gt5": 0.057,
+    "in_v_le4_a_ge6": 0.0444,
+    "in_v_le3_a_ge7": 0.0222
+   },
+   "relaxation": {
+    "n": 1683,
+    "pct_of_known": 0.0982,
+    "valence_mean": 7.555,
+    "valence_sd": 1.208,
+    "valence_q": [
+     6.71,
+     7.72,
+     8.64
+    ],
+    "arousal_mean": 2.95,
+    "arousal_sd": 2.017,
+    "arousal_q": [
+     1.35,
+     2.25,
+     3.88
+    ],
+    "in_v_lt5_a_gt5": 0.0059,
+    "in_v_le4_a_ge6": 0.003,
+    "in_v_le3_a_ge7": 0.0024
+   },
+   "sensuality": {
+    "n": 863,
+    "pct_of_known": 0.0503,
+    "valence_mean": 7.179,
+    "valence_sd": 1.184,
+    "valence_q": [
+     6.33,
+     7.24,
+     8.06
+    ],
+    "arousal_mean": 4.794,
+    "arousal_sd": 2.26,
+    "arousal_q": [
+     2.66,
+     5.53,
+     6.66
+    ],
+    "in_v_lt5_a_gt5": 0.0127,
+    "in_v_le4_a_ge6": 0.0012,
+    "in_v_le3_a_ge7": 0.0
+   },
+   "neutral": {
+    "n": 2269,
+    "pct_of_known": 0.1324,
+    "valence_mean": 5.125,
+    "valence_sd": 1.359,
+    "valence_q": [
+     4.42,
+     5.03,
+     5.78
+    ],
+    "arousal_mean": 3.711,
+    "arousal_sd": 1.726,
+    "arousal_q": [
+     2.12,
+     3.96,
+     5.05
+    ],
+    "in_v_lt5_a_gt5": 0.1049,
+    "in_v_le4_a_ge6": 0.0234,
+    "in_v_le3_a_ge7": 0.0044
+   },
+   "curiosity": {
+    "n": 1793,
+    "pct_of_known": 0.1046,
+    "valence_mean": 6.117,
+    "valence_sd": 1.697,
+    "valence_q": [
+     5.08,
+     6.38,
+     7.34
+    ],
+    "arousal_mean": 4.554,
+    "arousal_sd": 2.073,
+    "arousal_q": [
+     2.81,
+     4.81,
+     6.28
+    ],
+    "in_v_lt5_a_gt5": 0.1099,
+    "in_v_le4_a_ge6": 0.0597,
+    "in_v_le3_a_ge7": 0.0173
+   }
+  }
+ }
+}

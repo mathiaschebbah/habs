@@ -1,0 +1,150 @@
+{
+ "criterion_full": {
+  "any_rank_123_in_stress": {
+   "n_stress_known": 3938,
+   "pct_any_negative_123": 0.9716,
+   "pct_any_acute_threat_123": 0.901,
+   "n_incoherent_e1": 209,
+   "pct_incoherent_e1_with_neg_e23": 0.6986,
+   "n_surprise_e1": 216,
+   "pct_surprise_e1_with_neg_e23": 0.7731
+  },
+  "flagged_outliers": {
+   "flagged_fraction_all": 0.0,
+   "flagged_fraction_stress": 0.0,
+   "clean_n": 22974,
+   "clean_purity": {
+    "n_known": 3938,
+    "counts_ranked": {
+     "anger": 1012,
+     "fear": 943,
+     "disgust": 901,
+     "sadness": 585,
+     "surprise": 216,
+     "curiosity": 107,
+     "guilt": 72,
+     "neutral": 53,
+     "excitement": 42,
+     "relaxation": 5,
+     "sensuality": 1,
+     "joy": 1
+    },
+    "pct_ranked": {
+     "anger": 0.257,
+     "fear": 0.2395,
+     "disgust": 0.2288,
+     "sadness": 0.1486,
+     "surprise": 0.0549,
+     "curiosity": 0.0272,
+     "guilt": 0.0183,
+     "neutral": 0.0135,
+     "excitement": 0.0107,
+     "relaxation": 0.0013,
+     "sensuality": 0.0003,
+     "joy": 0.0003
+    },
+    "negative_purity": 0.8921,
+    "acute_threat_purity": 0.7252,
+    "sadness_guilt_rate": 0.1668,
+    "surprise_rate": 0.0549,
+    "incoherent_rate": 0.0531,
+    "recall_by_emotion": {
+     "anger": 0.6965,
+     "fear": 0.6618,
+     "disgust": 0.4961,
+     "sadness": 0.398,
+     "guilt": 0.385,
+     "surprise": 0.1729
+    }
+   },
+   "clean_effect_d": {
+    "heart": [
+     -0.0984,
+     -0.1414,
+     -0.0554,
+     286
+    ],
+    "skin": [
+     0.1735,
+     0.1106,
+     0.2398,
+     246
+    ],
+    "breathing": [
+     -0.0734,
+     -0.1104,
+     -0.0336,
+     285
+    ],
+    "delta": [
+     0.1438,
+     0.094,
+     0.1892,
+     285
+    ],
+    "alpha": [
+     -0.0062,
+     -0.052,
+     0.042,
+     285
+    ]
+   },
+   "clean_coupling_heart_valence": {
+    "beta_shared": [
+     0.0488,
+     0.0289,
+     0.0681
+    ],
+    "beta_own": [
+     0.0037,
+     -0.0148,
+     0.0213
+    ],
+    "r_total": [
+     0.0479,
+     0.0316,
+     0.0639
+    ],
+    "r_shared": [
+     0.0509,
+     0.0342,
+     0.0671
+    ],
+    "r_own": [
+     0.0036,
+     -0.0124,
+     0.018
+    ],
+    "people": 313
+   },
+   "clean_coupling_skin_arousal": {
+    "beta_shared": [
+     0.1058,
+     0.083,
+     0.1294
+    ],
+    "beta_own": [
+     0.0228,
+     0.0029,
+     0.0426
+    ],
+    "r_total": [
+     0.0785,
+     0.0582,
+     0.0994
+    ],
+    "r_shared": [
+     0.1029,
+     0.082,
+     0.124
+    ],
+    "r_own": [
+     0.0233,
+     0.005,
+     0.042
+    ],
+    "people": 274
+   }
+  }
+ }
+}

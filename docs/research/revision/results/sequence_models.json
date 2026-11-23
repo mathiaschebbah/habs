@@ -1,0 +1,2944 @@
+{
+ "sequence_models": {
+  "splits": {
+   "dev": {
+    "trials": 12052,
+    "people": 249,
+    "themes": 60
+   },
+   "test_new_both": {
+    "trials": 1646,
+    "people": 65,
+    "themes": 24
+   },
+   "test_new_person": {
+    "trials": 3285,
+    "people": 65,
+    "themes": 60
+   },
+   "test_new_video": {
+    "trials": 5991,
+    "people": 249,
+    "themes": 24
+   }
+  },
+  "models": {
+   "baseline_1s_logreg": {
+    "n_features": 340,
+    "dev": {
+     "within_person": {
+      "auc": 0.5458,
+      "ci95": [
+       0.5319,
+       0.5605
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5122,
+      "ci95": [
+       0.492,
+       0.5328
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5192,
+      "ci95": [
+       0.4936,
+       0.5438
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5771,
+      "ci95": [
+       0.556,
+       0.5987
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5194,
+      "ci95_weighted": [
+       0.5043,
+       0.534
+      ],
+      "auc_unweighted": 0.5148,
+      "ci95_unweighted": [
+       0.4953,
+       0.5337
+      ],
+      "d_within_video": [
+       0.0501,
+       -0.0114,
+       0.1148,
+       102
+      ],
+      "diff_within_video": [
+       0.0174,
+       -0.0055,
+       0.0413,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5257,
+      "ci95": [
+       0.4814,
+       0.5703
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5428,
+      "ci95": [
+       0.4838,
+       0.6088
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5289,
+      "ci95": [
+       0.4359,
+       0.6327
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5695,
+      "ci95": [
+       0.5163,
+       0.6246
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4933,
+      "ci95_weighted": [
+       0.4486,
+       0.5412
+      ],
+      "auc_unweighted": 0.527,
+      "ci95_unweighted": [
+       0.4654,
+       0.589
+      ],
+      "d_within_video": [
+       0.0553,
+       -0.1513,
+       0.2623,
+       26
+      ],
+      "diff_within_video": [
+       0.0227,
+       -0.0434,
+       0.0931,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.5997,
+      "ci95": [
+       0.5703,
+       0.6291
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5885,
+      "ci95": [
+       0.5481,
+       0.6288
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5763,
+      "ci95": [
+       0.5185,
+       0.6335
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6323,
+      "ci95": [
+       0.5929,
+       0.6719
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5575,
+      "ci95_weighted": [
+       0.521,
+       0.5925
+      ],
+      "auc_unweighted": 0.5515,
+      "ci95_unweighted": [
+       0.5195,
+       0.5809
+      ],
+      "d_within_video": [
+       0.16,
+       0.0498,
+       0.2645,
+       78
+      ],
+      "diff_within_video": [
+       0.0471,
+       0.0145,
+       0.0792,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.527,
+      "ci95": [
+       0.5008,
+       0.5519
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.516,
+      "ci95": [
+       0.4824,
+       0.5497
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5241,
+      "ci95": [
+       0.4775,
+       0.5717
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5498,
+      "ci95": [
+       0.5145,
+       0.5845
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5031,
+      "ci95_weighted": [
+       0.4751,
+       0.5381
+      ],
+      "auc_unweighted": 0.5402,
+      "ci95_unweighted": [
+       0.5108,
+       0.5695
+      ],
+      "d_within_video": [
+       0.1577,
+       0.05,
+       0.2676,
+       33
+      ],
+      "diff_within_video": [
+       0.048,
+       0.0159,
+       0.0805,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "phase4_logreg": {
+    "n_features": 114,
+    "dev": {
+     "within_person": {
+      "auc": 0.5597,
+      "ci95": [
+       0.5449,
+       0.575
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5407,
+      "ci95": [
+       0.5207,
+       0.5605
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5165,
+      "ci95": [
+       0.4921,
+       0.5402
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5831,
+      "ci95": [
+       0.5616,
+       0.6041
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5235,
+      "ci95_weighted": [
+       0.5066,
+       0.5386
+      ],
+      "auc_unweighted": 0.5136,
+      "ci95_unweighted": [
+       0.496,
+       0.5305
+      ],
+      "d_within_video": [
+       0.0515,
+       -0.0132,
+       0.1149,
+       102
+      ],
+      "diff_within_video": [
+       0.019,
+       -0.0036,
+       0.04,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5696,
+      "ci95": [
+       0.5187,
+       0.618
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5359,
+      "ci95": [
+       0.4725,
+       0.6004
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5562,
+      "ci95": [
+       0.4596,
+       0.6681
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.6091,
+      "ci95": [
+       0.5485,
+       0.6783
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4787,
+      "ci95_weighted": [
+       0.4342,
+       0.5269
+      ],
+      "auc_unweighted": 0.4938,
+      "ci95_unweighted": [
+       0.4359,
+       0.5478
+      ],
+      "d_within_video": [
+       -0.0076,
+       -0.1973,
+       0.1871,
+       26
+      ],
+      "diff_within_video": [
+       0.0006,
+       -0.0606,
+       0.0659,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.5985,
+      "ci95": [
+       0.5691,
+       0.6259
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5986,
+      "ci95": [
+       0.5614,
+       0.6329
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5763,
+      "ci95": [
+       0.5071,
+       0.6438
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6321,
+      "ci95": [
+       0.5895,
+       0.6731
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5536,
+      "ci95_weighted": [
+       0.5212,
+       0.5855
+      ],
+      "auc_unweighted": 0.5648,
+      "ci95_unweighted": [
+       0.5355,
+       0.594
+      ],
+      "d_within_video": [
+       0.1949,
+       0.0895,
+       0.3008,
+       78
+      ],
+      "diff_within_video": [
+       0.0609,
+       0.0301,
+       0.0923,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5457,
+      "ci95": [
+       0.5219,
+       0.5669
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5378,
+      "ci95": [
+       0.5049,
+       0.5698
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5331,
+      "ci95": [
+       0.4896,
+       0.5763
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5764,
+      "ci95": [
+       0.5407,
+       0.611
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5242,
+      "ci95_weighted": [
+       0.4999,
+       0.5513
+      ],
+      "auc_unweighted": 0.5433,
+      "ci95_unweighted": [
+       0.5127,
+       0.5719
+      ],
+      "d_within_video": [
+       0.145,
+       0.0361,
+       0.2538,
+       33
+      ],
+      "diff_within_video": [
+       0.0422,
+       0.0092,
+       0.0746,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "phase4_deltas_logreg": {
+    "n_features": 190,
+    "dev": {
+     "within_person": {
+      "auc": 0.561,
+      "ci95": [
+       0.5462,
+       0.576
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5364,
+      "ci95": [
+       0.5154,
+       0.5575
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5133,
+      "ci95": [
+       0.4859,
+       0.5382
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5871,
+      "ci95": [
+       0.5653,
+       0.6086
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5204,
+      "ci95_weighted": [
+       0.5036,
+       0.5358
+      ],
+      "auc_unweighted": 0.5138,
+      "ci95_unweighted": [
+       0.495,
+       0.5309
+      ],
+      "d_within_video": [
+       0.0554,
+       -0.012,
+       0.1182,
+       102
+      ],
+      "diff_within_video": [
+       0.0238,
+       0.0,
+       0.0454,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5646,
+      "ci95": [
+       0.514,
+       0.613
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.53,
+      "ci95": [
+       0.4659,
+       0.5944
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5494,
+      "ci95": [
+       0.4528,
+       0.6625
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.605,
+      "ci95": [
+       0.5413,
+       0.6734
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4819,
+      "ci95_weighted": [
+       0.4321,
+       0.5308
+      ],
+      "auc_unweighted": 0.4904,
+      "ci95_unweighted": [
+       0.431,
+       0.5478
+      ],
+      "d_within_video": [
+       0.0056,
+       -0.1973,
+       0.2099,
+       26
+      ],
+      "diff_within_video": [
+       0.0032,
+       -0.0595,
+       0.0717,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.605,
+      "ci95": [
+       0.5763,
+       0.6311
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.6029,
+      "ci95": [
+       0.5638,
+       0.639
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5763,
+      "ci95": [
+       0.5076,
+       0.6456
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.65,
+      "ci95": [
+       0.6116,
+       0.687
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5549,
+      "ci95_weighted": [
+       0.5228,
+       0.5858
+      ],
+      "auc_unweighted": 0.564,
+      "ci95_unweighted": [
+       0.535,
+       0.5922
+      ],
+      "d_within_video": [
+       0.1968,
+       0.0902,
+       0.3007,
+       78
+      ],
+      "diff_within_video": [
+       0.0586,
+       0.03,
+       0.088,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5477,
+      "ci95": [
+       0.5237,
+       0.5691
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5359,
+      "ci95": [
+       0.503,
+       0.5689
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5444,
+      "ci95": [
+       0.5017,
+       0.584
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5763,
+      "ci95": [
+       0.5393,
+       0.6127
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5234,
+      "ci95_weighted": [
+       0.4958,
+       0.5548
+      ],
+      "auc_unweighted": 0.5414,
+      "ci95_unweighted": [
+       0.5088,
+       0.5718
+      ],
+      "d_within_video": [
+       0.1454,
+       0.0281,
+       0.2611,
+       33
+      ],
+      "diff_within_video": [
+       0.0399,
+       0.0062,
+       0.0726,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "ablation_plus_ecg_pqrst": {
+    "n_features": 243,
+    "dev": {
+     "within_person": {
+      "auc": 0.5589,
+      "ci95": [
+       0.5443,
+       0.5737
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5355,
+      "ci95": [
+       0.5152,
+       0.5558
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5143,
+      "ci95": [
+       0.4882,
+       0.5389
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5805,
+      "ci95": [
+       0.5589,
+       0.6011
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5227,
+      "ci95_weighted": [
+       0.5048,
+       0.5399
+      ],
+      "auc_unweighted": 0.5217,
+      "ci95_unweighted": [
+       0.5024,
+       0.5404
+      ],
+      "d_within_video": [
+       0.0818,
+       0.0122,
+       0.1493,
+       102
+      ],
+      "diff_within_video": [
+       0.0273,
+       0.0051,
+       0.048,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.562,
+      "ci95": [
+       0.5109,
+       0.6102
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5235,
+      "ci95": [
+       0.458,
+       0.5892
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5396,
+      "ci95": [
+       0.4429,
+       0.651
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5918,
+      "ci95": [
+       0.5275,
+       0.6642
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4845,
+      "ci95_weighted": [
+       0.4313,
+       0.5369
+      ],
+      "auc_unweighted": 0.4915,
+      "ci95_unweighted": [
+       0.4383,
+       0.544
+      ],
+      "d_within_video": [
+       -0.0247,
+       -0.2063,
+       0.1518,
+       26
+      ],
+      "diff_within_video": [
+       -0.0052,
+       -0.0634,
+       0.0568,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6077,
+      "ci95": [
+       0.5788,
+       0.6357
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.6089,
+      "ci95": [
+       0.5692,
+       0.6449
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5946,
+      "ci95": [
+       0.5273,
+       0.6621
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6488,
+      "ci95": [
+       0.609,
+       0.6873
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5524,
+      "ci95_weighted": [
+       0.5212,
+       0.5827
+      ],
+      "auc_unweighted": 0.5601,
+      "ci95_unweighted": [
+       0.5311,
+       0.5873
+      ],
+      "d_within_video": [
+       0.1959,
+       0.0935,
+       0.2951,
+       78
+      ],
+      "diff_within_video": [
+       0.0615,
+       0.031,
+       0.0907,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5404,
+      "ci95": [
+       0.5164,
+       0.5623
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.528,
+      "ci95": [
+       0.4948,
+       0.5601
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5227,
+      "ci95": [
+       0.4774,
+       0.5673
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5672,
+      "ci95": [
+       0.533,
+       0.6018
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5143,
+      "ci95_weighted": [
+       0.4815,
+       0.5499
+      ],
+      "auc_unweighted": 0.531,
+      "ci95_unweighted": [
+       0.499,
+       0.5625
+      ],
+      "d_within_video": [
+       0.1249,
+       -0.0038,
+       0.2525,
+       33
+      ],
+      "diff_within_video": [
+       0.0354,
+       -0.0017,
+       0.0721,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "ablation_plus_eeg_spatial": {
+    "n_features": 365,
+    "dev": {
+     "within_person": {
+      "auc": 0.5615,
+      "ci95": [
+       0.5465,
+       0.5762
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5423,
+      "ci95": [
+       0.5197,
+       0.5635
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5166,
+      "ci95": [
+       0.4897,
+       0.5419
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5836,
+      "ci95": [
+       0.5626,
+       0.6043
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5206,
+      "ci95_weighted": [
+       0.5045,
+       0.537
+      ],
+      "auc_unweighted": 0.5157,
+      "ci95_unweighted": [
+       0.4975,
+       0.5324
+      ],
+      "d_within_video": [
+       0.0483,
+       -0.0134,
+       0.1069,
+       102
+      ],
+      "diff_within_video": [
+       0.0214,
+       -0.0008,
+       0.0431,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5824,
+      "ci95": [
+       0.5307,
+       0.6329
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5659,
+      "ci95": [
+       0.5043,
+       0.63
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5715,
+      "ci95": [
+       0.4744,
+       0.6798
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.6,
+      "ci95": [
+       0.5386,
+       0.6622
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4832,
+      "ci95_weighted": [
+       0.4317,
+       0.5459
+      ],
+      "auc_unweighted": 0.5248,
+      "ci95_unweighted": [
+       0.4604,
+       0.5876
+      ],
+      "d_within_video": [
+       0.1079,
+       -0.1188,
+       0.3444,
+       26
+      ],
+      "diff_within_video": [
+       0.0275,
+       -0.0485,
+       0.1083,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6,
+      "ci95": [
+       0.5714,
+       0.6269
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5857,
+      "ci95": [
+       0.5451,
+       0.6221
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.581,
+      "ci95": [
+       0.5079,
+       0.6517
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.64,
+      "ci95": [
+       0.599,
+       0.6791
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5493,
+      "ci95_weighted": [
+       0.514,
+       0.5822
+      ],
+      "auc_unweighted": 0.5566,
+      "ci95_unweighted": [
+       0.5251,
+       0.5864
+      ],
+      "d_within_video": [
+       0.1997,
+       0.0949,
+       0.3076,
+       78
+      ],
+      "diff_within_video": [
+       0.0704,
+       0.0363,
+       0.1059,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5548,
+      "ci95": [
+       0.5306,
+       0.578
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.54,
+      "ci95": [
+       0.5056,
+       0.5741
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5317,
+      "ci95": [
+       0.4887,
+       0.5738
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5771,
+      "ci95": [
+       0.5404,
+       0.613
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5423,
+      "ci95_weighted": [
+       0.5202,
+       0.5623
+      ],
+      "auc_unweighted": 0.5482,
+      "ci95_unweighted": [
+       0.5197,
+       0.5759
+      ],
+      "d_within_video": [
+       0.1516,
+       0.0398,
+       0.2623,
+       33
+      ],
+      "diff_within_video": [
+       0.0501,
+       0.0115,
+       0.0887,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "ablation_plus_eeg_tvar": {
+    "n_features": 220,
+    "dev": {
+     "within_person": {
+      "auc": 0.5673,
+      "ci95": [
+       0.552,
+       0.5821
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5465,
+      "ci95": [
+       0.5261,
+       0.5664
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.529,
+      "ci95": [
+       0.5015,
+       0.5567
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5911,
+      "ci95": [
+       0.5686,
+       0.6131
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5385,
+      "ci95_weighted": [
+       0.5189,
+       0.555
+      ],
+      "auc_unweighted": 0.5284,
+      "ci95_unweighted": [
+       0.5093,
+       0.5461
+      ],
+      "d_within_video": [
+       0.0886,
+       0.0211,
+       0.1519,
+       102
+      ],
+      "diff_within_video": [
+       0.0374,
+       0.0108,
+       0.0609,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5798,
+      "ci95": [
+       0.5287,
+       0.6276
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5485,
+      "ci95": [
+       0.4829,
+       0.6157
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.55,
+      "ci95": [
+       0.4615,
+       0.6505
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.602,
+      "ci95": [
+       0.5309,
+       0.6718
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4714,
+      "ci95_weighted": [
+       0.407,
+       0.5356
+      ],
+      "auc_unweighted": 0.5126,
+      "ci95_unweighted": [
+       0.4606,
+       0.5666
+      ],
+      "d_within_video": [
+       0.0663,
+       -0.1312,
+       0.2667,
+       26
+      ],
+      "diff_within_video": [
+       0.0208,
+       -0.041,
+       0.0869,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.5993,
+      "ci95": [
+       0.5714,
+       0.6249
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5882,
+      "ci95": [
+       0.5506,
+       0.6241
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5923,
+      "ci95": [
+       0.5239,
+       0.6625
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6396,
+      "ci95": [
+       0.6039,
+       0.6733
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5474,
+      "ci95_weighted": [
+       0.5177,
+       0.5768
+      ],
+      "auc_unweighted": 0.5512,
+      "ci95_unweighted": [
+       0.5224,
+       0.5809
+      ],
+      "d_within_video": [
+       0.1816,
+       0.0632,
+       0.3008,
+       78
+      ],
+      "diff_within_video": [
+       0.0594,
+       0.0257,
+       0.0933,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5467,
+      "ci95": [
+       0.5231,
+       0.5693
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5265,
+      "ci95": [
+       0.4944,
+       0.5585
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5275,
+      "ci95": [
+       0.4847,
+       0.5724
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5863,
+      "ci95": [
+       0.5508,
+       0.6214
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5248,
+      "ci95_weighted": [
+       0.5019,
+       0.5494
+      ],
+      "auc_unweighted": 0.5325,
+      "ci95_unweighted": [
+       0.4994,
+       0.5636
+      ],
+      "d_within_video": [
+       0.1239,
+       0.0027,
+       0.2326,
+       33
+      ],
+      "diff_within_video": [
+       0.0387,
+       -0.0007,
+       0.0741,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "enriched_full_logreg": {
+    "n_features": 448,
+    "dev": {
+     "within_person": {
+      "auc": 0.5649,
+      "ci95": [
+       0.5495,
+       0.58
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.542,
+      "ci95": [
+       0.5215,
+       0.5622
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5179,
+      "ci95": [
+       0.4887,
+       0.5464
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5842,
+      "ci95": [
+       0.5612,
+       0.6063
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5328,
+      "ci95_weighted": [
+       0.5163,
+       0.5487
+      ],
+      "auc_unweighted": 0.5299,
+      "ci95_unweighted": [
+       0.5122,
+       0.5459
+      ],
+      "d_within_video": [
+       0.0953,
+       0.0326,
+       0.1558,
+       102
+      ],
+      "diff_within_video": [
+       0.036,
+       0.0119,
+       0.0587,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5889,
+      "ci95": [
+       0.5398,
+       0.6348
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5663,
+      "ci95": [
+       0.5052,
+       0.6273
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5561,
+      "ci95": [
+       0.4633,
+       0.6623
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5871,
+      "ci95": [
+       0.5126,
+       0.6637
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4807,
+      "ci95_weighted": [
+       0.4202,
+       0.5515
+      ],
+      "auc_unweighted": 0.5328,
+      "ci95_unweighted": [
+       0.475,
+       0.5889
+      ],
+      "d_within_video": [
+       0.1175,
+       -0.0802,
+       0.3247,
+       26
+      ],
+      "diff_within_video": [
+       0.0367,
+       -0.0321,
+       0.1072,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6022,
+      "ci95": [
+       0.5737,
+       0.6289
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5907,
+      "ci95": [
+       0.5483,
+       0.6301
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5987,
+      "ci95": [
+       0.5352,
+       0.6614
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6434,
+      "ci95": [
+       0.6036,
+       0.6834
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5452,
+      "ci95_weighted": [
+       0.5124,
+       0.5749
+      ],
+      "auc_unweighted": 0.5576,
+      "ci95_unweighted": [
+       0.5271,
+       0.5877
+      ],
+      "d_within_video": [
+       0.2243,
+       0.0902,
+       0.3934,
+       78
+      ],
+      "diff_within_video": [
+       0.0721,
+       0.0328,
+       0.1124,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5515,
+      "ci95": [
+       0.5282,
+       0.5749
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5305,
+      "ci95": [
+       0.4972,
+       0.5653
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5218,
+      "ci95": [
+       0.4791,
+       0.5643
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5906,
+      "ci95": [
+       0.5551,
+       0.6259
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.532,
+      "ci95_weighted": [
+       0.5055,
+       0.5528
+      ],
+      "auc_unweighted": 0.5271,
+      "ci95_unweighted": [
+       0.4969,
+       0.5574
+      ],
+      "d_within_video": [
+       0.1169,
+       0.004,
+       0.2354,
+       33
+      ],
+      "diff_within_video": [
+       0.0429,
+       -0.0004,
+       0.0868,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "enriched_full_ridge_va": {
+    "n_features": 448,
+    "dev": {
+     "within_person": {
+      "auc": 0.5758,
+      "ci95": [
+       0.5605,
+       0.5909
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5564,
+      "ci95": [
+       0.5342,
+       0.5784
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.533,
+      "ci95": [
+       0.5032,
+       0.5619
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.6019,
+      "ci95": [
+       0.5785,
+       0.6241
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5274,
+      "ci95_weighted": [
+       0.5114,
+       0.543
+      ],
+      "auc_unweighted": 0.5207,
+      "ci95_unweighted": [
+       0.5039,
+       0.5371
+      ],
+      "d_within_video": [
+       0.0707,
+       0.0112,
+       0.1247,
+       102
+      ],
+      "diff_within_video": [
+       0.1494,
+       0.0386,
+       0.2522,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5856,
+      "ci95": [
+       0.5359,
+       0.6328
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5471,
+      "ci95": [
+       0.4837,
+       0.6112
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.6022,
+      "ci95": [
+       0.5067,
+       0.7045
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.6037,
+      "ci95": [
+       0.5265,
+       0.6798
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4845,
+      "ci95_weighted": [
+       0.4382,
+       0.5377
+      ],
+      "auc_unweighted": 0.5172,
+      "ci95_unweighted": [
+       0.4742,
+       0.5618
+      ],
+      "d_within_video": [
+       0.0971,
+       -0.062,
+       0.2581,
+       26
+      ],
+      "diff_within_video": [
+       0.1579,
+       -0.1207,
+       0.444,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6074,
+      "ci95": [
+       0.5797,
+       0.6333
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5992,
+      "ci95": [
+       0.5615,
+       0.6344
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5909,
+      "ci95": [
+       0.5247,
+       0.6494
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6563,
+      "ci95": [
+       0.6225,
+       0.6889
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5399,
+      "ci95_weighted": [
+       0.5116,
+       0.5675
+      ],
+      "auc_unweighted": 0.5531,
+      "ci95_unweighted": [
+       0.525,
+       0.582
+      ],
+      "d_within_video": [
+       0.2004,
+       0.0972,
+       0.3076,
+       78
+      ],
+      "diff_within_video": [
+       0.3497,
+       0.179,
+       0.5282,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5582,
+      "ci95": [
+       0.5349,
+       0.5806
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5366,
+      "ci95": [
+       0.5023,
+       0.5699
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5385,
+      "ci95": [
+       0.494,
+       0.58
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5857,
+      "ci95": [
+       0.5495,
+       0.623
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5324,
+      "ci95_weighted": [
+       0.5114,
+       0.5531
+      ],
+      "auc_unweighted": 0.5339,
+      "ci95_unweighted": [
+       0.5053,
+       0.5623
+      ],
+      "d_within_video": [
+       0.126,
+       0.0166,
+       0.2305,
+       33
+      ],
+      "diff_within_video": [
+       0.2174,
+       0.0289,
+       0.4067,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "enriched_full_gbdt": {
+    "n_features": 448,
+    "dev": {
+     "within_person": {
+      "auc": 0.5615,
+      "ci95": [
+       0.5469,
+       0.5759
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5331,
+      "ci95": [
+       0.5127,
+       0.5525
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5422,
+      "ci95": [
+       0.5155,
+       0.5686
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5847,
+      "ci95": [
+       0.5643,
+       0.6037
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5136,
+      "ci95_weighted": [
+       0.4972,
+       0.5291
+      ],
+      "auc_unweighted": 0.5114,
+      "ci95_unweighted": [
+       0.4924,
+       0.5292
+      ],
+      "d_within_video": [
+       0.041,
+       -0.0275,
+       0.1039,
+       102
+      ],
+      "diff_within_video": [
+       0.004,
+       -0.0024,
+       0.0099,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5803,
+      "ci95": [
+       0.5331,
+       0.6254
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5535,
+      "ci95": [
+       0.4966,
+       0.6103
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5873,
+      "ci95": [
+       0.4811,
+       0.6961
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5932,
+      "ci95": [
+       0.5338,
+       0.6496
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.4906,
+      "ci95_weighted": [
+       0.4515,
+       0.5308
+      ],
+      "auc_unweighted": 0.5172,
+      "ci95_unweighted": [
+       0.4577,
+       0.5742
+      ],
+      "d_within_video": [
+       0.0438,
+       -0.1516,
+       0.2293,
+       26
+      ],
+      "diff_within_video": [
+       0.0045,
+       -0.0093,
+       0.0179,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6079,
+      "ci95": [
+       0.5774,
+       0.6365
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.6054,
+      "ci95": [
+       0.5627,
+       0.6451
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.6364,
+      "ci95": [
+       0.5829,
+       0.6848
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6435,
+      "ci95": [
+       0.6006,
+       0.6841
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5705,
+      "ci95_weighted": [
+       0.5355,
+       0.6033
+      ],
+      "auc_unweighted": 0.5828,
+      "ci95_unweighted": [
+       0.5543,
+       0.6129
+      ],
+      "d_within_video": [
+       0.2916,
+       0.1854,
+       0.3988,
+       78
+      ],
+      "diff_within_video": [
+       0.0213,
+       0.0138,
+       0.0292,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.532,
+      "ci95": [
+       0.5113,
+       0.5532
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5097,
+      "ci95": [
+       0.479,
+       0.5399
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5037,
+      "ci95": [
+       0.4642,
+       0.5418
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5466,
+      "ci95": [
+       0.5133,
+       0.5828
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5274,
+      "ci95_weighted": [
+       0.5063,
+       0.5503
+      ],
+      "auc_unweighted": 0.549,
+      "ci95_unweighted": [
+       0.5173,
+       0.581
+      ],
+      "d_within_video": [
+       0.2001,
+       0.0819,
+       0.3173,
+       33
+      ],
+      "diff_within_video": [
+       0.0148,
+       0.0057,
+       0.0239,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "sequence_multiscale_conv_logreg": {
+    "n_features": 620,
+    "dev": {
+     "within_person": {
+      "auc": 0.5692,
+      "ci95": [
+       0.5534,
+       0.585
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5432,
+      "ci95": [
+       0.5223,
+       0.5643
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5474,
+      "ci95": [
+       0.5207,
+       0.572
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5933,
+      "ci95": [
+       0.5717,
+       0.6154
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5409,
+      "ci95_weighted": [
+       0.525,
+       0.5554
+      ],
+      "auc_unweighted": 0.5256,
+      "ci95_unweighted": [
+       0.505,
+       0.5448
+      ],
+      "d_within_video": [
+       0.0748,
+       0.0004,
+       0.1437,
+       102
+      ],
+      "diff_within_video": [
+       0.0374,
+       0.0061,
+       0.0668,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.561,
+      "ci95": [
+       0.5032,
+       0.6175
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5368,
+      "ci95": [
+       0.4657,
+       0.6056
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5563,
+      "ci95": [
+       0.4706,
+       0.6554
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5929,
+      "ci95": [
+       0.5338,
+       0.6514
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.5273,
+      "ci95_weighted": [
+       0.4809,
+       0.5695
+      ],
+      "auc_unweighted": 0.5327,
+      "ci95_unweighted": [
+       0.481,
+       0.5871
+      ],
+      "d_within_video": [
+       0.1093,
+       -0.0766,
+       0.3038,
+       26
+      ],
+      "diff_within_video": [
+       0.0552,
+       -0.0338,
+       0.1489,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6069,
+      "ci95": [
+       0.5811,
+       0.6331
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5896,
+      "ci95": [
+       0.5483,
+       0.6282
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5962,
+      "ci95": [
+       0.5322,
+       0.6525
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6386,
+      "ci95": [
+       0.5849,
+       0.6864
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5492,
+      "ci95_weighted": [
+       0.5116,
+       0.5844
+      ],
+      "auc_unweighted": 0.5426,
+      "ci95_unweighted": [
+       0.5082,
+       0.5774
+      ],
+      "d_within_video": [
+       0.1621,
+       0.0352,
+       0.2923,
+       78
+      ],
+      "diff_within_video": [
+       0.0512,
+       0.0017,
+       0.099,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5404,
+      "ci95": [
+       0.5144,
+       0.5658
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5146,
+      "ci95": [
+       0.4785,
+       0.5476
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.535,
+      "ci95": [
+       0.4836,
+       0.5814
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5625,
+      "ci95": [
+       0.5217,
+       0.6039
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5174,
+      "ci95_weighted": [
+       0.4989,
+       0.5428
+      ],
+      "auc_unweighted": 0.5416,
+      "ci95_unweighted": [
+       0.5118,
+       0.5722
+      ],
+      "d_within_video": [
+       0.1651,
+       0.0578,
+       0.2783,
+       33
+      ],
+      "diff_within_video": [
+       0.0694,
+       0.0251,
+       0.1164,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "sequence_plus_enriched_logreg": {
+    "n_features": 1068,
+    "dev": {
+     "within_person": {
+      "auc": 0.5725,
+      "ci95": [
+       0.5574,
+       0.5873
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5503,
+      "ci95": [
+       0.5285,
+       0.572
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5411,
+      "ci95": [
+       0.5143,
+       0.5664
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5982,
+      "ci95": [
+       0.5762,
+       0.6189
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.5389,
+      "ci95_weighted": [
+       0.5243,
+       0.5514
+      ],
+      "auc_unweighted": 0.5285,
+      "ci95_unweighted": [
+       0.5087,
+       0.5463
+      ],
+      "d_within_video": [
+       0.0923,
+       0.0262,
+       0.1509,
+       102
+      ],
+      "diff_within_video": [
+       0.047,
+       0.016,
+       0.0751,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.5733,
+      "ci95": [
+       0.5206,
+       0.6262
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5472,
+      "ci95": [
+       0.4799,
+       0.6152
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.5285,
+      "ci95": [
+       0.4436,
+       0.6264
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5927,
+      "ci95": [
+       0.519,
+       0.6675
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.5147,
+      "ci95_weighted": [
+       0.4657,
+       0.5787
+      ],
+      "auc_unweighted": 0.5498,
+      "ci95_unweighted": [
+       0.4908,
+       0.6065
+      ],
+      "d_within_video": [
+       0.1378,
+       -0.0503,
+       0.3208,
+       26
+      ],
+      "diff_within_video": [
+       0.0618,
+       -0.0318,
+       0.1562,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6072,
+      "ci95": [
+       0.5806,
+       0.6327
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.5893,
+      "ci95": [
+       0.5498,
+       0.6256
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.5925,
+      "ci95": [
+       0.5321,
+       0.6454
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6535,
+      "ci95": [
+       0.6038,
+       0.6974
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5436,
+      "ci95_weighted": [
+       0.5103,
+       0.5735
+      ],
+      "auc_unweighted": 0.5447,
+      "ci95_unweighted": [
+       0.5139,
+       0.5762
+      ],
+      "d_within_video": [
+       0.2239,
+       0.0563,
+       0.4394,
+       78
+      ],
+      "diff_within_video": [
+       0.0667,
+       0.0139,
+       0.1193,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5489,
+      "ci95": [
+       0.5252,
+       0.5729
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.5247,
+      "ci95": [
+       0.4905,
+       0.5586
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5233,
+      "ci95": [
+       0.4786,
+       0.564
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5749,
+      "ci95": [
+       0.5359,
+       0.6129
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5274,
+      "ci95_weighted": [
+       0.506,
+       0.5488
+      ],
+      "auc_unweighted": 0.5334,
+      "ci95_unweighted": [
+       0.5056,
+       0.5612
+      ],
+      "d_within_video": [
+       0.1314,
+       0.0289,
+       0.2355,
+       33
+      ],
+      "diff_within_video": [
+       0.0656,
+       0.0141,
+       0.118,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   },
+   "sequence_plus_enriched_mlp": {
+    "n_features": 1068,
+    "dev": {
+     "within_person": {
+      "auc": 0.5517,
+      "ci95": [
+       0.5376,
+       0.5664
+      ],
+      "people": 225
+     },
+     "vs_excitement": {
+      "auc": 0.5298,
+      "ci95": [
+       0.5101,
+       0.5492
+      ],
+      "people": 193
+     },
+     "vs_calm_negative": {
+      "auc": 0.5319,
+      "ci95": [
+       0.5061,
+       0.5574
+      ],
+      "people": 119
+     },
+     "vs_relaxed": {
+      "auc": 0.5752,
+      "ci95": [
+       0.5549,
+       0.5958
+      ],
+      "people": 193
+     },
+     "same_video": {
+      "auc_weighted": 0.527,
+      "ci95_weighted": [
+       0.5095,
+       0.543
+      ],
+      "auc_unweighted": 0.5223,
+      "ci95_unweighted": [
+       0.5035,
+       0.5404
+      ],
+      "d_within_video": [
+       0.0696,
+       -0.0008,
+       0.1351,
+       102
+      ],
+      "diff_within_video": [
+       0.0383,
+       0.0004,
+       0.0739,
+       102
+      ],
+      "videos": 102,
+      "pairs": 110274
+     }
+    },
+    "test_new_both": {
+     "within_person": {
+      "auc": 0.57,
+      "ci95": [
+       0.5178,
+       0.6174
+      ],
+      "people": 41
+     },
+     "vs_excitement": {
+      "auc": 0.5602,
+      "ci95": [
+       0.4926,
+       0.6249
+      ],
+      "people": 35
+     },
+     "vs_calm_negative": {
+      "auc": 0.549,
+      "ci95": [
+       0.4674,
+       0.6438
+      ],
+      "people": 15
+     },
+     "vs_relaxed": {
+      "auc": 0.5487,
+      "ci95": [
+       0.4739,
+       0.6232
+      ],
+      "people": 25
+     },
+     "same_video": {
+      "auc_weighted": 0.5173,
+      "ci95_weighted": [
+       0.4629,
+       0.5812
+      ],
+      "auc_unweighted": 0.5191,
+      "ci95_unweighted": [
+       0.4709,
+       0.5668
+      ],
+      "d_within_video": [
+       0.0782,
+       -0.0961,
+       0.2412,
+       26
+      ],
+      "diff_within_video": [
+       0.0471,
+       -0.0521,
+       0.1428,
+       26
+      ],
+      "videos": 26,
+      "pairs": 3903
+     }
+    },
+    "test_new_person": {
+     "within_person": {
+      "auc": 0.6077,
+      "ci95": [
+       0.5822,
+       0.6297
+      ],
+      "people": 56
+     },
+     "vs_excitement": {
+      "auc": 0.6028,
+      "ci95": [
+       0.5662,
+       0.6374
+      ],
+      "people": 50
+     },
+     "vs_calm_negative": {
+      "auc": 0.6046,
+      "ci95": [
+       0.536,
+       0.6686
+      ],
+      "people": 28
+     },
+     "vs_relaxed": {
+      "auc": 0.6476,
+      "ci95": [
+       0.6094,
+       0.6833
+      ],
+      "people": 44
+     },
+     "same_video": {
+      "auc_weighted": 0.5447,
+      "ci95_weighted": [
+       0.5075,
+       0.584
+      ],
+      "auc_unweighted": 0.541,
+      "ci95_unweighted": [
+       0.5079,
+       0.5754
+      ],
+      "d_within_video": [
+       0.1818,
+       0.0543,
+       0.314,
+       78
+      ],
+      "diff_within_video": [
+       0.0909,
+       0.0282,
+       0.1568,
+       78
+      ],
+      "videos": 78,
+      "pairs": 8063
+     }
+    },
+    "test_new_video": {
+     "within_person": {
+      "auc": 0.5307,
+      "ci95": [
+       0.5055,
+       0.5559
+      ],
+      "people": 157
+     },
+     "vs_excitement": {
+      "auc": 0.513,
+      "ci95": [
+       0.4807,
+       0.5465
+      ],
+      "people": 137
+     },
+     "vs_calm_negative": {
+      "auc": 0.5174,
+      "ci95": [
+       0.4731,
+       0.5608
+      ],
+      "people": 63
+     },
+     "vs_relaxed": {
+      "auc": 0.5689,
+      "ci95": [
+       0.5269,
+       0.6104
+      ],
+      "people": 103
+     },
+     "same_video": {
+      "auc_weighted": 0.5224,
+      "ci95_weighted": [
+       0.4992,
+       0.5452
+      ],
+      "auc_unweighted": 0.5298,
+      "ci95_unweighted": [
+       0.5028,
+       0.5586
+      ],
+      "d_within_video": [
+       0.1156,
+       0.0219,
+       0.2179,
+       33
+      ],
+      "diff_within_video": [
+       0.0682,
+       0.0154,
+       0.1268,
+       33
+      ],
+      "videos": 33,
+      "pairs": 50671
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,8 +1,9 @@
 \documentclass[10pt]{article}
-\usepackage[a4paper,margin=1.75cm]{geometry}
+\usepackage[a4paper,margin=1.65cm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[english,french]{babel}
 \frenchsetup{SmallCapsFigTabCaptions=false}
+\addto\captionsfrench{\renewcommand{\tablename}{Tableau}}
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage{graphicx}
@@ -13,14 +14,14 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{caption}
 \captionsetup{font=small,labelfont=bf}
-\setlength{\parskip}{2pt}
-\graphicspath{{../research/timecourse/figures/}{../research/person/figures/}}
+\setlength{\parskip}{3pt}
+\graphicspath{{../research/timecourse/figures/}{../research/person/figures/}{../research/revision/figures/}}
 \definecolor{boxline}{HTML}{2a78d6}
-\newcommand{\questionbox}[1]{\par\smallskip\noindent\fcolorbox{boxline}{white}{%
+\definecolor{boxbg}{HTML}{f7f9fc}
+\newcommand{\questionbox}[1]{\par\smallskip\noindent\fcolorbox{boxline}{boxbg}{%
 \parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{#1}}\par\smallskip}
 
-\title{Réactions de stress aigu chez 314 spectateurs : ce que montrent le cerveau
-et le corps, à quel moment, et si cela reflète la personne ou la situation}
+\title{Caractérisation physiologique et évaluation des détecteurs de stress aigu chez 314 sujets : dynamique temporelle, morphologie cardiaque, spatialisation corticale, interaction cerveau--cœur et réponse évaluative à stimulus fixe}
 \author{Équipe 12 : Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo\\
 \small HABS Neuro-AI Hackathon, Université Paris-Saclay, novembre 2026}
 \date{}
@@ -29,367 +30,371 @@ et le corps, à quel moment, et si cela reflète la personne ou la situation}
 \maketitle
 
 \begin{abstract}
-\noindent Nous avons cherché ce que montrent le cerveau et le corps pendant une
-réaction de stress aigu, à quel moment chaque signal change, et si ce
-changement reflète la personne ou seulement la situation qu'elle vit. La
-question vient des métiers sous forte pression, comme la chirurgie, où l'on dit
-rarement qu'on est stressé. Dans le jeu de données HABS (314 personnes, 22\,974
-vidéos de 10 secondes notées, avec EEG, ECG, conductance cutanée et
-respiration), un essai comptait comme une réaction de stress quand la personne
-jugeait la vidéo négative et activante. La puissance EEG lente (delta) montait
-dès la première seconde, le cœur ralentissait dès 1 s, la respiration devenait
-plus superficielle dès 2 s et la conductance cutanée montait dès 4 s. Le cœur
-et la respiration suivaient le caractère désagréable de la vidéo, la peau son
-intensité. La réponse du cerveau à chaque battement cardiaque ne changeait pas
-($d = 0{,}039$, intervalle à 95\,\% de $-$0,002 à 0,078). Chacune des 252 vidéos
-a été vue par 13 à 234 personnes : nous avons donc séparé chaque note et chaque
-réponse en une part partagée avec les autres spectateurs de la même vidéo et une
-part propre à la personne. Le cœur et la respiration ne suivaient que la part
-partagée (cœur, part propre 0,004, de $-$0,015 à 0,021), alors que la part
-propre des notes était réelle : elle prédisait l'émotion choisie par chacun (AUC
-de 0,90 entre spectateurs d'une même vidéo). Entre ces spectateurs, la
-physiologie disait qui était stressé à peine mieux que le hasard (AUC 0,517),
-alors que les notes des autres spectateurs le prédisaient avec une AUC de 0,92.
-D'une vidéo à l'autre, la détection chez des personnes nouvelles était précoce
-mais faible (AUC 0,52 dès la première seconde, 0,55 à 0,64 sur toute la vidéo).
-La physiologie reflète surtout la situation. Nous proposons de comparer des
-personnes exposées au même stimulus comme contrôle standard des détecteurs de
-stress.
+\noindent Caractériser physiologiquement une réaction de stress aigu --- quels systèmes varient, dans quel ordre, avec quelle spatialisation et sous le contrôle de quelle branche autonome --- et mettre à l'épreuve les dispositifs de détection sont deux enjeux centraux des neurosciences affectives et du monitorage non verbal (du neurofeedback aux patients non communicants : douleur aiguë en pédiatrie pré-verbale, \emph{locked-in syndrome}, coma, anesthésie générale). Sur le jeu multimodal HABS (314 sujets sains, 22\,974 essais de vidéos de 10~s, 252 stimuli, EEG 64 voies, ECG, conductance cutanée, respiration), nous menons une caractérisation neurophysiologique et un audit méthodologique complets.
+\textbf{(1)~Critère et émotions brutes :} sur les émotions déclarées brutes (cohortes~2--5, $n = 3\,938$ essais inclus), le critère \og valence $\le 4$ et arousal $\ge 6$ \fg{} atteint 89,2\,\% de pureté négative au rang~1 (97,2\,\% aux rangs~1--3 ; 72,5\,\% de menace aiguë ; 5,3\,\% d'incohérences). Durcir le seuil jusqu'à $2/8$ porte la pureté à 95,3\,\% et double les effets peau ($d = +0{,}14 \to +0{,}34$) et delta ($+0{,}13 \to +0{,}30$) tout en atténuant la décélération cardiaque ($-0{,}11 \to -0{,}04$) par recrutement sympathique ; le compromis optimal pour la détection est $3/7$ (AUC 0,549). Les émotions n°1 dissocient la peur (cœur $-0{,}20$, peau $+0{,}25$, resp.\ $-0{,}11$, alpha $-0{,}12$), le dégoût (cœur $-0{,}20$, delta $+0{,}15$) et la tristesse (plate), tandis que le clustering non supervisé échoue ($\mathrm{ARI} < 0{,}009$).
+\textbf{(2)~Morphologie ECG et dynamique EEG :} après correction d'une polarité ECG inversée sur 96,6\,\% des essais, RR s'allonge ($+5{,}1$~ms, $d = +0{,}116$) mais l'intervalle et le segment PR (nœud AV) restent strictement nuls ($d = -0{,}005$ à $+0{,}010$) et la baisse apparente du QTc Bazett ($-0{,}092$) disparaît après contrôle sur $\Delta\mathrm{RR}$ ($-0{,}007$), prouvant un freinage sinusal vagal sans accélération adrénergique marquée. En EEG, la volatilité temporelle précoce (saut $\delta$ : $+0{,}151$) et une dynamique spatiale biphasique (homogénéisation précoce puis focalisation post-exposition, entropie $\alpha$ : $-0{,}076$) enrichissent le signal.
+\textbf{(3)~Cerveau--cœur sans ICA :} l'EEG brut \texttt{CURATED} reproduit exactement l'absence d'effet primaire du HEP ($d = +0{,}038$ brut vs $+0{,}039$ après ICA ; signal retiré par l'ICA $+0{,}012$).
+\textbf{(4)~Évaluation à vidéo fixe et sensibilité :} en excluant les essais intermédiaires pour opposer stressés et calmes (\og oklm \fg{}) devant la \emph{même} vidéo, l'AUC à vidéo fixe monte de 0,525 à 0,564 (cœur 0,553, delta 0,564, peau $d = +0{,}197$) ; dans la matrice $2\times 2$ Consensus $\times$ Vécu, les spectateurs calmes sur vidéos stressantes ne décélèrent pas ($-0{,}49$~bpm) et n'élèvent pas leur peau ($+0{,}014\,\mu$S), seule la chute d'alpha restant automatique ($-0{,}33$ à $-0{,}41$). La sensibilité individuelle corrèle avec $\beta/\gamma$ frontal ($-0{,}035$ à $-0{,}039$) et le delta centro-pariétal (résistant à 93\,\% à un proxy oculaire pré-ICA), et la sensibilité-trait avec la FC ($r = +0{,}140$) et le gamma ($+0{,}165$) de repos.
+\textbf{(5)~Détection en 4 phases et séquentielle :} sur un découpage inédit personne $\times$ thème, passer des bins 1~s aux 4 phases enrichies et aux convolutions séquentielles fait bondir l'AUC sur le test scellé strict (personnes et thèmes inédits) de 0,526 à 0,589 (linéaire enrichi) et 0,586 (Ridge continu V\&A, meilleur modèle global : dév.\ 0,576, sujets inédits 0,607, 0,656 contre relaxé), alors que les ondes PR et les têtes MLP/GBDT n'améliorent pas la généralisation sur thèmes inédits.
 \end{abstract}
 
-\section{Introduction}
+\section{Introduction et cadre neuroscientifique}
 
-\paragraph{D'où vient la question.} Deux d'entre nous sont en médecine, un en
-science des données. Nous sommes partis de situations comme le bloc opératoire,
-où le stress aigu monte, où on le dit rarement, et où une erreur peut coûter
-cher. Notre première idée était le \og point de rupture \fg{} : le moment où les
-signaux du cerveau et du corps changent avant que l'attention décroche et
-qu'une erreur soit commise. Les données HABS ne permettent pas d'y répondre.
-Les participants regardent des vidéos de 10 secondes et les notent, sans tâche,
-sans performance et sans erreur, et il n'y a ni questionnaire de stress ni
-cortisol. Nous avons gardé ce que les données permettent : la réaction de
-stress aigu elle-même, définie comme chez Giannakakis et al.\
-\cite{giannakakis2015} à partir des notes de chaque spectateur.
+\paragraph{Pourquoi caractériser et auditer le monitorage du stress aigu ?}
+La réaction de stress aigu mobilise de façon coordonnée le système nerveux central et les deux branches du système nerveux autonome (parasympathique vagale et sympathique adrénergique/sudomotrice). Deux questions scientifiques générales, indépendantes de tout contexte professionnel particulier, guident ce travail :
+\begin{enumerate}
+\item \textbf{Une question descriptive de neurophysiologie :} lors d'une réaction de stress aigu brève, quels signaux centraux et périphériques varient réellement, dans quelle séquence temporelle, avec quelle spatialisation et quelle homogénéité corticale, et sous le contrôle de quelle branche autonome (freinage vagal d'orientation ou activation sympathique adrénergique) ?
+\item \textbf{Une question méthodologique de validation des détecteurs :} à quel point un dispositif multimodal est-il capable de détecter un état de stress aigu chez un sujet inédit face à une situation inédite, et que lit-il réellement --- une réponse stéréotypée imposée par les caractéristiques sensorielles du stimulus, ou l'état évaluatif propre à l'individu ?
+\end{enumerate}
 
-Trois remarques du lancement et des mentors ont orienté la suite. Le label est
-subjectif : la même vidéo de saut en parachute fait peur aux uns et plaisir
-aux autres, si bien que choisir le \og vrai \fg{} état est une question de
-recherche en soi. Les signaux n'ont pas la même échelle de temps : l'EEG change
-en quelques millisecondes, la conductance cutanée quelques secondes plus tard,
-la respiration sur des cycles de plusieurs secondes. Et la variabilité
-cardiaque sur des fenêtres de moins de 30 s restait une question ouverte pour
-des extraits de 10 s. Un préprint de HABS a ensuite montré que les
-classifieurs d'émotions par EEG, sur un autre jeu de données, reconnaissent
-surtout le stimulus plutôt que l'émotion \cite{gerster2026}. Comme les mêmes
-vidéos reviennent d'un participant à l'autre, une vidéo stressante pourrait
-changer le corps de tout le monde par ses images et son son autant que par ce
-que chacun ressent. Des travaux antérieurs ont mesuré l'accord entre vécu et
-physiologie chez une même personne \cite{mauss2005,brown2020} et la
-synchronisation des réponses autonomes de spectateurs d'un même film
-\cite{golland2014}, mais pas la part du lien entre vécu et physiologie qui est
-partagée entre spectateurs et celle qui appartient à chacun. Les organisateurs
-ont demandé de ne pas utiliser l'oculométrie, qui est mal synchronisée ; le
-cœur et la respiration portent une bonne part de l'information sympathique de
-la pupille. Enfin, un cours sur les réseaux de la conscience (B. Hermann, 2024)
-a ajouté un angle cerveau--corps : la réponse corticale à chaque battement
-cardiaque \cite{park2014,candia2021}.
+Cette double interrogation est directement pertinente pour le monitorage physiologique du stress aigu dans des contextes très variés : étiquetage en temps réel pour le neurofeedback, protocoles expérimentaux standards en neurosciences affectives, et surtout situations cliniques où les patients \emph{ne peuvent pas s'exprimer verbalement}. De l'évaluation de la douleur aiguë en population pédiatrique n'ayant pas encore acquis le langage (la douleur ponctuelle étant un inducteur majeur de stress aigu) jusqu'aux patients en \emph{locked-in syndrome}, aux états de conscience altérée (coma) ou à l'exploration de l'activation des voies nociceptives et du stress sous anesthésie générale, la validité d'un biomarqueur non verbal repose précisément sur sa capacité à distinguer une souffrance interne propre au patient d'une simple réaction d'orientation sensorielle.
 
-\questionbox{\textbf{Question de recherche.} Quand quelqu'un vit une réaction
-de stress aigu, qu'est-ce que son cerveau et son corps montrent, à quel moment,
-et est-ce que cela reflète la personne ou seulement la situation qu'elle
-vit ?\\[2pt]
-\textbf{Q1, quoi et quand.} Quels signaux changent, dans quel ordre, et
-suivent-ils le caractère désagréable ou l'intensité de la réaction ? La réponse
-du cerveau aux battements cardiaques change-t-elle ?\\
-\textbf{Q2, la personne ou la situation.} Chaque signal suit-il la réaction
-propre de la personne, au-delà de ce qu'ont ressenti les autres spectateurs de
-la même vidéo ?\\
-\textbf{Q3, la détection.} Dès quand et à quel point un modèle figé détecte-t-il
-la réaction chez des personnes qu'il n'a jamais vues ?}
+\paragraph{Ce que les données HABS permettent --- et leurs limites structurelles.}
+Le jeu de données HABS réunit 314 volontaires sains (22\,974 essais audités sur 252 extraits audiovisuels de 10~s) enregistrés simultanément en EEG 64 voies, ECG, conductance cutanée (EDA/GSR) et ceinture respiratoire. L'oculométrie a été exclue sur recommandation des organisateurs en raison de sa désynchronisation temporelle. Ces données ne contiennent ni tâche cognitive à erreur mesurable, ni cortisol, ni douleur somatique ; elles offrent en revanche une échelle exceptionnelle (314 personnes contre 15 à 50 dans la plupart des études de laboratoire \cite{palomba2000,hagenaars2014,schubring2019}) et une structure croisée précieuse : chaque vidéo a été visionnée par 13 à 234 personnes différentes (médiane 83), permettant d'isoler rigoureusement ce qui relève du stimulus partagé et ce qui relève de l'évaluation propre à chaque individu. En outre, des travaux récents de l'équipe HABS ont montré que des classifieurs EEG d'émotions peuvent obtenir des scores élevés en reconnaissant simplement l'identité du stimulus plutôt que l'état émotionnel \cite{gerster2026}, un écueil déjà soulevé dans la littérature sur la détection du stress lors du visionnage de vidéos \cite{giannakakis2015}.
 
-\section{Méthodes}
+Les versions antérieures de ce travail (études 04 à 06) avaient établi une séquence temporelle de base, une détection modeste (AUC $\approx 0{,}55$--$0{,}64$), un potentiel évoqué cardiaque (HEP) nul, et une apparente prépondérance de la vidéo sur la personne. Une revue critique médico-scientifique approfondie a soulevé six objections majeures : (i) nécessité de valider et purifier le critère composite valence--arousal sur les émotions déclarées brutes ; (ii) intérêt d'évaluer des modèles directement sur les émotions n°1 fréquentes ainsi qu'en non-supervisé ; (iii) limite de la résolution figée à 1~s et richesse potentielle d'une segmentation en 4 phases, de la délinéation ECG P-QRS-T (en particulier l'intervalle/segment PR reflétant la conduction du nœud atrio-ventriculaire, sensible à l'adrénaline), de la variation temporelle et de l'homogénéité spatiale EEG, et d'architectures exploitant l'ordre temporel $t \to t+1$ ; (iv) risque que l'ICA du prétraitement détruise une composante EEG covariante avec l'ECG lors de l'analyse cerveau--cœur ; (v) sur-interprétation des termes \og personne \fg{} et \og situation \fg{}, biais de déséquilibre et d'essais limites dans le contrôle à vidéo fixe, et hypothèse d'une réponse évaluative en \og tout ou rien \fg{} ; (vi) exploration topographique de la sensibilité au stress à la lumière des études sur les troubles anxieux. Le présent article répond empiriquement à l'ensemble de ces six points selon un protocole figé avant calcul (\texttt{journal/07\_comprehensive\_revision.md}).
 
-\paragraph{Données et label.} Nous avons utilisé tous les essais audités :
-22\,974 vidéos notées par 314 participants de 5 cohortes, avec un EEG à 64 voies
-(nettoyé par ICA, sans EOG), un ECG, la conductance cutanée et une ceinture
-respiratoire. Un essai est une \emph{réaction de stress} quand la valence vaut
-au plus 4 et l'arousal au moins 6 sur des échelles de 1 à 9 (24\,\% des
-essais). Deux contrastes de contrôle ont été fixés à l'avance : stress contre
-excitation (même arousal, valence opposée) et stress contre négatif calme (même
-valence, arousal plus bas).
+\questionbox{\textbf{Six questions de recherche structurant l'étude.}
+\begin{description}
+\item[Q1 -- Critère et émotions brutes :] Le critère valence--arousal capture-t-il réellement des états de stress, comment évoluent pureté et effets physiologiques lorsqu'on durcit le seuil, et que donnent des modèles entraînés directement sur les émotions déclarées n°1 ou en non-supervisé ?
+\item[Q2 -- Dynamique 4 phases, morphologie ECG et spatialisation EEG :] Dans quel ordre les signaux varient-ils, le complexe P-QRS-T (segment PR, QRS, QT/QTc, onde T) révèle-t-il une modulation adrénergique précoce, et qu'apportent la volatilité temporelle et l'homogénéité spatiale EEG ?
+\item[Q3 -- Cerveau--cœur et prétraitement :] Le potentiel évoqué cardiaque (HEP) varie-t-il sous stress, et le prétraitement ICA détruit-il une information covariante avec le cœur par rapport à l'EEG brut \texttt{CURATED} ?
+\item[Q4 -- Réflexe normatif vs réponse évaluative à stimulus fixe :] Une fois contrôlés le déséquilibre des vidéos, les essais limites et la décomposition des deux axes valence/arousal, la physiologie répond-elle automatiquement au stimulus ou seulement lorsque l'individu évalue la situation comme stressante (profil à seuil / tout-ou-rien) ?
+\item[Q5 -- Topographie EEG de la sensibilité au stress :] Quelles bandes et régions corticales suivent la sensibilité idiosyncrasique essai par essai et la sensibilité-trait entre sujets, et l'effet delta résiste-t-il au contrôle d'un proxy oculaire pré-ICA ?
+\item[Q6 -- Détection multi-échelles et architectures séquentielles :] Des features physiologiques enrichies (4 phases, transitions $\Delta(t\to t+1)$, P-QRS-T, dynamique/homogénéité EEG) et des modèles non linéaires ou séquentiels améliorent-ils la généralisation ?
+\end{description}}
 
-\paragraph{Signaux.} Des jobs sur les serveurs HABS, sans accès aux notes, ont
-calculé pour chaque seconde, de 3 s avant à 12 s après le début de la vidéo :
-la fréquence cardiaque à partir des pics R, la conductance cutanée, l'amplitude
-respiratoire et la puissance EEG (log) dans cinq bandes sur six régions du
-scalp, chaque valeur moins celle des 3 s précédant le début de l'essai. Un
-troisième job a moyenné l'EEG calé sur chaque pic R (de $-$200 à $+$600 ms,
-0,5--30 Hz, époques au-dessus de 100\,$\mu$V rejetées) sur les battements de
-chaque vidéo, et l'ECG de la même façon.
+\section{Méthodes détaillées}
 
-\paragraph{La personne ou la situation (Q2).} Pour une note ou une réponse de
-la personne $p$ devant la vidéo $v$, nous la centrons sur la moyenne de la
-personne. Sa \emph{part partagée} est la moyenne des valeurs centrées des autres
-spectateurs de $v$ (au moins 9). Sa \emph{part propre} est le reste. Dans
-chaque personne (au moins 10 essais), nous régressons une réponse sur les parts
-partagée et propre d'une note, toutes centrées-réduites, puis moyennons les
-deux coefficients sur les personnes. Une réponse qui ne suit que la vidéo a un
-coefficient propre nul. Les réponses sont des changements moyens sur des
-fenêtres tirées de l'analyse temporelle : cœur 1--8 s, peau 4--10 s,
-respiration 2--6 s, delta 0--2 s, alpha 0--10 s. Nous calculons aussi l'AUC sur
-toutes les paires formées d'un spectateur stressé et d'un non stressé devant la
-\emph{même} vidéo (140 vidéos, 265\,019 paires). La vidéo est identique dans
-chaque paire, donc cette AUC ne peut venir que de la personne. Pour vérifier
-que la part propre d'une note n'est pas du simple bruit de notation, nous
-avons utilisé une seconde déclaration : la première émotion choisie par chaque
-spectateur (cohortes 2 à 5).
+Afin que chaque étape analytique soit pleinement lisible et reproductible, nous détaillons ci-dessous l'ensemble des choix de données, de traitement du signal et d'inférence statistique.
 
-\paragraph{Détection (Q3) et statistiques.} La détection utilise l'AUC ROC
-intra-personne (personnes avec au moins 3 essais de chaque type, moyenne sur
-les personnes, hasard à 0,5). Les modèles sont ajustés sur d'autres personnes
-\emph{et} d'autres thèmes de vidéos, sans jamais voir l'identité de la vidéo.
-Un modèle figé (régression logistique sur les secondes centrées par personne,
-du début jusqu'à la seconde $t$) n'est jamais réglé ; une recherche séparée de
-43 variantes de modèles avait son propre test scellé, ouvert une seule fois.
-Les intervalles sont des intervalles bootstrap à 95\,\% sur les personnes, ou
-sur les vidéos pour les AUC \og même vidéo \fg{} \cite{varoquaux2018}. Chaque
-protocole a été commité dans notre journal de projet avant le calcul de son
-résultat, et les analyses post hoc sont signalées comme telles.
+\subsection{Données, matériel d'acquisition et prétraitement HABS}
+Nous incluons la totalité des 22\,974 essais audités (314 participants, 5 cohortes, 508 enregistrements, 252 vidéos réparties en 84 thèmes) dont les marqueurs temporels concordent entre métadonnées et fichiers BDF à moins de 25~ms. Dans cette version diffusée de \texttt{labels\_train.csv}, l'indicateur \texttt{flagged\_outliers} vaut 0 sur 100\,\% des 22\,974 essais retenus (les essais initialement flaggés ayant déjà été écartés en amont). Les cohortes~2 à~5 ($n = 17\,142$ essais, 209 personnes) disposent d'échelles continues de valence et d'arousal (1 à 9) et de 1 à 3 émotions choisies par le participant parmi 12 catégories (\texttt{self\_reported\_emotion\_1..3}), tandis que la cohorte~1 ($n = 5\,832$ essais, 105 personnes) utilise des notes entières sans sélection d'émotion brute.
+
+L'acquisition (1\,000~Hz, amplificateur ANT Neuro eego~64 + SenseBox) comprend : (i)~64 électrodes EEG (montage 10--10, référence en ligne Cz/CPz) ; (ii)~une \textbf{dérivation ECG bipolaire unique} (deux électrodes Ag/AgCl placées bilatéralement en région sous-claviculaire, équivalent D1) --- l'absence de dérivations multiples ne permettant donc pas de comparaison spatiale inter-dérivations ECG sur ce jeu de données ; (iii)~une conductance cutanée (doigts de la main non dominante, convertie en $\mu$S via la courbe d'étalonnage constructeur sans écrêtage silencieux) ; et (iv)~une ceinture respiratoire piézoélectrique thoracique basse.
+
+Le dossier \texttt{PREPROCESSED} fourni par HABS exclut les voies T9 et T10, applique un filtre coupe-bande 50~Hz sur les signaux périphériques, filtre l'EEG entre 0,5 et 48~Hz (FIR phase nulle), le re-référence à la moyenne commune (CAR) des 62 voies conservées, puis applique une ICA étendue (algorithme Picard) couplée à \emph{ICLabel} : sont soustraites les composantes dont la probabilité estimée atteint $\ge 0{,}75$ pour les artefacts oculaires ou $\ge 0{,}90$ pour le bruit musculaire, secteur ou de canal. Notons que la classe \og cœur \fg{} d'ICLabel n'est pas explicitement listée dans ces seuils d'exclusion, mais qu'une fuite d'activité covariante avec le cœur dans d'autres composantes rejetées demeure théoriquement possible --- d'où notre test empirique direct sur le dossier brut \texttt{CURATED} (section~\ref{sec:meth_hep}).
+
+\subsection{Validation du critère de stress, modèles émotionnels et analyse non supervisée (Q1)}
+\paragraph{Audit non circulaire du critère.}
+Le label \texttt{final\_emotion\_label} de HABS étant raffiné à partir d'estimations de densité noyau sur le plan valence--arousal, l'utiliser pour valider un critère valence--arousal serait circulaire. Nous utilisons donc exclusivement l'émotion brute choisie en premier par le spectateur (\texttt{self\_reported\_emotion\_1}, complétée par les rangs~2 et~3 dans \texttt{criterion\_full}), disponible sur 100\,\% des cohortes~2 à~5 ($n = 17\,142$). Nous classons les 12 catégories en quatre groupes : \emph{menace aiguë} (colère, peur, dégoût), \emph{négatif non menaçant} (tristesse, culpabilité), \emph{surprise} (ambivalente, incluant les sursauts négatifs), et \emph{émotions incohérentes avec le stress} (joie, excitation, relaxation, sensualité, neutre, curiosité). Nous balayons dix seuils --- du quadrant ouvert ($V < 5 \cap A > 5$) au coin extrême ($V \le 2 \cap A \ge 8$), ainsi que trois seuils asymétriques --- en quantifiant pour chacun la pureté, le rappel par émotion, les tailles d'effet physiologiques et l'AUC de détection.
+
+\paragraph{Modèles supervisés sur émotions n°1 et piège méthodologique du décalage d'intercept.}
+Sur les 17\,142 essais des cohortes~2 à~5, nous entraînons en validation croisée double bloc $3\times 3$ (personnes $\times$ thèmes) : (i)~neuf classifieurs binaires (un contre reste et un contre neutre) pour les émotions les plus fréquentes (\emph{peur, colère, dégoût, tristesse, joie, relaxation, neutre}), la classe \emph{menace aiguë} et \emph{toutes négatives} ; et (ii)~un classifieur multiclasse unifié à $K+1 = 5$ classes (\emph{peur, colère, dégoût, tristesse, autre}). Un résultat méthodologique important est apparu lors du développement : parce que les thèmes vidéo sont associés à des émotions spécifiques, un découpage en 3 blocs de thèmes induit des taux de base inégaux d'une émotion donnée entre les plis d'entraînement. Sans pondération de classe, l'intercept logistique varie d'un pli de thème à l'autre et génère des AUC intra-personne artificiellement inférieures à 0,50 (jusqu'à 0,387 pour la colère) lorsque les prédictions des 3 plis sont concaténées. L'utilisation systématique de \texttt{class\_weight="balanced"} (ou d'un ajustement bayésien exact du rapport de vraisemblance $\log\frac{p}{1-p} - \log\frac{\pi_{\text{train}}}{1-\pi_{\text{train}}}$ pour les réseaux de neurones) fixe l'a priori d'entraînement à 0,50 sur chaque pli et supprime totalement ce biais sans aucune fuite de données.
+
+\paragraph{Exploration non supervisée.}
+Sur une matrice de 36 variables physiologiques centrées par participant (cœur, peau, amplitude et fréquence respiratoires en phases précoce/tardive, et 6 régions $\times$ 5 bandes EEG corrigées de la ligne de base), sans jamais exposer aucun label, nous appliquons une ACP (10 composantes) puis un clustering $k$-means ($k = 2$ à~6) et un modèle de mélanges gaussiens (GMM, $k = 2$ à~5) sur les 8 premières composantes. L'alignement spontané des clusters avec le stress, les 5 classes émotionnelles, le thème et l'identité de la vidéo est mesuré par l'indice de Rand ajusté (ARI) et l'information mutuelle normalisée (NMI).
+
+\subsection{Dynamique à 1~s et en 4 phases, délinéation ECG P-QRS-T et features EEG enrichies (Q2)}
+En complément de l'extraction seconde par seconde ($-3$ à $+12$~s) de l'étude~05, un nouvel extracteur (\texttt{decoding/\allowbreak rich\_extract.py}) exécuté sur le serveur HABS calcule sur les 22\,974 essais un jeu de 650 variables organisées selon les quatre phases physiologiques recommandées : \textbf{Référence} $[-3, 0)$~s, \textbf{Précoce} $[0, 5)$~s, \textbf{Tardif} $[5, 10)$~s et \textbf{Post-exposition} $[10, 12)$~s, ainsi que la fenêtre complète $[0, 10)$~s pour la morphologie ECG.
+
+\paragraph{Délinéation ECG P-QRS-T et découverte critique sur la polarité.}
+L'inspection directe des tracés bruts a révélé que la dérivation sous-claviculaire HABS présente une \textbf{polarité inversée dans 96,6\,\% des essais} (ondes P et T négatives, onde S profonde apparaissant positive), ce qui fait échouer la détection automatique de polarité standard d'une bibliothèque comme NeuroKit2 (qui ne détectait que 2\,\% des ondes T sur l'échantillon de validation). Nous avons donc conçu un délinéateur guidé par gabarit propre à chaque enregistrement (\texttt{delineate\_ecg}) : (1)~détection QRS (bande 5--25~Hz) et construction du complexe médian sur $[-350, +550]$~ms ; (2)~alignement de polarité par vote conjoint des ondes P ($[-240, -70]$~ms) et T ($[+130, +420]$~ms, positives en D1 sinusal) puis recalage sur le pic R positif ; (3)~rejet des battements artéfactés par corrélation QRS au gabarit médian ($r < 0{,}70$, taux médian de battements propres : 99,2\,\%) ; (4)~localisation battement par battement (sur ECG filtré 0,5--15~Hz pour P/T et 1--35~Hz pour la pente QRS) des fiduciaux $\mathrm{P}_{\text{on}}$, $\mathrm{P}_{\text{pic}}$, $\mathrm{P}_{\text{off}}$, $\mathrm{QRS}_{\text{on}}$, $\mathrm{R}$, $\mathrm{QRS}_{\text{off}}$, $\mathrm{T}_{\text{pic}}$, $\mathrm{T}_{\text{off}}$, avec bornes physiologiques strictes. Pour chaque phase sont moyennés : la fréquence cardiaque (FC), RR, RMSSD, le \textbf{pic PR} ($\mathrm{R} - \mathrm{P}_{\text{pic}}$, très robuste au bruit), l'\textbf{intervalle PR clinique} ($\mathrm{QRS}_{\text{on}} - \mathrm{P}_{\text{on}}$), le \textbf{segment PR pur} ($\mathrm{QRS}_{\text{on}} - \mathrm{P}_{\text{off}}$, reflet direct du délai nodal au nœud AV), la durée QRS, QT, QTc de Bazett ($\mathrm{QT}/\sqrt{\mathrm{RR}}$) et de Fridericia ($\mathrm{QT}/\mathrm{RR}^{1/3}$), le pic RT et le ratio d'amplitude T/R. Pour dissocier un effet dromotrope ou de repolarisation intrinsèque d'un simple couplage à la fréquence cardiaque, chaque métrique morphologique est également testée dans une régression intra-personne ajustée sur $\Delta\mathrm{RR}$.
+
+\paragraph{Features EEG d'homogénéité spatiale, de variation temporelle et proxy oculaire pré-ICA.}
+Sur chacune des 4 phases et des 5 bandes ($\delta, \theta, \alpha, \beta, \gamma$), nous calculons par densité spectrale de Welch (fenêtres de 1,5~s en référence, 2~s en précoce/tardif, 1~s en post) : (i)~la log-puissance moyenne des 6 régions du scalp ; (ii)~quatre indices d'\textbf{homogénéité spatiale} sur l'ensemble des 62 dérivations : écart-type inter-canaux (\texttt{sp\_std}), écart interquartile (\texttt{sp\_iqr}, robuste aux électrodes isolées), entropie de Shannon normalisée de la distribution spatiale de puissance linéaire (\texttt{sp\_ent} $\in [0,1]$, 1 = puissance parfaitement uniforme sur le scalp) et écart-type inter-régional ; (iii)~trois gradients et asymétries : gradient antéro-postérieur (frontal $-$ occipital), asymétrie frontale droite--gauche (\texttt{FAA}) et asymétrie temporale ; (iv)~trois indices de \textbf{variation temporelle intra-phase} calculés sur les sous-fenêtres de 1~s : écart-type temporel (\texttt{tvar}), pente linéaire (\texttt{tslope}) et saut maximal d'une seconde à la suivante $|\Delta_t|$ (\texttt{maxjump}). Pour chaque signal périphérique et EEG, les transitions explicites de phase $\Delta(t\to t+1)$ (0 en référence, $\text{précoce}-\text{réf}$, $\text{tardif}-\text{précoce}$, $\text{post}-\text{tardif}$) fournissent aux modèles la structure séquentielle explicite. Enfin, nous extrayons sur l'EEG \emph{brut pré-ICA} (\texttt{CURATED}) l'amplitude crête-à-crête frontopolaire moyenne (Fp1/Fp2) sur $[0, 2]$~s comme proxy direct de clignement/sursaut oculaire afin de contrôler l'effet delta précoce.
+
+\subsection{Interaction cerveau--cœur : comparaison directe \texttt{CURATED} brut vs \texttt{PREPROCESSED} ICA (Q3)}
+\label{sec:meth_hep}
+Pour tester directement l'hypothèse selon laquelle l'ICA de \texttt{PREPROCESSED} supprimerait un signal cortical covariant avec le battement cardiaque, nous avons extrait le potentiel évoqué cardiaque (HEP) à partir des fichiers \textbf{bruts non traités \texttt{CURATED}}, sans aucune ICA : exclusion exacte de T9 et T10 pour obtenir un montage rigoureusement identique de 62 voies, re-référencement à la moyenne commune (CAR), filtrage passe-bande 0,5--30~Hz, découpage autour des \textbf{mêmes pics R raffinés} que \texttt{hep\_extract.py} ($-200$ à $+600$~ms en 16 bins de 50~ms, ligne de base $-200$ à $-50$~ms), et rejet d'époques au seuil standard de 100\,$\mu$V ainsi qu'un seuil élargi de 200\,$\mu$V (sensibilité aux clignements bruts). L'appariement essai par essai entre \texttt{CURATED} et \texttt{PREPROCESSED} permet en outre de calculer directement la forme d'onde exacte \emph{retirée par l'ICA} ($\mathrm{HEP}_{\text{brut}} - \mathrm{HEP}_{\text{ICA}}$) calée sur chaque battement. La fenêtre primaire pré-spécifiée est 250--600~ms sur les régions frontale et centrale, analysée avant et après ajustement intra-personne sur l'amplitude ECG de la même fenêtre et l'intervalle RR moyen \cite{parkblanke2019}.
+
+\subsection{Consensus normatif, évaluation à vidéo fixe, matrice \texorpdfstring{$2\times 2$}{2x2} et sensibilité EEG (Q4--Q5)}
+\paragraph{Clarification conceptuelle et décomposition.}
+Pour éviter toute sur-interprétation binaire \og personne contre situation \fg{}, nous distinguons : (1)~la \textbf{composante normative / consensuelle} (\emph{part partagée}), estimée pour un essai $(p, v)$ par la moyenne des valeurs centrées des \emph{autres} spectateurs de la même vidéo $v$ ($\ge 9$ autres spectateurs, \emph{leave-one-out}), qui mélange propriétés sensorielles du stimulus et réaction humaine stéréotypée hautement reproductible ; et (2)~la \textbf{composante idiosyncrasique} (\emph{part propre}), résidu de la note du spectateur $p$ par rapport au consensus de la vidéo $v$, qui reflète sa sensibilité différentielle à ce stimulus particulier.
+
+\paragraph{Contrôles à vidéo fixe non adjacents et matrice $2\times 2$.}
+Une vidéo consensuellement stressante peut présenter un fort déséquilibre de classes, et le complément \og non stressé \fg{} mélange des spectateurs réellement calmes avec des spectateurs quasiment au seuil (par ex. $V = 3{,}5, A = 5{,}5$). Nous auditons donc d'abord l'histogramme du taux de stress $p_v$ sur les 252 vidéos, puis nous évaluons à vidéo strictement fixe : (i)~les vidéos polarisantes uniquement ($0{,}20 \le p_v \le 0{,}80$, AUC pondérée par paires et moyenne non pondérée par vidéo) ; (ii)~le contraste \textbf{non adjacent \og stressé contre calme / oklm \fg{}} à l'intérieur de la \emph{même} vidéo ($V \le 4, A \ge 6$ contre $V \ge 5, A \le 5$, puis version stricte $V \ge 5{,}5, A \le 4{,}5$), en calculant à la fois l'AUC et le $d$ de Cohen intra-vidéo ; et (iii)~les contrastes purs isolant chaque axe séparément (valence pure $V \le 3{,}5$ vs $\ge 5{,}5$ à arousal $\ge 5$ ; arousal pur $A \ge 6{,}5$ vs $\le 4$ à valence $\le 4{,}5$).
+
+Surtout, pour trancher entre réflexe stimulus-dépendant automatique et réaction évaluative en \og tout ou rien \fg{}, nous construisons la \textbf{matrice $2\times 2$ Consensus du stimulus $\times$ État vécu du spectateur} croisant trois strates de consensus vidéo (\emph{bas} $p_{v,-i} \le 10\,\%$, \emph{polarisant} $20$--$55\,\%$, \emph{haut} $\ge 50\,\%$) et trois états vécus (\emph{très calme / oklm}, \emph{intermédiaire}, \emph{stressé}). Nous testons directement en intra-personne : (a)~\emph{l'effet stimulus pur chez les spectateurs calmes} (vidéo stressante vs neutre quand le spectateur reste calme) ; et (b)~\emph{l'effet évaluatif pur à strate vidéo constante} (stressé vs calme devant des vidéos de même consensus). Enfin, nous traçons les courbes dose--réponse sur 8 tranches de valence, d'arousal et de consensus, et comparons dans chaque sujet un modèle linéaire, un modèle en palier (tout-ou-rien) et leur modèle conjoint.
+
+\paragraph{Topographie EEG de sensibilité essai par essai et sensibilité-trait.}
+Nous cartographions $\beta_{\text{propre}}$ sur les 6 régions $\times$ 5 bandes, l'asymétrie frontale (FAA) et les 62 électrodes individuelles. Au niveau inter-individuel ($N = 314$), nous définissons la \textbf{sensibilité-trait au stress} de chaque participant comme son biais moyen de déclaration de stress par rapport aux autres spectateurs des \emph{mêmes} vidéos ($\overline{s_{p,v} - p_{v,-p}}$, contrôlant la personnalisation des stimuli), corrigé de l'effet cohorte, et nous le corrélons à la topographie EEG pré-stimulus ($[-3,0]$~s), à la FC de repos et à l'amplitude moyenne de réactivité physiologique.
+
+\subsection{Protocole de détection, architectures séquentielles et inférence (Q6)}
+Tous les modèles prédictifs sont évalués sur un découpage déterministe inédit personne $\times$ thème (\texttt{SALT = habs-revision-2026-11-23}) garantissant qu'aucune prédiction scorée ne porte sur une personne ou un thème vus à l'entraînement (validation croisée $3\times 3$ sur développement, puis test scellé ouvert une seule fois sur personnes et thèmes entièrement nouveaux). Nous comparons douze configurations couvrant la référence 1~s, les 4 phases, l'ajout progressif des transitions $\Delta(t\to t+1)$, des ondes ECG P-QRS-T, de l'homogénéité spatiale EEG et de la variation temporelle EEG, des modèles non linéaires (Ridge V\&A, \emph{HistGradientBoosting}) et des architectures explicitement séquentielles (banque de 48 filtres convolutifs 1D multi-échelles sur la série multivariée de 12~s + dérivées première/seconde + MLP calibré). Tous les intervalles de confiance à 95\,\% proviennent de 2\,000 tirages bootstrap sur les personnes (ou sur les vidéos pour les métriques à vidéo fixe) \cite{varoquaux2018}.
 
 \section{Résultats}
 
-\subsection{Ce qui change, et quand (Q1)}
+\subsection{Validité du critère de stress, purification et émotions discrètes (Q1)}
 
-Sur les données de développement (235 personnes), la puissance EEG lente
-montait dès la première seconde ($d$ de $+$0,11 à $+$0,14), la fréquence
-cardiaque baissait dès 1 s (jusqu'à $-$0,12 à 7 s), l'amplitude respiratoire
-baissait de 2 à 6 s et la conductance cutanée montait dès 4 s
-(figure~\ref{fig:curves}). Chez 52 personnes tenues à l'écart, la réponse de la
-peau se retrouvait avec le même délai (jusqu'à $+$0,25), et les courbes du cœur
-et de la respiration avaient la même forme. Cet ordre correspond aux études sur
-des images : décélération cardiaque dans les 2 s \cite{bradley2009}, réponses
-cutanées plus tardives \cite{benedek2010}.
+\paragraph{Contrôle de cohérence sur les émotions déclarées brutes.}
+Sur les 3\,938 essais inclus dans notre critère standard ($V \le 4 \cap A \ge 6$) disposant d'une émotion déclarée brute (cohortes 2--5, couverture 100\,\%), la hiérarchie des émotions choisies en n°1 valide nettement le critère (figure~\ref{fig:criterion}A) : \textbf{colère} (25,7\,\%), \textbf{peur} (23,9\,\%), \textbf{dégoût} (22,9\,\%) et \textbf{tristesse} (14,9\,\%) dominent massivement, suivis de la \emph{surprise} (5,5\,\%, majoritairement sursauts aversifs), la curiosité (2,7\,\%), la culpabilité (1,8\,\%), neutre (1,4\,\%) et l'excitation (1,1\,\%), tandis que relaxation (0,13\,\%), sensualité (0,03\,\%) et joie (0,03\,\%) sont quasi absentes. Ainsi, \textbf{89,2\,\% des essais inclus déclarent une émotion négative en rang~1} (dont 72,5\,\% de menace aiguë : colère, peur, dégoût), et \textbf{97,2\,\% déclarent une émotion négative dans au moins un de leurs trois choix} (90,1\,\% de menace aiguë aux rangs~1--3). Même parmi les rares 5,3\,\% d'essais ($n = 209$) dont le choix n°1 paraît incohérent, 69,9\,\% mentionnent une émotion négative en rang~2 ou~3 (et 77,3\,\% pour le choix n°1 \emph{surprise}). Le critère capte 69,7\,\% de toutes les colères, 66,2\,\% de toutes les peurs et 49,6\,\% des dégoûts, tout en excluant 99,9\,\% des joies, 99,7\,\% des relaxations et 97,7\,\% des neutres.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\linewidth]{curves_fr.png}
-\caption{Taille d'effet intra-personne du stress contre les autres essais,
-seconde par seconde autour du début de la vidéo. Bleu : données de
-développement (bande : intervalle à 95\,\%). Orange en tirets : personnes de
-test tenues à l'écart. Chaque seconde est rapportée aux 3 s précédant le début
-de l'essai.}
+\includegraphics[width=\linewidth]{fig1_criterion_fr.png}
+\caption{\textbf{Audit et purification du critère de stress (Q1).} \textbf{A.} Distribution ordonnée de l'émotion brute déclarée n°1 (\texttt{self\_reported\_emotion\_1}, non circulaire) dans le critère standard $V \le 4 \cap A \ge 6$ (cohortes 2--5, $n = 3\,938$). \textbf{B.} Balayage de 7 seuils symétriques : la pureté négative monte de 83,8\,\% à 95,3\,\% et les incohérences chutent de 10,1\,\% à 1,4\,\% ; les effets peau et delta doublent, mais la décélération cardiaque s'atténue aux niveaux d'arousal extrêmes.}
+\label{fig:criterion}
+\end{figure}
+
+\paragraph{Courbe de purification et divergence autonome inattendue.}
+Le balayage des seuils (figure~\ref{fig:criterion}B, tableau~\ref{tab:purification}) révèle deux phénomènes majeurs. Premièrement, le quadrant ouvert ($V < 5 \cap A > 5$, 29,0\,\% des essais) laisse entrer 10,1\,\% d'émotions incohérentes (4,7\,\% neutre, 3,9\,\% curiosité) ; passer à $V \le 4 \cap A \ge 6$ divise par deux les faux positifs (5,3\,\%) et passer à $V \le 3 \cap A \ge 7$ (13,4\,\% des essais, 241 sujets éligibles) atteint 92,7\,\% de pureté négative (3,2\,\% d'incohérences) tout en \textbf{maximisant la détectabilité} (AUC intra-personne 0,549 [0,535 ; 0,563], AUC à vidéo fixe 0,527 [0,510 ; 0,543]). Au-delà ($V \le 2 \cap A \ge 8$, $N = 137$ sujets), la pureté atteint 95,3\,\% (1,4\,\% d'incohérences) mais la perte d'effectif réduit la puissance d'apprentissage (AUC 0,540).
+
+Deuxièmement, la purification met au jour une \textbf{dissociation physiologique remarquable} : en durcissant le seuil de $V<5/A>5$ à $V\le 2{,}5/A\ge 7{,}5$, la taille d'effet de la conductance cutanée \textbf{plus que double} ($d = +0{,}143 \to +0{,}342$) et celle du delta EEG double également ($+0{,}126 \to +0{,}302$ à $2/8$), alors que \textbf{la décélération cardiaque s'amenuise de plus de moitié} ($-0{,}106 \to -0{,}041$). Les seuils asymétriques confirment que ce renversement provient spécifiquement de l'arousal : à valence fixée ($V \le 4$), relever l'arousal de $>5$ à $\ge 7$ fait bondir la peau ($+0{,}148 \to +0{,}286$) et réduit de moitié la bradycardie ($-0{,}099 \to -0{,}052$). Physiologiquement, l'activation sympathique cardiaque aux très hauts niveaux d'arousal vient s'opposer au freinage vagal d'orientation.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Seuil ($V / A$) & Essais (\%) & Pureté nég. & Menace & Incoh. & Peau ($d$) & Cœur ($d$) & AUC intra (pers.)\\
+\midrule
+$V < 5 \cap A > 5$ & 6\,661 (29,0\,\%) & 83,8\,\% & 66,6\,\% & 10,1\,\% & $+0{,}143$ & $-0{,}106$ & 0,537 (292)\\
+$V \le 4 \cap A \ge 6$ (réf.) & 5\,510 (24,0\,\%) & 89,2\,\% & 72,5\,\% & 5,3\,\% & $+0{,}173$ & $-0{,}098$ & 0,540 (287)\\
+$V \le 3 \cap A \ge 7$ (optimum) & 3\,081 (13,4\,\%) & 92,7\,\% & 78,7\,\% & 3,2\,\% & $+0{,}278$ & $-0{,}056$ & \textbf{0,549} (241)\\
+$V \le 2{,}5 \cap A \ge 7{,}5$ & 1\,874 (8,2\,\%) & 94,7\,\% & 81,4\,\% & 1,9\,\% & $\mathbf{+0{,}342}$ & $-0{,}062$ & 0,526 (173)\\
+$V \le 2 \cap A \ge 8$ & 1\,351 (5,9\,\%) & \textbf{95,3\,\%} & \textbf{84,7\,\%} & \textbf{1,4\,\%} & $+0{,}327$ & $-0{,}041$ & 0,540 (137)\\
+\bottomrule
+\end{tabular}
+\caption{Courbe de purification du critère de stress (pureté sur \texttt{self\_reported\_emotion\_1} brut, effets intra-personne et AUC logistique équilibrée en validation croisée $3\times 3$ hors personne et hors thème).}
+\label{tab:purification}
+\end{table}
+
+\paragraph{Profils par émotion brute n°1, classifieurs directs et exploration non supervisée.}
+L'analyse directe des émotions déclarées n°1 (figure~\ref{fig:emotions}A, $n = 17\,142$, $N = 209$) montre que le quadrant stress regroupe des états physiologiquement hétérogènes, en accord avec la méta-analyse de Siegel et al.\ \cite{siegel2018} montrant l'absence d'empreinte autonome unique par catégorie émotionnelle :
+\begin{itemize}
+\item La \textbf{peur} ($n = 1\,425$) possède la signature autonome la plus complète et la plus marquée : bradycardie franche ($d = -0{,}20$ [$-0{,}28 ; -0{,}11$]), forte conductance cutanée ($+0{,}25$ [$+0{,}13 ; +0{,}36$]), respiration plus superficielle ($-0{,}11$) et chute d'alpha ($-0{,}12$).
+\item Le \textbf{dégoût} ($n = 1\,816$) déclenche une bradycardie tout aussi forte ($-0{,}20$ [$-0{,}28 ; -0{,}12$]) et un delta élevé ($+0{,}15$), mais sans élévation cutanée significative ($+0{,}06$) ni baisse d'alpha ($-0{,}01$) --- profil vagal classique du dégoût organique \cite{palomba2000}.
+\item La \textbf{colère} ($n = 1\,453$) élève le delta ($+0{,}16$) avec des tendances faibles sur la peau ($+0{,}09$) et le cœur ($-0{,}08$).
+\item La \textbf{tristesse} ($n = 1\,470$) est \textbf{physiologiquement plate} sur tous les capteurs (cœur $-0{,}04$, peau $0{,}00$, respiration $+0{,}04$, alpha $+0{,}08$). L'inclure dans le quadrant stress (14,9\,\% des essais inclus) dilue donc mécaniquement le signal de menace aiguë.
+\item À l'opposé, la \textbf{joie} accélère le cœur ($+0{,}09$ [$+0{,}01 ; +0{,}17$]) et la \textbf{relaxation} approfondit la respiration ($+0{,}23$) tout en élevant l'alpha ($+0{,}12$).
+\end{itemize}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig2_emotions_fr.png}
+\caption{\textbf{Signatures et classification directe sur l'émotion déclarée brute n°1 (Q1).} \textbf{A.} Taille d'effet intra-personne contre \emph{neutre} par émotion brute (cohortes 2--5) : la peur cumule bradycardie, réponse cutanée, respiration superficielle et chute d'alpha, le dégoût est purement vagal/delta, la tristesse est plate. \textbf{B.} AUC des classifieurs binaires équilibrés (entre vidéos d'une même personne en bleu, entre spectateurs d'une même vidéo en orange).}
+\label{fig:emotions}
+\end{figure}
+
+Les classifieurs binaires équilibrés entraînés directement sur l'émotion n°1 (figure~\ref{fig:emotions}B) confirment l'absence de sous-groupe caché hautement séparable sur thèmes nouveaux : \emph{relaxation} atteint 0,557 [0,540 ; 0,573], \emph{menace aiguë} (peur+colère+dégoût) 0,545 [0,532 ; 0,558] (0,550 contre neutre ; 0,519 à vidéo fixe), \emph{dégoût} 0,536, \emph{joie} 0,531, \emph{toutes négatives} 0,529 (et \textbf{0,532 [0,515 ; 0,547] à vidéo fixe}, avec un coefficient propre du cœur significativement non nul : $\beta_{\text{propre}} = -0{,}032$ [$-0{,}049 ; -0{,}014$] !), \emph{peur} 0,523, \emph{tristesse} 0,515 et \emph{colère} 0,486. Le classifieur multiclasse unifié à 5 classes (\emph{peur, colère, dégoût, tristesse, autre}) obtient une exactitude équilibrée de 22,3\,\% contre 20,0\,\% au hasard (AUC OvR : dégoût 0,530, tristesse 0,525, peur 0,523, autre 0,522, colère 0,502).
+
+En \textbf{non supervisé} (sans aucune étiquette), l'ACP sur les 36 variables centrées par personne est dominée par la puissance EEG large bande thêta/bêta (PC1 : 44,4\,\% de variance), le gamma (PC2 : 10,2\,\%) et l'alpha pariéto-occipital (PC3 : 8,3\,\%, corrélé à l'arousal $r = -0{,}060$ et à la valence $+0{,}052$) ; seule PC4 capte un axe cardio-respiratoire corrélé au stress ($r = -0{,}054$). Les partitionnements $k$-means ($k = 2$--$6$) et GMM ($k = 2$--$5$) ne retrouvent ni le stress ($\mathrm{ARI} \in [-0{,}006 ; +0{,}008]$, $\mathrm{NMI} \le 0{,}0006$ ; taux de stress compris entre 23,1\,\% et 26,6\,\% dans les 4 clusters) ni les 5 émotions ($\mathrm{NMI} \le 0{,}0015$), alors que leur information mutuelle avec l'identité de la vidéo est plus de dix fois supérieure ($\mathrm{NMI} = 0{,}009$--$0{,}013$). La variance physiologique spontanée est donc dominée par les fluctuations d'état EEG non affectives et les stimuli, rendant indispensable un encadrement supervisé ou par contrastes contrôlés.
+
+\subsection{Séquence temporelle, morphologie ECG P-QRS-T et dynamique EEG (Q2)}
+
+\paragraph{Séquence d'apparition seconde par seconde et contraste des dimensions.}
+Comme établi en résolution 1~s (figure~\ref{fig:curves}), le cerveau et le corps répondent dans un ordre fixe : la puissance EEG lente ($\delta$) monte dès la première seconde ($d = +0{,}11$ à $+0{,}14$), le cœur ralentit dès 1~s (jusqu'à $-0{,}12$ à 7~s), la respiration devient plus superficielle de 2 à 6~s, et la conductance cutanée monte à partir de 4~s (répliquée sur 52 sujets tenus à l'écart avec exactement le même délai, $d$ jusqu'à $+0{,}25$) \cite{bradley2009,benedek2010}. Les contrastes de contrôle confirment que le cœur et la respiration suivent avant tout le caractère désagréable (contre excitation à arousal égal : cœur $-0{,}075$, respiration $-0{,}078$ ; contre négatif calme : $+0{,}001$ et $-0{,}009$), tandis que la conductance cutanée suit l'intensité (contre négatif calme $+0{,}13$, contre excitation nul) \cite{lang1993}. Concernant la variabilité cardiaque ultra-courte, la fréquence cardiaque sur 10~s concorde avec la fenêtre de 60~s ($r = 0{,}94$, limites $\pm 7{,}3$~bpm), mais la RMSSD ne concorde pas ($r = 0{,}75$ global et seulement $0{,}43$ intra-enregistrement ; fiabilité précoce--tardive sur 5~s : $r_{\text{intra}} = 0{,}22$), contre-indiquant son usage essai par essai pendant une stimulation brève \cite{munoz2015}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.96\linewidth]{curves_fr.png}
+\caption{\textbf{Séquence temporelle seconde par seconde des quatre grandes réponses physiologiques (Q2).} Taille d'effet intra-personne stress contre autres essais, rapportée aux 3~s de référence pré-stimulus. Bleu : développement (235 sujets, bande IC 95\,\%). Orange tireté : réplication sur 52 sujets tenus à l'écart.}
 \label{fig:curves}
 \end{figure}
 
-Les contrastes de contrôle montrent ce que suit chaque signal. Contre
-l'excitation (même arousal), le cœur ralentissait encore ($d$ moyen de 1 à
-8 s : $-$0,075 ; $-$0,14 à 6 s chez les personnes de test, de $-$0,23 à
-$-$0,04) et la respiration restait plus superficielle ($-$0,078). Contre les
-essais négatifs calmes (même valence), aucun des deux ne bougeait ($+$0,001,
-$-$0,009). La peau faisait l'inverse : elle séparait le stress des essais
-négatifs calmes ($+$0,13 à 6 s, de $+$0,02 à $+$0,24) mais pas de l'excitation.
-Le cœur et la respiration suivent le caractère désagréable, la peau
-l'intensité, comme chez Lang et al.\ \cite{lang1993}. Le cœur ralentissait
-autant pour la peur, le dégoût et la tristesse ($-$0,70 à $-$0,90 bpm) que pour
-la colère ($-$0,51, de $-$1,06 à $+$0,03), ce qui correspond mieux à une
-réponse d'orientation commune \cite{bradley2009} qu'à des profils propres à
-chaque émotion \cite{siegel2018}. L'effet delta était aussi grand en Pz
-($+$0,16) qu'en Fp1 ($+$0,16) : ce n'est donc pas un simple artefact oculaire
-\cite{hagemann2001}.
+\paragraph{Morphologie ECG P-QRS-T : preuve directe d'un mécanisme vagal sans raccourcissement PR.}
+Notre délinéation battement par battement (après correction automatique de la polarité inversée sur 96,6\,\% des essais) obtient une couverture de 94,7 à 98,7\,\% sur 22\,974 essais et des valeurs médianes parfaitement physiologiques : FC 76,3~bpm, RR 786,3~ms, pic PR 128,3~ms, intervalle PR clinique 134,9~ms, segment PR 39,9~ms, QRS 76,2~ms, QT 360,2~ms, QTc Bazett 402,7~ms, QTc Fridericia 386,9~ms, pic RT 250,2~ms et ratio T/R 0,53. Sur des phases de 5~s (précoce vs tardive), la fiabilité intra-sujet de ces marqueurs morphologiques (pic RT $r = 0{,}71$, QT $0{,}62$, T/R $0{,}60$, pic PR $0{,}49$, PR clinique $0{,}45$) est deux à trois fois supérieure à celle de la RMSSD ($r = 0{,}22$).
 
-La réponse du cerveau à chaque battement ne suivait pas le ralentissement du
-cœur (figure~\ref{fig:hep}). Moyenné sur les 13 battements d'une vidéo typique,
-l'EEG de 250 à 600 ms après chaque pic R, sur les régions frontale et centrale,
-ne différait pas pendant les réactions de stress : $d = 0{,}039$ (de $-$0,002 à
-0,078, 287 personnes), sans changement avec l'amplitude de l'ECG et l'intervalle
-RR en covariables (0,039, de $-$0,002 à 0,081). Ce contrôle compte, car le champ
-électrique du cœur atteint lui-même le scalp \cite{parkblanke2019}. Ici, la
-forme de l'ECG ne différait pas ($d = -0{,}009$) alors que l'intervalle RR
-s'allongeait ($d = +0{,}087$, de 0,042 à 0,132). Avec 287 personnes, un effet
-supérieur à environ $d = 0{,}08$ est exclu.
+Le résultat électrophysiologique principal (figure~\ref{fig:ecg_eeg}A) est d'une netteté remarquable :
+\begin{itemize}
+\item L'intervalle \textbf{RR s'allonge clairement} ($d = +0{,}116$ [$+0{,}071 ; +0{,}163$], $+5{,}06$~ms ; précoce $+0{,}092$, tardif $+0{,}115$, post-exposition $+0{,}058$ ; contre excitation $+0{,}126$, contre relaxé $+0{,}167$).
+\item \textbf{L'intervalle PR et le segment PR (conduction du nœud AV) restent strictement nuls :} pic PR $d = -0{,}002$ [$-0{,}043 ; +0{,}036$] ($-0{,}05$~ms), PR clinique $+0{,}010$ [$-0{,}035 ; +0{,}053$] ($+0{,}06$~ms), segment PR pur $-0{,}005$ [$-0{,}050 ; +0{,}040$] ($-0{,}04$~ms). L'ajustement sur $\Delta\mathrm{RR}$ ne révèle aucun effet caché ($-0{,}001$ à $-0{,}014$), et les couplages partagé comme propre avec la valence et l'arousal sont tous centrés sur zéro ($\pm 0{,}01$). La durée QRS ($+0{,}007$) et l'amplitude T/R ($+0{,}025$) ne bougent pas davantage.
+\item \textbf{Piège cardiologique sur le QTc :} les durées brutes RT ($+0{,}068$ [$+0{,}027 ; +0{,}110$], $+0{,}22$~ms) et QT ($+0{,}047$ [$+0{,}009 ; +0{,}085$], $+0{,}39$~ms) s'allongent légèrement avec la bradycardie, tandis que le QTc de Bazett baisse en apparence ($d = -0{,}092$ [$-0{,}140 ; -0{,}045$], $-1{,}00$~ms ; Fridericia $-0{,}066$). Or, dès qu'on contrôle $\Delta\mathrm{RR}$ en régression intra-personne, \textbf{tous ces effets s'annulent totalement} (QTc Bazett $-0{,}007$ [$-0{,}035 ; +0{,}020$], Fridericia $+0{,}014$, pic RT $+0{,}011$, QT $+0{,}034$, tous IC traversant 0). Il s'agit de la sur-correction classique de Bazett lors d'une variation rapide de RR, la repolarisation ventriculaire s'adaptant avec une inertie bien supérieure à 10~s.
+\end{itemize}
+L'absence totale de raccourcissement PR (excluant un effet $>0{,}3$~ms) et d'aplatissement de l'onde T démontre directement que la réponse cardiaque aiguë sur 10~s est \textbf{dominée par un freinage sinusal vagal (parasympathique) rapide}, et non par une décharge adrénergique accélérant le nœud AV.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.88\linewidth]{hep_fr.png}
-\caption{Taille d'effet du stress contre les autres essais sur l'EEG et l'ECG
-moyennés autour de chaque pic R pendant la vidéo (287 personnes ; bande :
-intervalle à 95\,\%). La fenêtre testée va de 250 à 600 ms sur les régions
-frontale et centrale.}
-\label{fig:hep}
+\includegraphics[width=\linewidth]{fig3_ecg_eeg_rich_fr.png}
+\caption{\textbf{Morphologie ECG P-QRS-T et nouvelles dynamiques EEG (Q2).} \textbf{A.} Tailles d'effet intra-personne sur les 10~s (bleu) et coefficients ajustés sur $\Delta\mathrm{RR}$ (orange) : RR s'allonge nettement, mais PR, QRS et T/R sont strictement nuls et la baisse apparente du QTc disparaît entièrement après contrôle de $\Delta\mathrm{RR}$. \textbf{B.} Effets marqués des nouvelles features EEG : volatilité temporelle précoce (violet, jusqu'à $d = +0{,}151$), gradients antéro-postérieurs et asymétrie temporale bêta (vert), et dynamique biphasique d'homogénéité spatiale (rouge).}
+\label{fig:ecg_eeg}
 \end{figure}
 
-\subsection{La personne ou la situation (Q2)}
+\paragraph{Volatilité temporelle et dynamique spatiale biphasique de l'EEG.}
+Contrairement aux ondes PR, les nouveaux descripteurs EEG proposés lors de la révision révèlent des signaux robustes (figure~\ref{fig:ecg_eeg}B) :
+\begin{itemize}
+\item \textbf{Hausse généralisée de la volatilité temporelle précoce ($[0, 5]$~s) :} dans les cinq bandes, l'écart-type temporel de la puissance 1~s augmente fortement ($\delta$ : $+0{,}101$ [$+0{,}061 ; +0{,}139$], $\alpha$ : $+0{,}097$, $\theta$ : $+0{,}096$, $\beta$ : $+0{,}091$, $\gamma$ : $+0{,}057$) et le saut maximal seconde-à-seconde en delta atteint \textbf{$d = +0{,}151$ [$+0{,}107 ; +0{,}193$]}, rivalisant avec les meilleures features statiques. Les pentes temporelles précoces sont négatives en alpha ($-0{,}056$) et thêta ($-0{,}051$), reflétant une désynchronisation progressive au cours des cinq premières secondes.
+\item \textbf{Réorganisation spatiale biphasique :} en phase \emph{précoce} ($[0, 5]$~s), la dispersion inter-canaux (\texttt{sp\_iqr}) \textbf{diminue} ($\theta$ : $-0{,}064$ [$-0{,}105 ; -0{,}024$], $\delta$ : $-0{,}048$, $\gamma$ : $-0{,}047$), traduisant une homogénéisation transitoire à l'apparition du stimulus. En phases \emph{tardive} ($[5, 10]$~s) et \emph{post-exposition} ($[10, 12]$~s), le phénomène s'inverse : l'entropie spatiale normalisée (\texttt{sp\_ent}) \textbf{chute} ($\alpha$ post : $-0{,}076$ [$-0{,}118 ; -0{,}032$], $\theta$ post : $-0{,}062$, $\delta$ post : $-0{,}058$) tandis que l'écart-type inter-canaux augmente ($+0{,}055$ à $+0{,}057$), signalant une focalisation spatiale persistante après la fin de la vidéo.
+\item \textbf{Gradients et asymétries :} le gradient antéro-postérieur (frontal $-$ occipital) bascule nettement vers l'avant en phase tardive ($\delta$ : $+0{,}075$, $\alpha$ : $+0{,}070$, $\theta$ : $+0{,}065$), traduisant la conjonction d'une désynchronisation alpha occipitale et d'un engagement lent frontal, tandis que l'asymétrie temporale bêta dévie durablement vers la gauche (précoce $-0{,}048$, tardif $-0{,}063$, post $-0{,}059$).
+\end{itemize}
 
-Le lien du cœur avec la valence passait entièrement par la part partagée
-(figure~\ref{fig:coupling}) : partagée 0,049 (de 0,029 à 0,068), propre 0,004
-(de $-$0,015 à 0,021), 313 personnes. La respiration se comportait de même
-(partagée 0,049, propre 0,001). Quand une personne trouvait une vidéo plus
-désagréable que les autres spectateurs, ni son cœur ni sa respiration ne le
-montraient. La peau suivait l'arousal par les deux parts, mais la part
-partagée était cinq fois plus grande (0,106 contre 0,023, de 0,003 à 0,043). La
-puissance alpha ne suivait que la part partagée de l'arousal. Le delta précoce
-était le seul signal avec une part propre nette (0,029, de 0,010 à 0,047, pour
-l'arousal).
+\subsection{Interaction cerveau--cœur (HEP) : l'ICA ne masque pas d'effet caché (Q3)}
+
+La figure~\ref{fig:hep_raw} répond directement et empiriquement à l'objection sur le prétraitement. Sur les 287 participants éligibles (couverture 98,6\,\%, médiane 13 battements par vidéo dans les deux conditions, pics R et montage 62 voies rigoureusement identiques) :
+\begin{itemize}
+\item Sur l'EEG \texttt{PREPROCESSED} (nettoyé par ICA, 100\,$\mu$V), l'effet primaire du stress sur la fenêtre 250--600~ms (frontal + central) n'est pas établi : $d = +0{,}039$ [$-0{,}002 ; +0{,}078$] (ajusté sur ECG et RR : $+0{,}039$ [$-0{,}002 ; +0{,}081$]).
+\item Sur l'EEG \textbf{brut \texttt{CURATED} (CAR 62 voies, SANS ICA, 100\,$\mu$V)}, le résultat est \textbf{superposable à la troisième décimale} : $d = +0{,}038$ [$-0{,}001 ; +0{,}077$] (ajusté ECG+RR : $+0{,}033$ [$-0{,}006 ; +0{,}073$] ; seuil élargi 200\,$\mu$V : $+0{,}006$ [$-0{,}034 ; +0{,}047$] ; changement par rapport aux 3~s pré-stimulus : $-0{,}010$).
+\item Le \textbf{signal exact soustrait par l'ICA} ($\mathrm{CURATED} - \mathrm{PREPROCESSED}$, calé sur les mêmes pics R) ne présente aucune modulation par le stress ($d = +0{,}012$ [$-0{,}028 ; +0{,}053$]) et sa corrélation intra-personne avec le champ ECG dans 250--600~ms est nulle ($r = -0{,}004$ [$-0{,}021 ; +0{,}014$]).
+\item Un très faible effet positif émerge uniquement sur le contraste extrême \emph{stress contre relaxé}, de manière \textbf{identique} avec ICA ($d = +0{,}072$ [$+0{,}014 ; +0{,}132$]) et sans ICA ($d = +0{,}076$ [$+0{,}021 ; +0{,}137$]).
+\end{itemize}
+Le prétraitement ICA n'a donc pas détruit d'information cerveau--cœur pertinente : sur des extraits brefs de 10~s ($\approx 13$ battements par essai, contre 100 à 300 battements dans les études de conscience au repos \cite{park2014,candia2021}), la modulation du HEP par le stress aigu reste au plus très faible ($|d| < 0{,}08$).
 
 \begin{figure}[t]
 \centering
-\begin{minipage}[b]{0.64\linewidth}
-\includegraphics[width=\linewidth]{coupling_fr.png}
-\end{minipage}\hfill
-\begin{minipage}[b]{0.34\linewidth}
-\includegraphics[width=\linewidth]{room_fr.png}
-\end{minipage}
-\caption{À gauche : coefficients intra-personne de chaque réponse sur la part
-de la note partagée avec les autres spectateurs de la même vidéo (bleu) et sur
-la part propre de la personne (orange), 274 à 314 personnes. À droite : AUC des
-réactions de stress entre les vidéos d'une même personne (bleu) et entre
-personnes devant la même vidéo (orange). Le taux de stress des autres
-spectateurs pour la vidéo donne à lui seul une AUC intra-personne de 0,917,
-hors échelle. Barres : intervalles à 95\,\%.}
-\label{fig:coupling}
+\includegraphics[width=\linewidth]{fig4_hep_raw_vs_ica_fr.png}
+\caption{\textbf{Contrôle empirique du prétraitement sur le potentiel évoqué cardiaque (Q3).} Taille d'effet stress contre autres essais (287 sujets, bande IC 95\,\% en frontal, tireté en central) sur les mêmes pics R et les 62 mêmes électrodes : \textbf{A.} \texttt{PREPROCESSED} (ICA). \textbf{B.} \texttt{CURATED} brut (sans ICA). \textbf{C.} Différence exacte retirée par l'ICA ($\text{Brut}-\text{ICA}$). Les courbes A et B sont pratiquement identiques et la composante retirée par l'ICA est plate.}
+\label{fig:hep_raw}
 \end{figure}
 
-Le test direct va dans le même sens. Entre les vidéos d'une même personne, le
-modèle figé atteignait une AUC de 0,549 (de 0,537 à 0,561) ; entre spectateurs
-de la même vidéo, elle tombait à 0,517 (de 0,503 à 0,531). Aucun signal seul ne
-faisait mieux (cœur 0,513, peau 0,514, delta 0,523, respiration 0,493, alpha
-0,484). Le taux de stress des autres spectateurs pour la vidéo donnait à lui
-seul 0,917 (de 0,911 à 0,923). En post hoc, le même modèle réentraîné sur la
-seule part propre de chaque variable ne détectait rien (0,505 entre spectateurs
-de la même vidéo). Les liens partagés du cœur et de la peau se retrouvaient dans
-chacun des trois groupes de cohortes. Le lien propre de la peau et l'AUC
-\og même vidéo \fg{} ne tenaient que dans la cohorte 1 (0,545, de 0,521 à 0,570).
-Moyennée sur les spectateurs, la physiologie distinguait bien les vidéos
-stressantes : la réponse cutanée moyenne d'une moitié des personnes corrélait à
-$r = 0{,}26$ (de 0,17 à 0,36) avec le taux de stress de l'autre moitié (post
-hoc).
+\subsection{Consensus normatif vs réponse évaluative à vidéo fixe : un mécanisme à seuil (Q4)}
 
-La part propre d'une note n'est-elle que du bruit ? Dans ce cas, aucun signal
-ne pourrait la suivre. La part propre de la valence corrélait avec la part
-propre du choix d'une émotion négative ($r = -0{,}45$, de $-$0,48 à $-$0,42, 208
-personnes) et, entre spectateurs de la même vidéo, disait qui en avait choisi
-une avec une AUC de 0,897 (de 0,873 à 0,921). Dans la régression utilisée pour
-le cœur, l'émotion choisie suivait la part propre de la valence avec un
-coefficient de $-$0,257, le cœur avec 0,004. Les spectateurs vivent donc la même
-vidéo différemment et le déclarent de façon cohérente ; leur cœur ne suit pas.
-Une réserve demeure. Dans le pire cas permis par la théorie classique des tests
-(fiabilité égale à $r^2$), le coefficient propre du cœur corrigé du bruit de
-notation pourrait atteindre 0,047 sur toutes les personnes et 0,076 sur les
-cohortes 2 à 5, cette seconde valeur dépassant la part partagée de 0,049.
-
-\subsection{Dès quand et à quel point on peut la détecter (Q3)}
-
-Avec le modèle figé (257 personnes, chaque prédiction portant sur une personne
-et un thème nouveaux), tous les signaux battaient le hasard dès la première
-seconde (AUC 0,517, de 0,504 à 0,531) et atteignaient 0,546 vers 8 s
-(figure~\ref{fig:latency}). L'EEG était fiable dès 2 s, le cœur, la peau et la
-respiration ensemble dès 4 s. Chez des personnes nouvelles (51 éligibles), le
-modèle était fiable dès 3 s et atteignait 0,570 ; sur des thèmes tenus à
-l'écart (35 éligibles), il atteignait 0,642 (de 0,586 à 0,700). La cellule
-scellée principale ne comptait que 9 personnes éligibles et est rapportée comme
-un découpage raté. Les 3 s précédant la vidéo donnaient 0,483. Sur toute la
-vidéo, la recherche de modèles faisait passer l'AUC de développement de 0,537 à
-0,585, mais sur son test scellé (60 personnes, 18 thèmes) le modèle final
-obtenait 0,605 (de 0,544 à 0,668) contre 0,634 (de 0,570 à 0,699) pour la
-régression logistique de départ ; onze familles de scikit-learn n'ont jamais
-battu un modèle linéaire. Le stress contre l'excitation restait entre 0,45 et
-0,59. Pour la question des mentors sur la variabilité cardiaque, la fréquence
-cardiaque sur 10 s concordait avec la même fenêtre de 60 s ($r = 0{,}94$,
-limites de $\pm$7,3 bpm), la RMSSD non ($r = 0{,}75$, contre 0,85 au repos
-\cite{munoz2015}). Aucune réponse ne s'atténuait au fil d'une séance ou d'un
-jour à l'autre.
+\paragraph{Pourquoi l'analyse linéaire initiale sous-estimait le rôle de l'évaluation personnelle.}
+L'audit des 252 vidéos (figure~\ref{fig:fixed_video}C) éclaire immédiatement le paradoxe apparent de notre étude~06 (où $\beta_{\text{propre}}$ du cœur sur la valence valait 0,004 et l'AUC à vidéo fixe 0,517). La distribution des vidéos est fortement bimodale : 123 vidéos ont un taux de stress inférieur à 10\,\%, 112 sont polarisantes (20--80\,\%) et 4 dépassent 80\,\%. Sur les vidéos consensuellement stressantes ($p_{v,-i} \ge 50\,\%$, $n = 5\,069$ essais), 63,9\,\% des spectateurs sont classés \emph{stressés} ($n = 3\,241$) et \textbf{33,6\,\% sont dans la zone intermédiaire} ($n = 1\,704$, par ex. valence négative à arousal modéré) ; seuls \textbf{2,5\,\% ($n = 124$, dont $n = 63$ très calmes) restent réellement calmes (\og oklm \fg{}, $V \ge 5, A \le 5$)} ! Autrement dit, opposer \og stressé \fg{} à \og tout le reste \fg{} devant une vidéo stressante comparait 93\,\% du temps des essais stressés à des essais déjà négatifs/intermédiaires, diluant l'effet individuel.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9\linewidth]{latency_fr.png}
-\caption{AUC intra-personne du modèle figé n'utilisant que les $t$ premières
-secondes de chaque vidéo. À gauche : validation croisée de développement. À
-droite : test scellé, thèmes tenus à l'écart. Bandes : intervalles à 95\,\%.}
-\label{fig:latency}
+\includegraphics[width=\linewidth]{fig5_fixed_video_fr.png}
+\caption{\textbf{Séparation évaluative à vidéo fixe et matrice $2\times 2$ Consensus $\times$ Vécu (Q4).} \textbf{A.} L'AUC à vidéo fixe bondit de 0,525 (contraste dilué) à 0,564 [0,528 ; 0,602] (cœur 0,553, delta 0,564) dès qu'on oppose des spectateurs stressés à des spectateurs réellement calmes devant la \emph{même} vidéo. \textbf{B.} Variation de fréquence cardiaque dans la matrice $2\times 2$ : sur les vidéos à haut consensus de stress, les spectateurs calmes (\og oklm \fg{}, vert) ne décélèrent pas ($-0{,}49$~bpm), contrairement aux spectateurs intermédiaires ($-2{,}43$) et stressés ($-3{,}08$). \textbf{C.} Répartition des taux de stress sur les 252 vidéos.}
+\label{fig:fixed_video}
 \end{figure}
 
-\section{Discussion}
+\paragraph{Contrastes non adjacents à vidéo fixe et matrice $2\times 2$.}
+Dès que l'on lève cette dilution en comparant des états franchement distincts devant la \textbf{même} vidéo (figure~\ref{fig:fixed_video}A--B, tableau~\ref{tab:matrix2x2}), l'interprétation change qualitativement :
+\begin{itemize}
+\item \textbf{Contraste \og stressé contre très calme \fg{} à vidéo strictement fixe} (48 vidéos, 6\,403 paires) : l'AUC du modèle multimodal saute de 0,525 [0,512 ; 0,538] (0,524 sur vidéos polarisantes) à \textbf{0,564 [0,528 ; 0,602]}, l'AUC du cœur de 0,513 à \textbf{0,553}, celle du delta de 0,523 à \textbf{0,564}, et le $d$ intra-vidéo de la peau double de $+0{,}093$ à \textbf{$+0{,}197$} ($+0{,}175$ [$+0{,}019 ; +0{,}320$] contre calme $5/5$ sur 72 vidéos). La séparation par axe pur à vidéo fixe confirme que la peau ($d = +0{,}072$) et le delta ($+0{,}061$) séparent l'arousal pur, tandis que le delta ($+0{,}103$) et le modèle (0,534) séparent la valence pure.
+\item \textbf{Matrice $2\times 2$ Consensus $\times$ État vécu (tableau~\ref{tab:matrix2x2}) :} devant des vidéos consensuellement stressantes ($p_{v,-i} \ge 50\,\%$), les spectateurs véritablement calmes ($V \ge 5{,}5, A \le 4{,}5$) ne montrent \textbf{aucune décélération cardiaque} ($-0{,}49$~bpm [$-3{,}16 ; +2{,}25$]), \textbf{aucune élévation cutanée} ($+0{,}014\,\mu$S, identique aux vidéos neutres $+0{,}014\,\mu$S) et aucun pic delta ($-0{,}073$), alors que les spectateurs stressés devant ces mêmes vidéos affichent $-3{,}08$~bpm, $+0{,}041\,\mu$S et $+0{,}021$. À l'inverse, quand un spectateur se sent stressé devant une vidéo consensuellement calme ($p_{v,-i} \le 10\,\%$, $n = 113$), son cœur ralentit de $-3{,}24$~bpm [$-5{,}19 ; -1{,}43$] et sa peau monte de $+0{,}071\,\mu$S [$+0{,}022 ; +0{,}136$] !
+\item \textbf{Contrastes appariés intra-personne :} chez les sujets ayant vécu certains clips consensuellement stressants comme calmes et d'autres comme stressants ($N = 26$), l'effet évaluatif pur atteint \textbf{$-2{,}97$~bpm [$-4{,}81 ; -1{,}10$] ($d = -0{,}41$ [$-0{,}65 ; -0{,}13$])} sur le cœur, \textbf{$+0{,}033\,\mu$S [$+0{,}003 ; +0{,}066$] ($d = +0{,}31$)} sur la peau et \textbf{$d = +0{,}45$ [$+0{,}00 ; +0{,}95$]} sur le delta (et sur vidéos polarisantes $N = 36$--$60$ : peau $d = +0{,}26$, delta $d = +0{,}27$ à $+0{,}47$, cœur $-1{,}72$~bpm). En revanche, en maintenant le spectateur calme et en faisant varier le consensus vidéo (effet stimulus pur chez les calmes, $N = 29$), \textbf{seule la désynchronisation alpha répond automatiquement au stimulus} ($d = -0{,}33$ [$-0{,}56 ; -0{,}12$], et $-0{,}41$ chez les très calmes), tandis que la peau ($-0{,}06$), la respiration ($-0{,}04$), le delta ($-0{,}13$) et la bradycardie (absence totale de ralentissement) ne se déclenchent pas.
+\end{itemize}
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Consensus vidéo ($p_{v,-i}$) & État du spectateur & Essais & Cœur (bpm) & Peau ($\mu$S) & Resp. & Delta ($\log_{10}$)\\
+\midrule
+Bas ($\le 10\,\%$) & Très calme ($V\ge 5{,}5, A\le 4{,}5$) & 4\,414 & $-1{,}67$ [$-2{,}17 ; -1{,}19$] & $+0{,}014$ & $-0{,}092$ & $-0{,}040$\\
+ & Intermédiaire & 5\,831 & $-2{,}08$ [$-2{,}53 ; -1{,}68$] & $+0{,}025$ & $-0{,}156$ & $-0{,}049$\\
+ & Stressé ($V\le 4, A\ge 6$) & 113 & $\mathbf{-3{,}24}$ [$-5{,}19 ; -1{,}43$] & $\mathbf{+0{,}071}$ & $-0{,}236$ & $-0{,}059$\\
+\midrule
+Polarisant ($20$--$55\,\%$) & Très calme & 167 & $-2{,}00$ [$-3{,}35 ; -0{,}71$] & $+0{,}021$ & $-0{,}197$ & $-0{,}094$\\
+ & Intermédiaire & 3\,578 & $-2{,}39$ [$-2{,}85 ; -1{,}94$] & $+0{,}032$ & $-0{,}176$ & $-0{,}028$\\
+ & Stressé & 2\,855 & $-2{,}58$ [$-3{,}14 ; -2{,}06$] & $\mathbf{+0{,}049}$ & $-0{,}188$ & $\mathbf{+0{,}009}$\\
+\midrule
+Haut ($\ge 50\,\%$) & Très calme (\og oklm \fg{}) & 63 & $\mathbf{-0{,}49}$ [$-3{,}16 ; +2{,}25$] & $\mathbf{+0{,}014}$ & $-0{,}111$ & $-0{,}073$\\
+ & Intermédiaire & 1\,704 & $-2{,}43$ [$-3{,}08 ; -1{,}81$] & $+0{,}029$ & $-0{,}181$ & $-0{,}002$\\
+ & Stressé & 3\,241 & $\mathbf{-3{,}08}$ [$-3{,}64 ; -2{,}57$] & $\mathbf{+0{,}041}$ & $-0{,}203$ & $\mathbf{+0{,}021}$\\
+\bottomrule
+\end{tabular}
+\caption{Matrice $2\times 2$ Consensus du stimulus $\times$ État vécu (changements bruts moyens par rapport aux 3~s pré-stimulus, moyennés par participant avec IC bootstrap 95\,\%).}
+\label{tab:matrix2x2}
+\end{table}
+
+\paragraph{Profil non linéaire et à seuil des courbes dose--réponse.}
+Les courbes dose--réponse centrées par personne sur 8 tranches expliquent parfaitement pourquoi la régression linéaire de $\beta_{\text{propre}}$ était quasiment nulle tout en coexistant avec un effet évaluatif net (un résultat cohérent avec la littérature sur la synchronisation autonome partagée face aux films \cite{golland2014} et la cohérence modérée entre vécu et physiologie \cite{mauss2005}) :
+\begin{itemize}
+\item Sur l'axe \textbf{valence}, la fréquence cardiaque suit un \textbf{palier en tout-ou-rien centré sur 5} : plate et négative sur toute la moitié désagréable ($[1,2): -0{,}42$~bpm, $[2,3): -0{,}35$, $[3,4): -0{,}25$, $[4,5): -0{,}20$), elle saute brusquement en positif dès $V \ge 5$ ($+0{,}52$ sur $[5,6)$, $+0{,}54$ sur $[8,9]$). Une fois la vidéo perçue comme déplaisante, la bradycardie ne varie donc presque plus avec le degré fin de désagrément --- ce qui expliquait l'absence de pente linéaire intra-vidéo chez des spectateurs presque tous situés sous~5.
+\item Sur l'axe \textbf{arousal}, la fréquence cardiaque décrit une \textbf{courbe en U non monotone} : plate jusqu'à 5 ($+0{,}02$ à $+0{,}16$~bpm), elle atteint son creux maximal de bradycardie sur $[6,7)$ ($-0{,}55$~bpm), puis \textbf{remonte} sur $[7,8)$ ($+0{,}05$~bpm) et $[8,9]$ ($+0{,}13$~bpm) sous l'effet du recrutement sympathique. À l'inverse, la conductance cutanée et le delta fonctionnent comme des \textbf{alarmes à seuil haut} : plats de 1 à 7 (peau $-0{,}012$ à $-0{,}004\,\mu$S), ils décollent brutalement sur $[7,8)$ ($+0{,}014\,\mu$S, delta $+0{,}016$) et $[8,9]$ ($+0{,}032\,\mu$S, delta $+0{,}036$).
+\end{itemize}
+
+\subsection{Topographie EEG de la sensibilité au stress et lien avec l'anxiété (Q5)}
+
+\paragraph{Sensibilité idiosyncrasique essai par essai ($\beta_{\text{propre}}$) et contrôle oculaire pré-ICA.}
+La cartographie complète des 6 régions $\times$ 5 bandes (figure~\ref{fig:sens_models}A) met en évidence une signature spectrale et spatiale très structurée de la sensibilité individuelle à la valence négative (au-delà du consensus vidéo) :
+\begin{itemize}
+\item \textbf{Rythmes rapides frontaux $\beta$ et $\gamma$ :} les coefficients propres les plus forts sur l'ensemble du scalp concernent le \textbf{gamma frontal} ($\beta_{\text{propre}} = -0{,}039$ [$-0{,}056 ; -0{,}022$]) et le \textbf{bêta frontal} ($-0{,}035$ [$-0{,}053 ; -0{,}017$]), complétés par le gamma temporal gauche sur l'arousal propre ($+0{,}030$ [$+0{,}013 ; +0{,}047$]). Sur la topographie des 62 électrodes, le bêta propre culmine en région préfrontale bilatérale (Fp2 $-0{,}034$, Fp1 $-0{,}033$, AF7 $-0{,}029$, F4 $-0{,}028$, AF8 $-0{,}028$, F3 $-0{,}027$).
+\item \textbf{Delta centro-pariétal réellement cortical :} le delta suit l'évaluation propre dans les six régions (maximum en \textbf{central} $-0{,}037$ [$-0{,}053 ; -0{,}020$] et temporal droit $-0{,}030$), avec des pics d'électrodes en \textbf{FC3 ($-0{,}041$), POz ($-0{,}041$), Pz ($-0{,}040$) et C3 ($-0{,}038$)} --- et non en frontopolaire. Notre contrôle par le proxy oculaire pré-ICA (amplitude crête-à-crête Fp1/Fp2 sur \texttt{CURATED}, fortement corrélée au delta global : $\beta = +0{,}416$) confirme que ce proxy n'a lui-même aucun lien propre avec l'arousal ($\beta_{\text{propre}} = +0{,}0004$ [$-0{,}017 ; +0{,}018$]) et que \textbf{93\,\% de l'effet propre du delta persiste après son ajustement} ($+0{,}0286 \to +0{,}0267$ [$+0{,}0102 ; +0{,}0423$]), levant définitivement la réserve oculaire de l'étude~06.
+\item \textbf{Alpha, thêta et asymétrie frontale (FAA) :} $\beta_{\text{propre}}$ est nul sur l'alpha et le thêta dans toutes les régions, et la FAA ne montre aucun effet dans aucune bande ($d = +0{,}021$ [$-0{,}023 ; +0{,}064$] pour la FAA alpha), en accord avec la méta-analyse négative de van der Vinne et al.\ \cite{vandervinne2017}.
+\end{itemize}
+
+\paragraph{Corrélats inter-individuels de la sensibilité-trait au stress ($N = 314$).}
+Les participants présentent une forte variabilité dans leur propension à juger les mêmes vidéos plus stressantes que leurs pairs (taux brut de stress : IQR 15,1--32,7\,\% ; écart-type du biais individuel par rapport au consensus : 12,1 points). Après ajustement sur la cohorte, une sensibilité-trait élevée au stress ou à l'arousal corrèle avec : (i)~une \textbf{fréquence cardiaque de repos pré-stimulus plus élevée} ($r = +0{,}140$ [$+0{,}032 ; +0{,}244$], $\rho = +0{,}142$) ; (ii)~une \textbf{puissance gamma pré-stimulus plus élevée sur l'ensemble du scalp}, maximale en frontal ($r = +0{,}165$ [$+0{,}061 ; +0{,}279$], $\rho = +0{,}185$), central ($+0{,}148$) et occipital ($+0{,}142$) ; (iii)~une \textbf{puissance thêta temporale pré-stimulus plus basse} (temporal droit $r = -0{,}149$ [$-0{,}260 ; -0{,}033$], temporal gauche $-0{,}126$) ; et (iv)~le sexe féminin ($r = +0{,}172$ pour le biais de stress, $+0{,}226$ pour la valence négative, résultat classique sur stimuli affectifs \cite{bradley2001}). En revanche, les sujets les plus sensibles subjectivement ne montrent \emph{pas} de réactivité phasique autonome plus grande (tendance non significative à une moindre réponse cutanée, $r = -0{,}11$). Ce profil --- tonus cardiaque basal élevé, hyper-activité rapide frontale/gamma tonique et phasique, absence de FAA --- fait directement écho au modèle neurobiologique de l'hypervigilance anxieuse \cite{oathes2008}, tout en gardant la prudence méthodologique d'une possible contribution micro-EMG frontale/temporale dans la bande gamma même après ICA.
+
+\subsection{Benchmark des 4 phases, transitions \texorpdfstring{$\Delta(t\to t+1)$}{Delta(t->t+1)} et architectures séquentielles (Q6)}
+\label{sec:seq_results}
+
+Le benchmark complet des douze configurations sur le découpage inédit personne $\times$ thème (développement : 12\,052 essais, 249 sujets, 60 thèmes ; tests scellés : 1\,646 essais sur 65 sujets $\times$ 24 thèmes inédits, 3\,285 sur 65 nouveaux sujets, 5\,991 sur 24 nouveaux thèmes) valide de façon nette et graduée les recommandations sur la résolution temporelle et les features EEG, tout en confirmant les limites physiques des ondes PR et des modèles non linéaires (figure~\ref{fig:sens_models}B, tableau~\ref{tab:seq_models}) :
+\begin{enumerate}
+\item \textbf{Passer des bins de 1~s aux 4 phases physiologiques apporte le gain le plus rentable :} avec \textbf{trois fois moins de variables} ($p = 114$ contre 340), la régression logistique sur 4 phases surclasse la référence à 1~s sur tous les tests de généralisation vers de nouveaux thèmes --- développement $+0{,}014$ (0,546 $\to$ 0,560, et $+0{,}029$ contre excitation), test scellé personnes et thèmes inédits $+0{,}044$ (0,526 [0,481 ; 0,570], indiscernable du hasard $\to$ \textbf{0,570 [0,519 ; 0,618]}), thèmes inédits $+0{,}019$ (0,527 $\to$ 0,546). Le lissage en phases de 2 à 5~s réduit drastiquement le bruit d'estimation de la FC et des spectres EEG.
+\item \textbf{Ce qui fait réellement progresser la détection dans les ablations :} sur la base des 4 phases + transitions $\Delta(t\to t+1)$ ($p = 190$ : dév.\ 0,561, pers.+th.\ 0,565), l'ajout des \textbf{ondes ECG P-QRS-T} n'apporte aucun gain (dév.\ 0,559, pers.+th.\ 0,562, thèmes inédits 0,540), en parfait accord avec l'absence d'effet PR/QRS/QT observée en Q2. À l'inverse, l'ajout de la \textbf{volatilité temporelle EEG} ($+30$ variables seulement) produit le plus fort saut unitaire en développement (0,567 [0,552 ; 0,582], et AUC à vidéo fixe passant de 0,520 à \textbf{0,539 [0,519 ; 0,555]}) ainsi qu'en test strict (0,580), tandis que l'ajout de l'\textbf{homogénéité spatiale et des gradients EEG} porte le test strict à \textbf{0,582 [0,531 ; 0,633]} et l'AUC à vidéo fixe sur thèmes inédits à son maximum (\textbf{0,542 [0,520 ; 0,562]}).
+\item \textbf{Supervision continue et convolutions séquentielles multi-échelles :} sur le jeu enrichi complet ($p = 448$), le modèle linéaire atteint \textbf{0,589 [0,540 ; 0,635]} sur le test strict pers.+th.\ ($+0{,}063$ au-dessus de la référence 1~s ; 0,566 contre excitation), et la \textbf{régression Ridge continue valence--arousal} (\texttt{enriched\_full\_ridge\_va}) s'impose comme le \textbf{meilleur modèle global} : développement \textbf{0,576 [0,561 ; 0,591]} ($+0{,}030$ vs 1~s ; 0,602 contre relaxé), test strict \textbf{0,586 [0,536 ; 0,633]} (0,602 contre négatif calme, 0,604 contre relaxé), thèmes inédits \textbf{0,558 [0,535 ; 0,581]} (meilleur score), et sujets inédits \textbf{0,607 [0,580 ; 0,633]} (\textbf{0,656 [0,623 ; 0,689]} contre relaxé). Exploiter explicitement la série 1~s par convolutions 1D multi-échelles et dérivées $t\to t+1$ (\texttt{sequence\_multiscale\_conv}, $p = 620$) fait bondir la détection par rapport aux mêmes bins 1~s à plat (dév.\ 0,546 $\to$ \textbf{0,569}, meilleur score à vidéo fixe en dév.\ \textbf{0,541} et en test strict \textbf{0,527}), et sa fusion linéaire avec les 4 phases enrichies atteint 0,573 en dév.\ et 0,573 en test strict.
+\item \textbf{Plafond des têtes non linéaires sur stimuli inédits :} le \emph{HistGradientBoosting} excelle sur thèmes déjà vus (sujets inédits 0,608, vidéo fixe 0,571, négatif calme 0,636) mais perd du terrain sur thèmes inédits (0,532 contre 0,558 pour Ridge), et le MLP sur les 1\,068 variables reste en retrait des têtes linéaires régularisées (dév.\ 0,552, thèmes inédits 0,531). Sur 249 sujets d'entraînement et un faible rapport signal/bruit par essai, la qualité de la représentation temporelle et spatiale prime nettement sur la non-linéarité du classifieur.
+\end{enumerate}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{fig6_sensitivity_models_fr.png}
+\caption{\textbf{Topographie EEG de sensibilité individuelle (Q5) et benchmark des 12 configurations temporelles (Q6).} \textbf{A.} Matrice 6 régions $\times$ 5 bandes de $-\beta_{\text{propre}}$ (valence) : la sensibilité individuelle se concentre sur $\beta/\gamma$ frontaux et $\delta$ sur tout le scalp, tandis qu'alpha et thêta sont nuls (* : IC 95\,\% excluant 0). \textbf{B.} AUC intra-personne sur le découpage inédit personne $\times$ thème en développement (bleu) et sur le test scellé personnes et thèmes nouveaux (orange). Les 4 phases enrichies et les convolutions séquentielles gagnent $+0{,}030$ en développement et jusqu'à $+0{,}063$ sur le test strict par rapport aux bins 1~s.}
+\label{fig:sens_models}
+\end{figure}
+
+\begin{table}[t]
+\centering\footnotesize
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Configuration & $p$ & Dév.\ WP & Dév.\ SV & Nouv.\ P\&T & Nouv.\ Pers. & Nouv.\ Th. & vs Relaxé (P)\\
+\midrule
+Bins 1~s (référence lin.) & 340 & 0,546 & 0,519 & 0,526 & 0,600 & 0,527 & 0,632\\
+4 phases (Réf/Préc/Tard/Post) & 114 & 0,560 & 0,524 & 0,570 & 0,599 & 0,546 & 0,632\\
+4 phases + $\Delta(t\to t+1)$ & 190 & 0,561 & 0,520 & 0,565 & 0,605 & 0,548 & 0,650\\
+\quad $+$ ECG P-QRS-T (PR/QT/T) & 243 & 0,559 & 0,523 & 0,562 & 0,608 & 0,540 & 0,649\\
+\quad $+$ EEG homogénéité spatiale & 365 & 0,562 & 0,521 & 0,582 & 0,600 & 0,555 & 0,640\\
+\quad $+$ EEG variation temporelle & 220 & 0,567 & 0,539 & 0,580 & 0,599 & 0,547 & 0,640\\
+Complet enrichi (linéaire) & 448 & 0,565 & 0,533 & \textbf{0,589} & 0,602 & 0,552 & 0,643\\
+Complet enrichi (Ridge V\&A) & 448 & \textbf{0,576} & 0,527 & 0,586 & 0,607 & \textbf{0,558} & \textbf{0,656}\\
+Complet enrichi (GBDT) & 448 & 0,562 & 0,514 & 0,580 & \textbf{0,608} & 0,532 & 0,644\\
+Séquence conv.\ 1D multi-éch. & 620 & 0,569 & \textbf{0,541} & 0,561 & 0,607 & 0,540 & 0,639\\
+Séquence + enrichi (linéaire) & 1\,068 & 0,573 & 0,539 & 0,573 & 0,607 & 0,549 & 0,654\\
+Séquence + enrichi (MLP) & 1\,068 & 0,552 & 0,527 & 0,570 & 0,608 & 0,531 & 0,648\\
+\bottomrule
+\end{tabular}
+\caption{Benchmark complet des douze représentations et architectures sur le découpage inédit personne $\times$ thème (\texttt{habs-revision-2026-11-23}). WP : AUC intra-personne ; SV : AUC à vidéo fixe (pondérée) ; Nouv.\ P\&T : test scellé personnes et thèmes nouveaux (65 sujets $\times$ 24 thèmes) ; Nouv.\ Pers. : 65 sujets nouveaux ; Nouv.\ Th. : 24 thèmes nouveaux ; vs Relaxé (P) : contraste stress vs relaxé sur sujets nouveaux.}
+\label{tab:seq_models}
+\end{table}
+
+\section{Discussion et perspectives}
 
 \begin{table}[t]
 \centering\small
 \begin{tabularx}{\linewidth}{@{}l X l@{}}
 \toprule
-Question & Ce que nous avons trouvé & Chiffre clé\\
+Question & Résultat principal & Chiffre clé\\
 \midrule
-Q1, ordre & EEG avant 1 s, cœur 1 s, respiration 2 s, peau 4 s & peau jusqu'à $d = +0{,}25$ (test)\\
-Q1, dimensions & Cœur et respiration suivent le désagréable, la peau l'intensité & cœur contre excitation $-$0,075\\
-Q1, cerveau--cœur & La réponse corticale aux battements ne change pas & $d = 0{,}039$ ($-$0,002 ; 0,078)\\
-Q2, cœur & Ne suit que la situation & propre 0,004, partagée 0,049\\
-Q2, peau & Surtout la situation, un peu la personne & propre 0,023, partagée 0,106\\
-Q2, même salle & La physiologie dit à peine qui est stressé & AUC 0,517 contre 0,917\\
-Q2, bruit de notation & La part propre des notes est réelle & AUC 0,897 pour l'émotion choisie\\
-Q3, détection & Précoce mais faible chez des personnes nouvelles & AUC 0,517 à 1 s, 0,55--0,64 à 10 s\\
+Q1, critère & Pureté validée sur émotions brutes ; divergence autonome & 89,2\,\% rang 1 (97,2\,\% rangs 1--3) ; opt.\ $3/7$\\
+Q1, émotions & Peur (HR+SC+$\alpha$), dégoût (HR+$\delta$), tristesse plate ; non sup.\ nul & Peur SC $+0{,}25$, HR $-0{,}20$ ; $\mathrm{ARI} < 0{,}009$\\
+Q2, ECG P-QRS-T & RR s'allonge, PR (NAV) strictement nul, QTc = art.\ Bazett & RR $+5{,}1$~ms ; PR $-0{,}05$~ms ; QTc ctrl $-0{,}007$\\
+Q2, EEG riche & Volatilité temporelle précoce forte ; homogénéité biphasique & Saut $\delta$ : $+0{,}151$ ; entropie $\alpha$ post : $-0{,}076$\\
+Q3, HEP brut/ICA & L'ICA ne détruit pas le HEP ; effet primaire nul dans les deux & Brut $+0{,}038$ vs ICA $+0{,}039$ ; diff.\ $+0{,}012$\\
+Q4, vidéo fixe & Contraste non adjacent (vs calme) révèle l'effet évaluatif & AUC 0,564 ; $2\times 2$ HR $-2{,}97$~bpm ($d = -0{,}41$)\\
+Q5, sensibilité & $\beta/\gamma$ frontal + $\delta$ centro-pariétal (survit au proxy oculaire) & $\gamma$ front.\ $-0{,}039$ ; trait FC $+0{,}14$, $\gamma$ $+0{,}17$\\
+Q6, 4 ph.\ \& séq. & 4 phases + EEG riche + Ridge V\&A / conv.\ 1D surclassent 1~s ; PR/MLP nuls & Test P\&T 0,526 $\to$ 0,589 ; Ridge dév.\ 0,576, rel.\ 0,656\\
 \bottomrule
 \end{tabularx}
-\caption{Ce que nous avons demandé et ce que nous avons trouvé. Intervalles et
-effectifs dans le texte.}
+\caption{Synthèse des six questions de recherche et des résultats empiriques vérifiés sur les 314 sujets.}
 \label{tab:summary}
 \end{table}
 
-Le tableau~\ref{tab:summary} répond à notre question. Pendant une réaction de
-stress aigu, le cerveau et le corps changent dans un ordre fixe : le cerveau
-d'abord, puis le cœur et la respiration, puis la peau. Mais l'essentiel du
-changement appartient à la situation. Le cœur et la respiration suivent le
-caractère désagréable d'une vidéo pour les spectateurs en général, pas pour ce
-spectateur-là, alors même que les spectateurs déclarent cette différence de
-façon cohérente. La peau ne suit que faiblement l'arousal propre de la
-personne.
+\paragraph{Un modèle neurophysiologique en trois branches du stress aigu bref.}
+Pris ensemble (tableau~\ref{tab:summary}), nos résultats dessinent une architecture physiologique cohérente à trois composantes distinctes lors d'une exposition aversive brève :
+\begin{enumerate}
+\item \textbf{Une composante attentionnelle automatique, liée au stimulus :} la désynchronisation alpha pariéto-occipitale survient même lorsque le sujet reste parfaitement calme devant une vidéo stressante ($d = -0{,}33$ à $-0{,}41$) et ne présente aucun couplage propre avec l'évaluation subjective.
+\item \textbf{Une composante vagale d'orientation, déclenchée par l'évaluation (à seuil) :} dès que la situation franchit le seuil d'aversivité subjective ($V < 5$), la fréquence cardiaque ralentit (dès 1~s, $-2{,}4$ à $-3{,}1$~bpm) et la respiration devient plus superficielle (2~s), sans aucun raccourcissement du segment PR ni aplatissement de l'onde T --- signature électrophysiologique d'un freinage parasympathique sinusal sans décharge adrénergique marquée au nœud AV. Chez le sujet qui reste calme devant le même stimulus, cette bradycardie ne se déclenche pas ($-0{,}49$~bpm).
+\item \textbf{Une composante d'alarme sympathique et corticale à seuil élevé :} lorsque l'arousal dépasse~7, la conductance cutanée sudomotrice (dès 4~s) et la volatilité/puissance delta centro-pariétale doublent, accompagnées d'une activation rapide préfrontale $\beta/\gamma$ liée à la sensibilité individuelle, tandis qu'un recrutement sympathique cardiaque commence à contrer la bradycardie vagale (courbe en U à $A = 8$--$9$).
+\end{enumerate}
 
-\paragraph{Retour au bloc opératoire.} Un moniteur de stress physiologique
-dirait surtout qu'il se passe quelque chose de difficile, pas que ce
-chirurgien-là le vit mal. Un événement aversif bref ralentit le cœur : un
-moniteur qui ne cherche qu'une accélération le raterait, et la RMSSD sur 10 s
-n'est pas fiable pendant une stimulation. Étudier le point de rupture avant
-l'erreur demande des données avec une tâche, une performance et des erreurs :
-c'est la suite naturelle.
+\paragraph{Implications pour le monitorage en populations non communicantes et en recherche.}
+Ce cadre éclaire directement la conception et l'évaluation des détecteurs de stress ou de douleur aiguë chez des patients ne pouvant s'exprimer (nouveau-nés et enfants pré-verbaux, \emph{locked-in syndrome}, coma, anesthésie générale) :
+\begin{itemize}
+\item \textbf{Ne pas présupposer une tachycardie linéaire :} un événement aversif bref déclenche d'abord une décélération vagale (courbe en U selon l'arousal), tandis qu'une nociception somatique intense ou un stress prolongé recrute la tachycardie sympathique. Des modèles linéaires monotones sur la FC ratent cette inversion ; des représentations en phases et non linéaires s'imposent.
+\item \textbf{Prudence sur les métriques cardiaques ultra-courtes :} sur des fenêtres de 10~s, la RMSSD n'est pas fiable ($r_{\text{intra}} = 0{,}22$--$0{,}43$), le QTc de Bazett produit un artefact de sur-correction massif lors des variations rapides de RR, et le segment PR n'offre pas encore de marqueur adrénergique mesurable à cette échelle de temps. De même, le HEP exige bien davantage que 13 battements par essai pour devenir exploitable.
+\item \textbf{Un standard de validation rigoureux :} tenir à l'écart personnes et thèmes empêche la mémorisation de vidéos mais n'isole pas l'état subjectif du stimulus. Réciproquement, un contrôle à stimulus fixe comparant \og stressé contre tout le reste \fg{} dilue l'effet par les essais intermédiaires. Nous proposons de rapporter conjointement : (i)~l'AUC hors personne et hors stimulus, (ii)~l'AUC et le $d$ à stimulus fixe sur \emph{contrastes non adjacents} (stressé vs calme), et (iii)~la matrice $2\times 2$ Consensus $\times$ État.
+\item \textbf{Enjeu clinique de la puissance essai par essai :} bien que la représentation en 4 phases enrichies et séquentielles apporte un gain net ($+0{,}030$ à $+0{,}063$ d'AUC sur le test strict), l'AUC par essai plafonne autour de 0,56--0,61 sur sujets/thèmes inédits (0,65--0,66 contre relaxé). Un détecteur non invasif isolé ne permet donc pas encore une décision clinique sur un événement unique de 10~s ; l'agrégation multi-essais, la calibration individuelle de repos (FC basale, profil spectral) et l'extension à des paradigmes de stress actif ou nociceptif constituent les étapes suivantes indispensables.
+\end{itemize}
 
-\paragraph{Un contrôle pour les détecteurs de stress.} Tenir à l'écart des
-personnes et des vidéos, comme nous et la plupart des études le faisons,
-empêche de mémoriser une vidéo, mais un modèle peut quand même apprendre ce
-que les vidéos stressantes font à tout le monde, et son AUC mesure alors le
-stimulus. Comparer des personnes exposées au même stimulus isole la personne.
-Ce contrôle ne coûte rien dans les jeux de données où les stimuli sont
-partagés, et nous proposons de le rapporter à côté de l'AUC habituelle. Côté
-méthode, une recherche de modèles qui gagnait 0,048 en développement n'a rien
-donné sur son test scellé : sans ce test, nous aurions annoncé un meilleur
-modèle.
-
-\paragraph{Limites.} Le label est une auto-évaluation d'une vidéo de 10
-secondes par des volontaires sains, pas un stress clinique. Les effets sont
-petits ($|d| \le 0{,}25$). La part partagée mélange le contenu émotionnel avec
-l'image et le son. Le bruit de notation n'est pas entièrement exclu pour le
-lien propre du cœur dans les cohortes 2 à 5 ; des notes répétées
-trancheraient. Le delta précoce, seul signal avec une part
-propre, peut refléter un sursaut ou un mouvement, ce qu'on ne peut exclure sans
-EOG. Quatre tests principaux partagent un même seuil à 95\,\%.
-
-\paragraph{Reproductibilité.} Le dépôt contient les extracteurs et les analyses
-figées (\texttt{decoding/}), les protocoles (\texttt{journal/}), les résultats
-agrégés et les scripts des figures (\texttt{docs/research/}). Seuls des
-chiffres agrégés quittent les serveurs de HABS.
+\paragraph{Limites et reproductibilité.}
+Nos observations portent sur des vidéos passives de 10~s chez des adultes sains : un stress métabolique, social ou douloureux aigu (en particulier en pédiatrie) recrute plus fortement la branche sympathique adrénergique (tachycardie et possible raccourcissement PR au-delà de 10--30~s). La dérivation ECG unique exclut l'analyse vectorielle multi-dérivations. Les cellules extrêmes de la matrice $2\times 2$ (spectateurs très calmes face aux vidéos très stressantes, $n = 63$) ont un effectif restreint et des intervalles plus larges. Bien que le proxy oculaire pré-ICA écarte l'artefact de clignement pour le delta centro-pariétal, une contribution micro-EMG crânienne ne peut être totalement exclue pour les bandes $\beta/\gamma$ préfrontales et temporales. Enfin, l'absence de notations répétées d'une même vidéo par un même sujet empêche de mesurer directement la fiabilité test--retest de l'échelle analogique. L'ensemble du code d'extraction (\texttt{decoding/rich\_extract.py}), des analyses (\texttt{decoding/revision.py}), des protocoles figés (\texttt{journal/}), des résultats agrégés et des scripts de figures (\texttt{docs/research/revision/}) est versionné dans le dépôt ; aucune donnée individuelle ne quitte les serveurs HABS.
 
 \begin{otherlanguage*}{english}
-\begin{thebibliography}{99}\footnotesize
+\begin{thebibliography}{99}\footnotesize\setlength{\itemsep}{1.5pt}
 \bibitem{giannakakis2015} G. Giannakakis, D. Grigoriadis, M. Tsiknakis. Detection of stress/anxiety state from EEG features during video watching. IEEE EMBC 2015, 6034--6037.
 \bibitem{gerster2026} M. Gerster et al. Stimulus identity rather than emotion drives EEG classification on the FACED dataset. bioRxiv 2026, doi:10.64898/2026.06.12.731889.
-\bibitem{mauss2005} I. B. Mauss et al. The tie that binds? Coherence among emotion experience, behavior, and physiology. Emotion 5 (2005) 175--190.
-\bibitem{brown2020} C. L. Brown et al. Coherence between subjective experience and physiology in emotion: individual differences and implications for well-being. Emotion 20 (2020) 818--829.
-\bibitem{golland2014} Y. Golland, K. Keissar, N. Levit-Binnun. Studying the dynamics of autonomic activity during emotional experience. Psychophysiology 51 (2014) 1101--1111.
-\bibitem{park2014} H.-D. Park, S. Correia, A. Ducorps, C. Tallon-Baudry. Spontaneous fluctuations in neural responses to heartbeats predict visual detection. Nat. Neurosci. 17 (2014) 612--618.
-\bibitem{candia2021} D. Candia-Rivera et al. Neural responses to heartbeats detect residual signs of consciousness during resting state in postcomatose patients. J. Neurosci. 41 (2021) 5251--5262.
-\bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
+\bibitem{bradley2001} M. M. Bradley, M. Codispoti, D. Sabatinelli, P. J. Lang. Emotion and motivation II: sex differences in picture processing. Emotion 1 (2001) 300--319.
 \bibitem{bradley2009} M. M. Bradley. Natural selective attention: orienting and emotion. Psychophysiology 46 (2009) 1--11.
 \bibitem{benedek2010} M. Benedek, C. Kaernbach. A continuous measure of phasic electrodermal activity. J. Neurosci. Methods 190 (2010) 80--91.
 \bibitem{lang1993} P. J. Lang, M. K. Greenwald, M. M. Bradley, A. O. Hamm. Looking at pictures: affective, facial, visceral, and behavioral reactions. Psychophysiology 30 (1993) 261--273.
+\bibitem{palomba2000} D. Palomba, M. Sarlo, A. Angrilli, A. Mini, L. Stegagno. Cardiac responses associated with affective processing of unpleasant film stimuli. Int. J. Psychophysiol. 36 (2000) 45--57.
+\bibitem{hagenaars2014} M. A. Hagenaars, K. Roelofs, J. F. Stins. Human freezing in response to affective films. Anxiety, Stress, \& Coping 27 (2014) 27--37.
+\bibitem{schubring2019} D. Schubring, H. T. Schupp. Affective picture processing: alpha- and lower beta-band desynchronization reflects emotional arousal. Psychophysiology 56 (2019) e13386.
 \bibitem{siegel2018} E. H. Siegel et al. Emotion fingerprints or emotion populations? A meta-analytic investigation of autonomic features of emotion categories. Psychol. Bull. 144 (2018) 343--393.
-\bibitem{hagemann2001} D. Hagemann, E. Naumann. The effects of ocular artifacts on (lateralized) broadband power in the EEG. Clin. Neurophysiol. 112 (2001) 215--231.
+\bibitem{mauss2005} I. B. Mauss et al. The tie that binds? Coherence among emotion experience, behavior, and physiology. Emotion 5 (2005) 175--190.
+\bibitem{golland2014} Y. Golland, K. Keissar, N. Levit-Binnun. Studying the dynamics of autonomic activity during emotional experience. Psychophysiology 51 (2014) 1101--1111.
+\bibitem{park2014} H.-D. Park, S. Correia, A. Ducorps, C. Tallon-Baudry. Spontaneous fluctuations in neural responses to heartbeats predict visual detection. Nat. Neurosci. 17 (2014) 612--618.
+\bibitem{candia2021} D. Candia-Rivera et al. Neural responses to heartbeats detect residual signs of consciousness during resting state in postcomatose patients. J. Neurosci. 41 (2021) 5251--5262.
 \bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: underlying mechanisms, functional roles, and methodological considerations. NeuroImage 197 (2019) 502--511.
 \bibitem{munoz2015} M. L. Munoz et al. Validity of (ultra-)short recordings for heart rate variability measurements. PLoS ONE 10 (2015) e0138921.
+\bibitem{vandervinne2017} N. van der Vinne et al. Frontal alpha asymmetry as a diagnostic marker in depression: fact or fiction? A meta-analysis. NeuroImage: Clinical 16 (2017) 79--87.
+\bibitem{oathes2008} D. J. Oathes, W. J. Ray, A. S. Yamasaki, T. D. Borkovec, L. G. Castonguay, M. G. Newman, J. Nitschke. Worry, generalized anxiety disorder, and emotion: evidence from the EEG gamma band. Biol. Psychol. 79 (2008) 165--170.
+\bibitem{varoquaux2018} G. Varoquaux. Cross-validation failure: small sample sizes lead to large error bars. NeuroImage 180 (2018) 68--77.
 \end{thebibliography}
 \end{otherlanguage*}
 

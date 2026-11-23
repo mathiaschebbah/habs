@@ -6,15 +6,11 @@ Université Paris-Saclay · 2–30 November 2026 · [hackathon.habs.ai](https://
 
 ## Research study
 
-**Submission paper:** [Acute stress reactions in 314 viewers: what the brain and body show, when, and
-whether it reflects the person or the situation](docs/paper/paper.pdf), also
-[in French](docs/paper/paper_fr.pdf) (studies 04 to 06, [literature](docs/research/stress/LITERATURE.md)). Stressful videos change slow EEG power within the first
-second, slow the heart from 1 s, make breathing shallower from 2 s and raise skin conductance from 4 s. The
-heart and breathing follow how unpleasant a video is for viewers in general: their link with the viewer's
-own valence, beyond what the other viewers of the same video reported, is zero. Among people watching the
-same video, physiology tells who felt stressed barely above chance (AUC 0.517), while the other viewers'
-ratings of the video predict it with AUC 0.92. The heart slows, but the EEG response to each heartbeat does
-not measurably change (d = 0.039, 95% interval −0.002 to 0.078).
+**Submission paper:** [Physiological Characterization and Detection Audit of Acute Stress in 314 People](docs/paper/paper.pdf), also
+[in French](docs/paper/paper_fr.pdf) and as a [2-page French executive synthesis](docs/paper/synthese_fr.pdf) (studies 04 to 07, [literature](docs/research/stress/LITERATURE.md)). Audited against raw rank-1 emotions, the stress criterion ($V\le 4 \cap A\ge 6$) reaches 89.2% negative purity (97.2% across ranks 1–3; detection optimum $3/7$). Responses follow a three-branch architecture: automatic stimulus-driven occipital alpha desynchronization ($d = -0.33$ to $-0.41$ even in calm viewers); appraisal-gated vagal sinus braking (RR $+5.1$ ms from 1 s with strictly null AV-node PR segment $-0.05$ ms and QTc Bazett artifact vanishing after $\Delta\mathrm{RR}$ control; absent in calm viewers of stressful clips); and a high-threshold ($A \ge 7$) sudomotor/centroparietal-delta alarm alongside prefrontal $\beta/\gamma$ sensitivity. Raw `CURATED` EEG without ICA replicates the null primary HEP ($+0.038$ vs $+0.039$). Excluding borderline trials raises fixed-video AUC from 0.525 to 0.564 (paired appraisal $-2.97$ bpm, $d = -0.41$). Replacing 1-s bins with 4 enriched physiological phases and sequence architectures lifts double-unseen sealed-test AUC from 0.526 to 0.589 (linear) and 0.586 (continuous V&A Ridge: dev 0.576, unseen people 0.607, 0.656 vs relaxed).
+
+**Study 07, comprehensive revision:** [protocol and provenance](journal/07_comprehensive_revision.md),
+[French results](docs/research/revision/RESULTS.md), [aggregates](docs/research/revision/results), [figures](docs/research/revision/figures).
 
 **Study 06, the person or the video:** [protocol and outcome](journal/06_person_or_video.md),
 [aggregates](docs/research/person/results), [figures](docs/research/person/figures).
