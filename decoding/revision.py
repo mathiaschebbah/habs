@@ -2187,7 +2187,7 @@ def sensitivity_controls(frame):
             person._person_betas(frame, d_rim, frame["rating_valence"])
         )
         # Regress interior gamma on valence_shared + valence_own + rim_gamma
-        shared_v, own_v = person._components(frame, frame["rating_valence"])
+        _, shared_v, own_v = person.components(frame, frame["rating_valence"])
         df_t = pd.DataFrame(
             {
                 "p": frame["participant_id"],
