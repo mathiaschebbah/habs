@@ -95,6 +95,8 @@ def process(data_dir: Path, out_dir: Path) -> None:
         module = "decoding.timecourse_extract"
     elif stage == "hep_features":
         module = "decoding.hep_extract"
+    elif stage == "rich_features":
+        module = "decoding.rich_extract"
     elif temporal:
         module = "experiments.02_emotional_carryover"
     else:
