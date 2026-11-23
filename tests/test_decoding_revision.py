@@ -3,10 +3,41 @@
 import numpy as np
 import pandas as pd
 import pytest
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
-from decoding import common, revision, timecourse
+from decoding import common, person, revision, timecourse
 
 pytestmark = pytest.mark.filterwarnings("ignore")
+
+
+@pytest.fixture(autouse=True)
+def fast_test_boots(monkeypatch):
+    """Keep unit tests fast without changing production parameters."""
+    monkeypatch.setattr(revision, "DRAWS", 40)
+    monkeypatch.setattr(person, "DRAWS", 40)
+    monkeypatch.setattr(timecourse, "DRAWS", 40)
+    orig_boot = common.bootstrap
+    orig_rboot = revision._boot_ci
+
+    def _fast_common_boot(stats, value, draws=40, seed=0):
+        return orig_boot(stats, value, draws=min(draws, 40), seed=seed)
+
+    def _fast_rev_boot(values, draws=40, seed=0):
+        return orig_rboot(values, draws=min(draws, 40), seed=seed)
+
+    def _fast_balanced_model():
+        return make_pipeline(
+            SimpleImputer(strategy="median"),
+            StandardScaler(),
+            LogisticRegression(C=0.1, class_weight="balanced", max_iter=200),
+        )
+
+    monkeypatch.setattr(common, "bootstrap", _fast_common_boot)
+    monkeypatch.setattr(revision, "_boot_ci", _fast_rev_boot)
+    monkeypatch.setattr(revision, "_balanced_model", _fast_balanced_model)
 
 
 @pytest.fixture
