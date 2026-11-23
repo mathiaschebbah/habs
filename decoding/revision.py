@@ -46,7 +46,7 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression, RidgeCV
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV, RidgeCV
 from sklearn.metrics import (
     adjusted_rand_score,
     balanced_accuracy_score,
@@ -242,10 +242,26 @@ def _safe_mean_ci(df):
     return person._mean_ci(df)
 
 
+def _balanced_model():
+    """L2 logistic regression with balanced class weights (no fold prior shift)."""
+    return make_pipeline(
+        SimpleImputer(strategy="median"),
+        StandardScaler(),
+        LogisticRegressionCV(
+            Cs=np.logspace(-4, 0, 9),
+            l1_ratios=(0,),
+            class_weight="balanced",
+            scoring="neg_log_loss",
+            use_legacy_attributes=False,
+            max_iter=2000,
+        ),
+    )
+
+
 def _cross_fit_binary(frame, x, y, *, model_fn=None):
     """3x3 person x theme cross-fit returning out-of-fold continuous scores."""
     y_arr = np.asarray(y, dtype=int)
-    model_fn = model_fn or timecourse._model
+    model_fn = model_fn or _balanced_model
     blocks = [(p, t) for p in range(3) for t in range(3)]
 
     def one(p, t):
@@ -1768,7 +1784,7 @@ def _eval_model_spec(frame, x, builder_kind="logreg"):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             if builder_kind == "logreg":
-                clf = timecourse._model().fit(xtr, ytr)
+                clf = _balanced_model().fit(xtr, ytr)
                 sc = clf.decision_function(xev)
             elif builder_kind == "ridge_va":
                 people_tr = frame.loc[train_idx, "participant_id"]
@@ -1795,6 +1811,7 @@ def _eval_model_spec(frame, x, builder_kind="logreg"):
                     learning_rate=0.05,
                     min_samples_leaf=40,
                     l2_regularization=10.0,
+                    class_weight="balanced",
                     random_state=0,
                 ).fit(xtr, ytr)
                 sc = clf.predict_proba(xev)[:, 1]
@@ -1810,7 +1827,9 @@ def _eval_model_spec(frame, x, builder_kind="logreg"):
                         random_state=0,
                     ),
                 ).fit(xtr, ytr)
-                sc = clf.predict_proba(xev)[:, 1]
+                prob = np.clip(clf.predict_proba(xev)[:, 1], 1e-6, 1.0 - 1e-6)
+                pi = np.clip(float(ytr.mean()), 1e-6, 1.0 - 1e-6)
+                sc = np.log(prob / (1.0 - prob)) - np.log(pi / (1.0 - pi))
             else:
                 raise ValueError(builder_kind)
         return pd.Series(sc, index=eval_idx)

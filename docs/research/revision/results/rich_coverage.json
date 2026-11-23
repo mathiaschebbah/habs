@@ -1,0 +1,43 @@
+{
+  "rows": 22974,
+  "columns": 650,
+  "workers": 8,
+  "coverage": {
+    "ecg_pr_pk_vid": 0.9767,
+    "ecg_pr_on_vid": 0.9465,
+    "ecg_pr_seg_vid": 0.776,
+    "ecg_qrs_vid": 0.8362,
+    "ecg_qt_vid": 0.9855,
+    "ecg_qtc_baz_vid": 0.9767,
+    "ecg_rt_pk_vid": 0.9862,
+    "ecg_t_amp_vid": 0.9817,
+    "ecg_pr_pk_early": 0.9751,
+    "ecg_pr_pk_late": 0.9751,
+    "sc_mean_early": 0.7602,
+    "resp_amp_early": 0.9993,
+    "eeg_ep_early_frontal_delta": 0.9954,
+    "eeg_sp_ent_early_alpha": 0.9951,
+    "eeg_faa_early_alpha": 0.9942,
+    "eeg_tvar_early_alpha": 0.9807,
+    "hep_raw_video_frontal_10": 0.9862,
+    "hep_raw_video_central_10": 0.9862,
+    "hep_raw200_video_frontal_10": 0.9865,
+    "flagged_outliers": 1.0
+  },
+  "medians_vid": {
+    "ecg_hr_vid": 76.31,
+    "ecg_pr_pk_vid": 128.31,
+    "ecg_pr_on_vid": 134.94,
+    "ecg_pr_seg_vid": 39.92,
+    "ecg_qrs_vid": 76.17,
+    "ecg_qt_vid": 360.17,
+    "ecg_qtc_baz_vid": 402.69,
+    "ecg_qtc_frid_vid": 386.9,
+    "ecg_rt_pk_vid": 250.23,
+    "ecg_t_amp_vid": 0.53,
+    "ecg_good_qrs_frac": 0.99,
+    "hep_raw_beats_video": 13.0,
+    "hep_raw200_beats_video": 13.0
+  },
+  "ecg_inverted_fraction": 0.9657
+}
