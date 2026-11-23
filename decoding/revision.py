@@ -41,7 +41,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
-from scipy.stats import spearmanr
+from scipy.stats import pearsonr, spearmanr
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 from sklearn.ensemble import HistGradientBoostingClassifier
@@ -1913,6 +1913,462 @@ def sequence_models(frame):
     }
 
 
+def _residualize(y, covs):
+    """OLS residuals of 1D vector y on 2D covariate matrix covs (handles NaNs)."""
+    y_arr = np.asarray(y, dtype=float)
+    x_arr = np.asarray(covs, dtype=float)
+    if x_arr.ndim == 1:
+        x_arr = x_arr[:, None]
+    ok = np.isfinite(y_arr) & np.all(np.isfinite(x_arr), axis=1)
+    out = np.full(len(y_arr), np.nan, dtype=float)
+    if ok.sum() < x_arr.shape[1] + 5:
+        return out
+    design = np.column_stack([np.ones(ok.sum()), x_arr[ok]])
+    beta, *_ = np.linalg.lstsq(design, y_arr[ok], rcond=None)
+    out[ok] = y_arr[ok] - design @ beta
+    return out
+
+
+def _corr_ci_p(x, y, draws=None):
+    """Pearson r, bootstrap 95% CI, exact two-sided p, and Spearman rho."""
+    draws = DRAWS if draws is None else draws
+    xv = np.asarray(x, dtype=float)
+    yv = np.asarray(y, dtype=float)
+    ok = np.isfinite(xv) & np.isfinite(yv)
+    xv, yv = xv[ok], yv[ok]
+    if len(xv) < 20 or np.std(xv) == 0 or np.std(yv) == 0:
+        return None
+    r, pval = pearsonr(xv, yv)
+    rho = float(spearmanr(xv, yv).statistic)
+    rng = np.random.default_rng(0)
+    bidx = rng.integers(0, len(xv), (draws, len(xv)))
+    br = [np.corrcoef(xv[i], yv[i])[0, 1] for i in bidx]
+    lo, hi = np.percentile(br, [2.5, 97.5])
+    return {
+        "r": round(float(r), 4),
+        "ci95": [round(float(lo), 4), round(float(hi), 4)],
+        "p": round(float(pval), 6),
+        "rho": round(rho, 4),
+        "n": int(len(xv)),
+    }
+
+
+def _bh_fdr(pvals):
+    """Benjamini-Hochberg FDR q-values for a dict of {key: entry_with_p}."""
+    keys = [k for k, v in pvals.items() if isinstance(v, dict) and "p" in v]
+    if not keys:
+        return pvals
+    ps = np.array([pvals[k]["p"] for k in keys], dtype=float)
+    order = np.argsort(ps)
+    n = len(ps)
+    q_ord = np.empty(n, dtype=float)
+    running = 1.0
+    for rank_rev in range(n - 1, -1, -1):
+        idx = order[rank_rev]
+        val = ps[idx] * n / (rank_rev + 1)
+        running = min(running, val)
+        q_ord[rank_rev] = running
+    for pos, idx in enumerate(order):
+        pvals[keys[idx]]["q_fdr"] = round(float(min(1.0, q_ord[pos])), 5)
+    return pvals
+
+
+INTERIOR_CH = (
+    "Cz",
+    "FCz",
+    "CPz",
+    "C1",
+    "C2",
+    "C3",
+    "C4",
+    "FC1",
+    "FC2",
+    "CP1",
+    "CP2",
+    "Pz",
+)
+RIM_CH = (
+    "Fp1",
+    "Fp2",
+    "AF7",
+    "AF8",
+    "F7",
+    "F8",
+    "FT7",
+    "FT8",
+    "T7",
+    "T8",
+    "TP7",
+    "TP8",
+    "PO7",
+    "PO8",
+    "O1",
+    "O2",
+)
+
+
+def _group_rel_power(frame, channels, kind="bp_pre"):
+    """Relative log10 band power for an arbitrary channel group."""
+    abs_cols = {}
+    for band in common.BANDS:
+        cols = [
+            f"{kind}_{ch}_{band}" for ch in channels if f"{kind}_{ch}_{band}" in frame
+        ]
+        if cols:
+            abs_cols[band] = frame[cols].mean(axis=1)
+    if not abs_cols:
+        return pd.DataFrame(index=frame.index), pd.DataFrame(index=frame.index)
+    abs_df = pd.DataFrame(abs_cols, index=frame.index)
+    tot = np.log10((10.0**abs_df).sum(axis=1))
+    rel_df = abs_df.sub(tot, axis=0)
+    return rel_df, abs_df
+
+
+def sensitivity_controls(frame):
+    """Strict confound, micro-EMG, sex-stratified, and cross-day trait controls."""
+    stressed = label(frame).to_numpy(bool)
+    st_f = pd.Series(stressed.astype(float), index=frame.index)
+    tot_s = st_f.groupby(frame["video"]).transform("sum")
+    cnt_s = st_f.groupby(frame["video"]).transform("count")
+    cons_s = ((tot_s - st_f) / (cnt_s - 1)).where(cnt_s - 1 >= person.MIN_OTHERS)
+
+    val_s = frame["rating_valence"]
+    tot_v = val_s.groupby(frame["video"]).transform("sum")
+    cnt_v = val_s.notna().groupby(frame["video"]).transform("sum")
+    cons_v = ((tot_v - val_s.fillna(0)) / (cnt_v - val_s.notna())).where(
+        cnt_v - val_s.notna() >= person.MIN_OTHERS
+    )
+
+    aro_s = frame["rating_arousal"]
+    tot_a = aro_s.groupby(frame["video"]).transform("sum")
+    cnt_a = aro_s.notna().groupby(frame["video"]).transform("sum")
+    cons_a = ((tot_a - aro_s.fillna(0)) / (cnt_a - aro_s.notna())).where(
+        cnt_a - aro_s.notna() >= person.MIN_OTHERS
+    )
+
+    resps = _base_responses(frame)
+    pre_reg = common.regional(frame, kind="bp_pre")
+    pre_reg_key = pre_reg.columns.str.rsplit("_", n=1).str[0]
+    pre_tot = np.log10((10**pre_reg).T.groupby(pre_reg_key).transform("sum").T)
+    pre_rel = pre_reg - pre_tot
+
+    int_rel, int_abs = _group_rel_power(frame, INTERIOR_CH, "bp_pre")
+    rim_rel, rim_abs = _group_rel_power(frame, RIM_CH, "bp_pre")
+
+    def _agg_subset(df_sub, p_id):
+        idx = df_sub.index
+        row = {
+            "participant_id": p_id,
+            "cohort": float(df_sub["cohort"].iloc[0]),
+            "age": float(df_sub["age"].iloc[0]) if "age" in df_sub else np.nan,
+            "female": 1.0
+            if str(df_sub["gender"].iloc[0]).strip().lower().startswith("f")
+            else 0.0,
+            "n_trials": int(len(df_sub)),
+            "trait_stress_bias": float((st_f.loc[idx] - cons_s.loc[idx]).mean()),
+            "trait_neg_valence": float((cons_v.loc[idx] - val_s.loc[idx]).mean()),
+            "trait_high_arousal": float((aro_s.loc[idx] - cons_a.loc[idx]).mean()),
+        }
+        for col in pre_rel.columns:
+            row[f"pre_{col}"] = float(pre_rel.loc[idx, col].mean())
+            row[f"abs_{col}"] = float(pre_reg.loc[idx, col].mean())
+        for b in common.BANDS:
+            if b in int_rel:
+                row[f"pre_interior_{b}"] = float(int_rel.loc[idx, b].mean())
+                row[f"abs_interior_{b}"] = float(int_abs.loc[idx, b].mean())
+            if b in rim_rel:
+                row[f"pre_rim_{b}"] = float(rim_rel.loc[idx, b].mean())
+                row[f"abs_rim_{b}"] = float(rim_abs.loc[idx, b].mean())
+            if b in int_rel and b in rim_rel:
+                row[f"pre_rim_minus_int_{b}"] = (
+                    row[f"pre_rim_{b}"] - row[f"pre_interior_{b}"]
+                )
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            row["pre_hr"] = float(
+                np.nanmean(df_sub[["tc_hr_0", "tc_hr_1", "tc_hr_2"]].to_numpy(float))
+            )
+            row["pre_sc"] = float(
+                np.nanmean(df_sub[["tc_sc_0", "tc_sc_1", "tc_sc_2"]].to_numpy(float))
+            )
+            if "raw_fp_ptp_ref" in df_sub:
+                row["raw_fp_ptp_ref"] = float(
+                    np.nanmean(df_sub["raw_fp_ptp_ref"].to_numpy(float))
+                )
+        sm = stressed[frame.index.get_indexer(idx)]
+        for rname, rval in resps.items():
+            rv = rval.loc[idx].to_numpy(float)
+            pos_v, neg_v = rv[sm], rv[~sm]
+            pos_v, neg_v = pos_v[np.isfinite(pos_v)], neg_v[np.isfinite(neg_v)]
+            row[f"react_{rname}"] = (
+                float(pos_v.mean() - neg_v.mean())
+                if len(pos_v) >= 3 and len(neg_v) >= 3
+                else np.nan
+            )
+        return row
+
+    pdf = pd.DataFrame([_agg_subset(g, p) for p, g in frame.groupby("participant_id")])
+
+    # Build cohort one-hot + age + female design matrix
+    cohorts = sorted(pdf["cohort"].dropna().unique())
+    coh_cols = [(pdf["cohort"] == c).astype(float).to_numpy() for c in cohorts[1:]]
+    cov_cohort = np.column_stack(coh_cols) if coh_cols else np.zeros((len(pdf), 0))
+    cov_full = np.column_stack(
+        [*coh_cols, pdf["age"].to_numpy(float), pdf["female"].to_numpy(float)]
+    )
+
+    # 1. Partial correlations adjusted for cohort + age + female (+ FDR)
+    key_preds = [
+        "pre_hr",
+        "pre_sc",
+        "raw_fp_ptp_ref",
+        "pre_interior_gamma",
+        "pre_rim_gamma",
+        "pre_rim_minus_int_gamma",
+        "abs_interior_gamma",
+        "abs_rim_gamma",
+        *[f"pre_{c}" for c in pre_rel.columns],
+        *[f"abs_{c}" for c in pre_reg.columns if c.endswith(("_gamma", "_theta"))],
+        *[f"react_{r}" for r in resps],
+    ]
+    key_preds = [c for c in key_preds if c in pdf]
+
+    adj_full = {}
+    adj_cohort = {}
+    for trait in ("trait_stress_bias", "trait_high_arousal", "trait_neg_valence"):
+        y_coh = _residualize(pdf[trait], cov_cohort)
+        y_full = _residualize(pdf[trait], cov_full)
+        c_res, f_res = {}, {}
+        for pred in key_preds:
+            c_res[pred] = _corr_ci_p(y_coh, _residualize(pdf[pred], cov_cohort))
+            f_res[pred] = _corr_ci_p(y_full, _residualize(pdf[pred], cov_full))
+        adj_cohort[trait] = _bh_fdr(c_res)
+        adj_full[trait] = _bh_fdr(f_res)
+
+    # 2. Micro-EMG partial controls (interior vs rim & raw_fp_ptp_ref)
+    emg_controls = {}
+    for trait in ("trait_stress_bias", "trait_high_arousal"):
+        emg_controls[trait] = {}
+        if "pre_interior_gamma" in pdf and "pre_rim_gamma" in pdf:
+            cov_plus_rim = np.column_stack(
+                [cov_full, pdf["pre_rim_gamma"].to_numpy(float)]
+            )
+            cov_plus_int = np.column_stack(
+                [cov_full, pdf["pre_interior_gamma"].to_numpy(float)]
+            )
+            emg_controls[trait]["interior_gamma_ctrl_rim"] = _corr_ci_p(
+                _residualize(pdf[trait], cov_plus_rim),
+                _residualize(pdf["pre_interior_gamma"], cov_plus_rim),
+            )
+            emg_controls[trait]["rim_gamma_ctrl_interior"] = _corr_ci_p(
+                _residualize(pdf[trait], cov_plus_int),
+                _residualize(pdf["pre_rim_gamma"], cov_plus_int),
+            )
+        if "raw_fp_ptp_ref" in pdf and "pre_bp_pre_frontal_gamma" in pdf:
+            cov_plus_fp = np.column_stack(
+                [cov_full, pdf["raw_fp_ptp_ref"].to_numpy(float)]
+            )
+            emg_controls[trait]["frontal_gamma_ctrl_raw_fp"] = _corr_ci_p(
+                _residualize(pdf[trait], cov_plus_fp),
+                _residualize(pdf["pre_bp_pre_frontal_gamma"], cov_plus_fp),
+            )
+
+    # 2b. Trial-level interior vs rim gamma coupling with valence_own
+    vid_int_rel, _ = _group_rel_power(frame, INTERIOR_CH, "bp_vid")
+    vid_rim_rel, _ = _group_rel_power(frame, RIM_CH, "bp_vid")
+    trial_emg = {}
+    if "gamma" in vid_int_rel and "gamma" in int_rel and "gamma" in vid_rim_rel:
+        d_int = vid_int_rel["gamma"] - int_rel["gamma"]
+        d_rim = vid_rim_rel["gamma"] - rim_rel["gamma"]
+        trial_emg["interior_gamma_valence"] = _safe_mean_ci(
+            person._person_betas(frame, d_int, frame["rating_valence"])
+        )
+        trial_emg["rim_gamma_valence"] = _safe_mean_ci(
+            person._person_betas(frame, d_rim, frame["rating_valence"])
+        )
+        # Regress interior gamma on valence_shared + valence_own + rim_gamma
+        shared_v, own_v = person._components(frame, frame["rating_valence"])
+        df_t = pd.DataFrame(
+            {
+                "p": frame["participant_id"],
+                "y": d_int,
+                "rim": d_rim,
+                "sh": shared_v,
+                "ow": own_v,
+            }
+        ).dropna()
+        rows_b = []
+        for _, g in df_t.groupby("p"):
+            if len(g) < MIN_TRIALS or g["y"].std() == 0 or g["rim"].std() == 0:
+                continue
+            y_z = (g["y"] - g["y"].mean()) / g["y"].std()
+            x_mat = np.column_stack(
+                [
+                    np.ones(len(g)),
+                    (g["sh"] - g["sh"].mean()) / (g["sh"].std() or 1.0),
+                    (g["ow"] - g["ow"].mean()) / (g["ow"].std() or 1.0),
+                    (g["rim"] - g["rim"].mean()) / g["rim"].std(),
+                ]
+            )
+            b, *_ = np.linalg.lstsq(x_mat, y_z.to_numpy(float), rcond=None)
+            rows_b.append(
+                {
+                    "beta_shared_ctrl_rim": float(b[1]),
+                    "beta_own_ctrl_rim": float(b[2]),
+                    "beta_rim_cov": float(b[3]),
+                }
+            )
+        trial_emg["interior_gamma_valence_ctrl_rim"] = _safe_mean_ci(
+            pd.DataFrame(rows_b)
+        )
+
+    # 3. Sex-stratified checks (cohort + age adjusted inside female & male separately)
+    sex_strat = {}
+    for label_sex, flag in (("female", 1.0), ("male", 0.0)):
+        sub = pdf[pdf["female"] == flag].reset_index(drop=True)
+        scohs = sorted(sub["cohort"].dropna().unique())
+        sc_cols = [(sub["cohort"] == c).astype(float).to_numpy() for c in scohs[1:]]
+        scov = np.column_stack([*sc_cols, sub["age"].to_numpy(float)])
+        sex_strat[label_sex] = {"n_people": int(len(sub))}
+        for trait in ("trait_stress_bias", "trait_high_arousal"):
+            ys = _residualize(sub[trait], scov)
+            sex_strat[label_sex][trait] = {}
+            for pred in (
+                "pre_hr",
+                "pre_bp_pre_frontal_gamma",
+                "pre_interior_gamma",
+                "pre_rim_gamma",
+                "pre_bp_pre_right_temporal_theta",
+            ):
+                if pred in sub:
+                    sex_strat[label_sex][trait][pred] = _corr_ci_p(
+                        ys, _residualize(sub[pred], scov)
+                    )
+
+    # 4. Cross-day stability & ZERO-LEAKAGE cross-day prediction (Day 1 <-> Day 2)
+    cross_day = {}
+    if "recorded_day" in frame:
+        d1_rows, d2_rows = [], []
+        for p, g in frame.groupby("participant_id"):
+            g1 = g[g["recorded_day"] == 1]
+            g2 = g[g["recorded_day"] == 2]
+            if len(g1) >= 5 and len(g2) >= 5:
+                d1_rows.append(_agg_subset(g1, p))
+                d2_rows.append(_agg_subset(g2, p))
+        if len(d1_rows) >= 20:
+            df1 = pd.DataFrame(d1_rows)
+            df2 = pd.DataFrame(d2_rows)
+            dc_cohs = sorted(df1["cohort"].dropna().unique())
+            dc_cols = [
+                (df1["cohort"] == c).astype(float).to_numpy() for c in dc_cohs[1:]
+            ]
+            dcov = np.column_stack(
+                [*dc_cols, df1["age"].to_numpy(float), df1["female"].to_numpy(float)]
+            )
+            cross_day["n_paired_people"] = int(len(df1))
+            # Test-retest reliability across days (cohort+age+sex adjusted)
+            retest = {}
+            for col in (
+                "trait_stress_bias",
+                "trait_high_arousal",
+                "trait_neg_valence",
+                "pre_hr",
+                "pre_bp_pre_frontal_gamma",
+                "pre_interior_gamma",
+                "pre_rim_gamma",
+                "pre_bp_pre_right_temporal_theta",
+            ):
+                if col in df1 and col in df2:
+                    retest[col] = {
+                        "raw": _corr_ci_p(df1[col], df2[col]),
+                        "adjusted": _corr_ci_p(
+                            _residualize(df1[col], dcov),
+                            _residualize(df2[col], dcov),
+                        ),
+                    }
+            cross_day["test_retest_d1_d2"] = retest
+            # Strict cross-day prediction: Day 1 resting -> Day 2 trait & Day 2 -> Day 1
+            xpred = {}
+            for trait in ("trait_stress_bias", "trait_high_arousal"):
+                y1 = _residualize(df1[trait], dcov)
+                y2 = _residualize(df2[trait], dcov)
+                xpred[trait] = {}
+                for pred in (
+                    "pre_hr",
+                    "pre_bp_pre_frontal_gamma",
+                    "pre_interior_gamma",
+                    "pre_rim_gamma",
+                    "pre_bp_pre_right_temporal_theta",
+                ):
+                    if pred in df1 and pred in df2:
+                        p1 = _residualize(df1[pred], dcov)
+                        p2 = _residualize(df2[pred], dcov)
+                        c12 = _corr_ci_p(p1, y2)
+                        c21 = _corr_ci_p(p2, y1)
+                        avg_r = (
+                            round(0.5 * (c12["r"] + c21["r"]), 4)
+                            if c12 and c21
+                            else None
+                        )
+                        xpred[trait][pred] = {
+                            "d1_phys_to_d2_trait": c12,
+                            "d2_phys_to_d1_trait": c21,
+                            "mean_cross_day_r": avg_r,
+                        }
+            cross_day["cross_day_prediction"] = xpred
+
+    # 5. Joint OLS summary (age, female, pre_hr, frontal gamma, R-temp theta)
+    joint_ols = {}
+    ols_cols = [
+        c
+        for c in (
+            "age",
+            "female",
+            "pre_hr",
+            "pre_bp_pre_frontal_gamma",
+            "pre_bp_pre_right_temporal_theta",
+        )
+        if c in pdf
+    ]
+    for trait in ("trait_stress_bias", "trait_high_arousal"):
+        y_coh = _residualize(pdf[trait], cov_cohort)
+        x_mat = np.column_stack([_residualize(pdf[c], cov_cohort) for c in ols_cols])
+        ok = np.isfinite(y_coh) & np.all(np.isfinite(x_mat), axis=1)
+        if ok.sum() >= len(ols_cols) + 10:
+            yz = (y_coh[ok] - y_coh[ok].mean()) / y_coh[ok].std()
+            xz = (x_mat[ok] - x_mat[ok].mean(axis=0)) / x_mat[ok].std(axis=0)
+            des = np.column_stack([np.ones(ok.sum()), xz])
+            beta, *_ = np.linalg.lstsq(des, yz, rcond=None)
+            resid = yz - des @ beta
+            r2 = float(1.0 - np.sum(resid**2) / np.sum(yz**2))
+            dof = ok.sum() - des.shape[1]
+            s2 = float(np.sum(resid**2) / dof)
+            se = np.sqrt(np.diag(s2 * np.linalg.pinv(des.T @ des)))
+            tstats = beta / se
+            joint_ols[trait] = {
+                "n": int(ok.sum()),
+                "r2_beyond_cohort": round(r2, 4),
+                "terms": {
+                    col: {
+                        "std_beta": round(float(beta[i + 1]), 4),
+                        "t": round(float(tstats[i + 1]), 3),
+                    }
+                    for i, col in enumerate(ols_cols)
+                },
+            }
+
+    return {
+        "n_people": int(len(pdf)),
+        "cohort_adjusted": adj_cohort,
+        "cohort_age_sex_adjusted": adj_full,
+        "emg_partial_controls": emg_controls,
+        "trial_level_emg": trial_emg,
+        "sex_stratified": sex_strat,
+        "cross_day": cross_day,
+        "joint_ols": joint_ols,
+    }
+
+
 def main():
     """Run one Study-07 revision split and write aggregate JSON only."""
     parser = argparse.ArgumentParser()
@@ -1921,6 +2377,7 @@ def main():
         "emotion_models",
         "fixed_video",
         "sensitivity",
+        "sensitivity_controls",
         "ecg_morphology",
         "hep_raw",
         "sequence_models",

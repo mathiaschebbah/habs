@@ -68,7 +68,7 @@ def sim_folder(tmp_path):
                 "trial_id": tid,
                 "participant_id": f"P{p:02d}",
                 "cohort": 2 + (p % 3),
-                "recorded_day": 1,
+                "recorded_day": 1 if v < 12 else 2,
                 "event_order": v,
                 "start_marker": 1,
                 "onset_s": float(v * 15),
@@ -224,6 +224,12 @@ def test_track_b_splits(sim_folder):
 
     cf = revision.criterion_full(table)
     assert cf["flagged_outliers"]["flagged_fraction_all"] > 0
+
+    sc = revision.sensitivity_controls(table)
+    assert sc["n_people"] == 36
+    assert "pre_hr" in sc["cohort_age_sex_adjusted"]["trait_stress_bias"]
+    assert sc["cross_day"]["n_paired_people"] == 36
+    assert "joint_ols" in sc
 
     em = revision.ecg_morphology(table)
     assert em["ecg_audit"]["inverted_lead_fraction"] == 1.0

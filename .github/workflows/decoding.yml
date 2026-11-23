@@ -16,7 +16,7 @@ on:
         required: true
       split:
         type: choice
-        options: [dev, test, correlates, curves, latency_test, latency_dev, explore, ocular, emotions, habituation, hrv, audit, main, hep, noise, criterion, emotion_models, fixed_video, sensitivity, ecg_morphology, hep_raw, sequence_models, criterion_full]
+        options: [dev, test, correlates, curves, latency_test, latency_dev, explore, ocular, emotions, habituation, hrv, audit, main, hep, noise, criterion, emotion_models, fixed_video, sensitivity, sensitivity_controls, ecg_morphology, hep_raw, sequence_models, criterion_full]
         default: dev
         description: "dev = search objective; test = one-time sealed evaluation of all refs together; correlates = stress feature differences on dev"
       source_job:
