@@ -143,7 +143,7 @@ review of studies 04–06.
 7. **4-phase & sequence model benchmark (`habs-revision-2026-11-23`):** switching from 1-s bins ($p = 340$) to 4 phases ($p = 114$) boosts dev WP-AUC from 0.546 to 0.560 and double-unseen sealed test (`test_new_both`) from 0.526 [0.481, 0.570] to 0.570 [0.519, 0.618]. Adding EEG temporal volatility ($+30$ feats) lifts dev to 0.567 (SV 0.539) and EEG spatial homogeneity lifts `new_both` to 0.582 (`new_video` SV 0.542), whereas ECG P-QRS-T adds zero gain. Full enriched linear reaches **0.589 [0.540, 0.635]** on `new_both` ($+0.063$ over 1-s baseline); **continuous V&A Ridge (`enriched_full_ridge_va`)** is the best overall model (dev **0.576**, `new_both` **0.586**, `new_video` **0.558**, `new_person` **0.607**, vs relaxed **0.656**). Multi-scale 1D conv sequence reaches 0.569 dev and best SV-AUC on dev (0.541) and `new_both` (0.527); nonlinear MLP/GBDT heads do not outperform regularized linear models on unseen themes.
 
 ### Deliverables
-- Upgraded French paper: `docs/paper/paper_fr.pdf` (14 pages, 7 figures, 4 tables)
-- Upgraded English paper: `docs/paper/paper.pdf` (13 pages, 7 figures, 4 tables)
+- Upgraded French paper: `docs/paper/paper_fr.pdf` (11 pages, 7 figures, 4 tables)
+- Upgraded English paper: `docs/paper/paper.pdf` (11 pages, 7 figures, 4 tables)
 - Upgraded French synthesis: `docs/paper/synthese_fr.pdf` (2 pages, 3 figures)
 - French results note & figures: `docs/research/revision/RESULTS.md`, `docs/research/revision/figures/`
