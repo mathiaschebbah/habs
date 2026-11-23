@@ -1,0 +1,123 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{fontspec}
+\setmainfont{Arial}
+
+\usepackage[french]{babel}
+\frenchsetup{StandardItemLabels=true}
+
+\usepackage{geometry}
+\geometry{top=1.6cm, bottom=1.6cm, left=1.8cm, right=1.8cm}
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{primary}{RGB}{20, 45, 85}
+\definecolor{secondary}{RGB}{70, 90, 120}
+\definecolor{darkgray}{RGB}{35, 35, 35}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyhead[L]{\small\color{secondary}\textbf{HABS Neuro-AI Hackathon 2026} \textbar\ Équipe 12}
+\fancyhead[R]{\small\color{secondary}Fiche synthétique de cadrage et résultats}
+\fancyfoot[L]{\footnotesize\color{secondary}Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo}
+\fancyfoot[R]{\small\color{secondary}\thepage\ / 2}
+
+\titleformat{\section}
+  {\color{primary}\large\bfseries}
+  {\thesection.}{0.5em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+
+\titleformat{\subsection}
+  {\color{secondary}\normalsize\bfseries}
+  {\thesubsection.}{0.4em}{}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+
+\setlist[itemize]{leftmargin=1.2em, itemsep=1.5pt, topsep=1.5pt, label=\textbullet}
+\setlist[enumerate]{leftmargin=1.2em, itemsep=1.5pt, topsep=1.5pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt}
+\color{darkgray}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries\color{primary} Détection et dynamique neurophysiologique du stress aigu}\\[3pt]
+  {\normalsize\bfseries\color{secondary} Cadrage initial, résultats expérimentaux HABS et perspectives au 30 novembre 2026}\\[3pt]
+  {\small Équipe 12 (Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo) \textbar\ 23 novembre 2026}
+\end{center}
+
+\vspace{-2pt}
+
+\section{La question initiale et son évolution}
+
+\subsection{Origine et cadrage dans les échanges d'équipe}
+Le projet s'inscrit dans le cadre du Hackathon Neuro-AI organisé par HABS et l'Université Paris-Saclay en novembre 2026. L'objectif consiste à valoriser les enregistrements multimodaux synchronisés (EEG 62 canaux, ECG bipolaire, conductance cutanée, respiration et diamètre pupillaire) collectés lors de stimulations audiovisuelles de 10 secondes. Les échanges initiaux au sein de l'équipe ont articulé deux visions complémentaires.
+
+D'un côté, Ashley Russo a proposé d'orienter le travail sur la quantification du stress aigu et de la charge cognitive, avec pour perspective d'isoler des biomarqueurs fiables chez des populations incapables de verbaliser leur ressenti (évaluation objective de la douleur pédiatrique pré-verbale, locked-in syndrome, réveil de coma ou sédation). De l'autre côté, les échanges méthodologiques avec le mentor Andrew Jeyathasan ont posé des contraintes rigoureuses. Le sujet devait répondre à une question scientifique réaliste et testable en quatre semaines. Il imposait d'auditer les signaux bruts, d'écarter les classifications émotionnelles fines non soutenues par la physiologie, et d'intégrer pleinement les résultats négatifs dans l'évaluation finale.
+
+\subsection{Formulation opérationnelle de la recherche}
+L'équipe a éliminé tout récit narratif artificiel pour formaliser deux interrogations fondamentales :
+\begin{enumerate}
+  \item \textbf{Signature neurophysiologique.} Quelle est la chronologie précise des adaptations corticales et autonomes déclenchées par un stress aigu de 10 secondes, et quel système périphérique gouverne ce freinage ?
+  \item \textbf{Généralisation par apprentissage automatique.} Dans quelle mesure des modèles prédictifs peuvent-ils détecter passivement cet état chez des participants et sur des vidéos jamais rencontrés durant l'apprentissage ?
+\end{enumerate}
+
+\section{Résultats établis sur les données HABS}
+
+L'évaluation porte sur l'intégralité des 22\,974 essais du jeu de données (314 participants). L'extraction a été réalisée par notre module \texttt{rich\_extract.py} (650 variables par essai), avec un audit systématique du matériel.
+
+\subsection{Audit technique et morphologie cardiaque (ECG)}
+\begin{itemize}
+  \item \textbf{Correction d'inversion matérielle.} L'électrocardiogramme repose sur une dérivation bipolaire unique sous les clavicules (axe Lead I). L'audit démontre que 96,57\,\% des essais présentent une polarité inversée. Un algorithme d'alignement par morphologie moyenne rétablit l'orientation des ondes sans introduire de décalage temporel.
+  \item \textbf{Freinage sinusal vagal pur.} Face au stress, l'intervalle RR s'allonge (+5,06 ms, $d = +0,116$, $p < 0,001$). En revanche, l'intervalle PR ($-0,05$ ms, $d = -0,002$) et le segment PR ($-0,04$ ms, $d = -0,005$) restent strictement plats, avant comme après correction du rythme cardiaque. Le cœur ralentit donc sous l'action exclusive de l'acétylcholine vagale sur le stimulateur sinusal. Le nœud atrio-ventriculaire ne reçoit aucune commande adrénergique en 10 secondes.
+  \item \textbf{Artefact de calcul sur la repolarisation.} Le raccourcissement apparent de l'intervalle QTc selon Bazett ($d = -0,092$) s'annule complètement après contrôle de la variation du rythme ($d = -0,007$). Ce résultat infirme l'existence d'une repolarisation ventriculaire accélérée.
+\end{itemize}
+
+\subsection{Sanity check du critère et spécificité des émotions}
+\begin{itemize}
+  \item \textbf{Validité du label composite.} Dans le quadrant de stress défini par une valence $\le 4$ et une activation $\ge 6$ (3\,938 essais), 89,2\,\% des participants rapportent une émotion négative en choix prioritaire (colère 25,7\,\%, peur 23,9\,\%, dégoût 22,9\,\%, tristesse 14,9\,\%), et 97,2\,\% sur leurs trois premiers choix. Seuls 5,3\,\% des essais comportent un étiquetage paradoxal (joie ou calme).
+  \item \textbf{Dissociation biologique des émotions.} La peur déclenche une réaction végétative complète (décélération cardiaque $d = -0,20$, sudation $d = +0,25$, respiration $d = -0,11$, blocage alpha $d = -0,12$). Le dégoût ralentit le cœur ($d = -0,20$) et stimule les ondes delta ($d = +0,15$), mais sans aucune sudation. La tristesse ne produit aucun changement autonome mesurable en 10 secondes. Le clustering non supervisé échoue ($\mathrm{ARI} < 0,009$).
+\end{itemize}
+
+\subsection{Évaluation cognitive subjective contre réflexe sensoriel}
+\begin{itemize}
+  \item \textbf{Absence de réaction chez les spectateurs calmes.} Devant les vidéos anxiogènes, 2,5\,\% des participants demeurent calmes (124 essais). Ces sujets ne présentent aucun ralentissement cardiaque ($-0,49$ bpm) et aucune hausse de sudation (+0,014 $\mu$S), montrant des valeurs identiques à celles d'un extrait neutre.
+  \item \textbf{Réflexe visuel contre commande autonome.} Seule la désynchronisation des ondes alpha occipitales est automatique chez tous les individus ($d = -0,33$ à $-0,41$). Le reste du corps n'enclenche la réponse d'alarme que si le cortex valide subjectivement la menace.
+  \item \textbf{Contraste franc à vidéo constante.} Comparer directement les sujets stressés aux sujets calmes sur une même vidéo porte l'AUC intra-vidéo de 0,525 à 0,564 ($d = +0,20$ sur la sudation, $d = -0,26$ sur le rythme cardiaque).
+\end{itemize}
+
+\subsection{Contrôle cerveau-cœur (HEP) et stabilité individuelle}
+\begin{itemize}
+  \item \textbf{Intégrité du potentiel évoqué cardiaque.} Le potentiel évoqué cardiaque (HEP) extrait des signaux bruts non nettoyés sans ICA présente un effet stress identique à celui des signaux nettoyés par ICA ($d = +0,0382$ contre $+0,0386$). L'ICA n'a donc pas éliminé de signal cortical cardiaque masqué.
+  \item \textbf{Stabilité du trait de réactivité.} La propension individuelle à coter le stress est stable entre deux jours distincts ($r = 0,70$ sur 169 paires). Cette sensibilité est corrélée dès la minute de repos préalable à une fréquence cardiaque de base plus élevée ($r = 0,14$, confirmé après contrôle de l'âge, du sexe et de la cohorte) et à un excès relatif d'ondes gamma frontales ($r = 0,13$, prédictif d'un jour sur l'autre à $r = 0,17$).
+\end{itemize}
+
+\subsection{Performance des modèles d'apprentissage automatique}
+\begin{itemize}
+  \item \textbf{Gain de la modélisation en 4 phases.} Découper le signal en 4 époques physiologiques (référence $[-3, 0[$, précoce $[0, 5[$, tardif $[5, 10[$, post-exposition $[10, 12[$ s) avec deltas de transition fait monter l'AUC sur le test scellé (nouveaux sujets et nouvelles vidéos) de 0,526 à 0,570.
+  \item \textbf{Modèle retenu.} L'ajout de l'entropie spatiale et de la volatilité EEG porte l'AUC linéaire à 0,589. La régression Ridge continue sur la valence et l'activation atteint 0,586 sur les deux axes inédits, 0,607 sur sujets inédits, et 0,656 face au repos calme. Les approches non linéaires (GBDT, MLP) n'apportent aucun gain face à des thèmes vidéo inconnus.
+\end{itemize}
+
+\section{Perspectives de travail jusqu'au 30 novembre 2026}
+
+Cinq actions concrètes permettent de finaliser le rendu et la soutenance dans les délais impartis :
+
+\begin{enumerate}
+  \item \textbf{Consolidation définitive du manuscrit.} Intégrer les résultats des contrôles partiels de sensibilité (ajustements par âge et sexe, robustesse inter-jours $r = 0,70$, validation de l'absence d'artefact de bordure musculaire sur le gamma) dans le texte du papier de soumission.
+  \item \textbf{Conception du support de soutenance.} Préparer un diaporama synthétique centré sur les trois découvertes majeures : le freinage vagal pur sans conduction atrio-ventriculaire, le découplage entre évaluation subjective et réflexe sensoriel, et la limite objective des modèles passifs courts.
+  \item \textbf{Simulation d'agrégation temporelle multi-essais.} Modéliser le gain prédictif obtenu par le cumul de 3 à 5 extraits successifs (passage d'une fenêtre de 10 s à une surveillance de 30 à 60 s) pour quantifier la durée minimale requise pour atteindre un seuil clinique exploitable (AUC $\ge 0,75$).
+  \item \textbf{Caractérisation des profils résistants au stress.} Isoler la signature électroencéphalographique des 2,5\,\% de participants restant physiologiquement calmes devant les extraits aversifs, afin d'identifier des biomarqueurs de régulation cognitive descendante.
+  \item \textbf{Contrôle de reproductibilité du code.} Vérifier l'exécution autonome du pipeline d'extraction et des tests d'intégration, documenter les scripts d'analyse, et figer les graines aléatoires sur le dépôt public avant le 30 novembre.
+\end{enumerate}
+
+\end{document}
