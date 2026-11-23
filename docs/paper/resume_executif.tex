@@ -1,4 +1,4 @@
-\documentclass[10.5pt,a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 
 \usepackage{fontspec}
 \setmainfont{Arial}
@@ -7,62 +7,67 @@
 \frenchsetup{StandardItemLabels=true}
 
 \usepackage{geometry}
-\geometry{top=2cm, bottom=2cm, left=2.2cm, right=2.2cm}
+\geometry{top=1.8cm, bottom=1.8cm, left=2.1cm, right=2.1cm}
+
+\usepackage{xcolor}
+\definecolor{highlight}{RGB}{255, 244, 165}
+\setlength{\fboxsep}{1.2pt}
+\newcommand{\hl}[1]{\colorbox{highlight}{\strut #1}}
 
 \usepackage{enumitem}
-\setlist[itemize]{leftmargin=1.2em, itemsep=3pt, topsep=2pt, label=\textbullet}
+\setlist[itemize]{leftmargin=1.2em, itemsep=2.5pt, topsep=2pt, label=\textbullet}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{4pt}
+\setlength{\parskip}{3.5pt}
 \pagestyle{empty}
 
 \begin{document}
 
 \begin{center}
-  {\Large\bfseries Synthèse du projet HABS Neuro-AI 2026}\\[4pt]
+  {\Large\bfseries Expériences sur le stress aigu \textbar\ Synthèse du projet HABS Neuro-AI 2026}\\[3pt]
   {\normalsize Équipe 12 (Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo) \textbar\ 23 novembre 2026}
 \end{center}
 
-\vspace{8pt}
+\vspace{5pt}
 
-{\large\bfseries 1. Réponses aux remarques méthodologiques}
+{\large\bfseries 1. Méthodologie}
 
-\vspace{3pt}
+\vspace{2pt}
 
 \begin{itemize}
-  \item \textbf{Cadrage.} Abandon du storytelling chirurgical. L'étude se concentre sur la neurophysiologie descriptive du stress aigu et sur le monitoring de populations non-verbales (pédiatrie, locked-in, coma).
-  \item \textbf{Validité du critère.} Le critère de stress ($V \le 4$, $A \ge 6$) inclut 89\,\% à 97\,\% d'émotions négatives réelles (peur, colère, dégoût). Seuls 5\,\% des essais sont incohérents. L'optimum de détection se situe à $V \le 3$, $A \ge 7$.
-  \item \textbf{Spécificité des émotions.} La peur active tout le corps (cœur ralenti, sueur, respiration, chute alpha). Le dégoût ralentit le cœur sans faire transpirer. La tristesse est physiologiquement muette en 10 secondes. Le clustering non supervisé échoue.
-  \item \textbf{Cœur et morphologie ECG.} Le cœur freine immédiatement via le nerf vague (+5 ms par battement). La conduction auriculo-ventriculaire reste strictement plate (intervalle PR inchangé), prouvant l'absence d'adrénaline en 10 secondes. Le raccourcissement du QTc était un artefact mathématique.
-  \item \textbf{Potentiel évoqué cardiaque (HEP).} L'ICA n'a pas détruit le signal. Le HEP calculé sur données brutes non nettoyées donne exactement le même résultat.
-  \item \textbf{Évaluation subjective.} Devant une scène d'horreur, les spectateurs calmes ne montrent aucun ralentissement cardiaque et aucune hausse de sueur. Seule l'attention visuelle est automatique.
+  \item \textbf{Question étudiée.} Le stress aigu induit par un extrait audiovisuel de 10 secondes produit-il une signature neurophysiologique mesurable, et peut-on le détecter chez de nouveaux individus et contenus ? L'application cible le monitoring passif (pédiatrie pré-verbale, locked-in, coma).
+  \item \textbf{Validité du critère.} Le quadrant de stress ($V \le 4$, $A \ge 6$) inclut \hl{89\,\% à 97\,\% d'émotions négatives} réelles ($n = 3\,938$, dont peur 24\,\%, colère 26\,\%, dégoût 23\,\%). Seuls 5\,\% des essais sont incohérents. L'optimum de séparabilité se situe à $V \le 3$, $A \ge 7$.
+  \item \textbf{Spécificité des émotions.} La peur mobilise tous les capteurs (cœur, sueur, respiration, alpha). Le dégoût ralentit le cœur sans sudation. La tristesse est \hl{physiologiquement muette} en 10 s. Le clustering non supervisé échoue ($\mathrm{ARI} < 0,009$).
+  \item \textbf{Audit ECG et morphologie.} Inversion matérielle de polarité sur 96,57\,\% des essais (Lead I), corrigée par alignement de template. L'intervalle RR s'allonge (\hl{+5,06 ms}, $d = +0,116^*$) mais le segment PR est \hl{strictement plat} ($-0,04$ ms, $d = -0,005$). Le raccourcissement du QTc était un pur artefact.
+  \item \textbf{Cerveau-cœur (HEP).} L'ICA n'a pas détruit le potentiel évoqué cardiaque. L'effet du stress sur données brutes non nettoyées (\hl{d = +0,0382}) est identique aux données après ICA (+0,0386).
+  \item \textbf{Évaluation subjective.} Devant un extrait effrayant, les 2,5\,\% de spectateurs calmes restent au repos avec \hl{zéro bradycardie} ($-0,49$ bpm) et une sudation nulle. Le corps attend la validation cognitive pour déclencher l'alarme autonome.
 \end{itemize}
 
-\vspace{8pt}
+\vspace{5pt}
 
 {\large\bfseries 2. Ce qu'il faut retenir de l'étude}
 
-\vspace{3pt}
+\vspace{2pt}
 
 \begin{itemize}
-  \item \textbf{L'émotion précède la réaction.} Le corps réagit au ressenti individuel, pas passivement aux images projetées sur l'écran.
-  \item \textbf{Un mécanisme purement vagal.} Sur un stimulus court de 10 secondes, le cœur freine par le nerf vague, sans mobilisation sympathique adrénergique.
-  \item \textbf{Un trait individuel stable.} La sensibilité au stress est constante d'un jour à l'autre ($r = 0,70$) et se lit déjà au repos par un rythme cardiaque plus rapide.
-  \item \textbf{Limite des modèles en 10 secondes.} La détection par IA plafonne à 59\,\% sur de nouveaux sujets (66\,\% face au calme profond), ce qui reste insuffisant pour un usage clinique direct.
+  \item \textbf{L'émotion précède la physiologie.} Le corps ne réagit pas mécaniquement aux images affichées : il obéit à l'évaluation cognitive subjective du sujet.
+  \item \textbf{Freinage purement vagal.} En 10 secondes, le cœur freine par le \hl{nerf vague au stimulateur sinusal}. La conduction atrio-ventriculaire ne reçoit aucune influence adrénergique mesurable.
+  \item \textbf{Stabilité du trait individuel.} La propension à stresser est constante d'un jour à l'autre (\hl{r = 0,70}) et se lit dès le repos par une fréquence cardiaque basale plus élevée ($r = 0,14^*$).
+  \item \textbf{Limite des modèles en 10 secondes.} La détection plafonne à une métrique \hl{AUC-ROC = 0,589} sur sujets et vidéos inédits (0,656 face au repos calme), insuffisant pour un usage clinique direct sans répétition.
 \end{itemize}
 
-\vspace{8pt}
+\vspace{5pt}
 
 {\large\bfseries 3. La cascade neurophysiologique en 10 secondes}
 
-\vspace{3pt}
+\vspace{2pt}
 
 \begin{itemize}
-  \item \textbf{0 à 1 s (Attention réflexe).} Chute brutale des ondes alpha occipitales. Ce réflexe visuel de fixation survient chez tout le monde, y compris chez les personnes impassibles.
-  \item \textbf{1 à 3 s (Évaluation cognitive).} Le cerveau analyse la scène. Si la menace n'est pas validée subjectivement, la cascade s'arrête et le corps reste au repos.
-  \item \textbf{2 à 5 s (Frein vagal).} Si la peur est confirmée, le nerf vague libère de l'acétylcholine sur le nœud sinusal et ralentit immédiatement le cœur.
-  \item \textbf{4 à 7 s (Sudation sympathique).} Activation retardée des glandes sudoripares sous commande sympathique (présente dans la peur, absente dans le dégoût).
-  \item \textbf{État basal de repos.} Les personnes sensibles présentent un cœur au repos plus rapide et une activité gamma frontale plus élevée avant même le début du stimulus.
+  \item \textbf{0 à 1 s (Attention réflexe).} \hl{Chute brutale de l'alpha occipital} ($d = -0,33^*$). Ce réflexe de fixation visuelle survient chez tous les spectateurs, y compris calmes.
+  \item \textbf{1 à 3 s (Évaluation cognitive).} Le cortex analyse la scène. Si la menace n'est pas validée subjectivement, la cascade s'interrompt et le système autonome reste au repos.
+  \item \textbf{2 à 5 s (Frein vagal sinusal).} Si la menace est validée, le nerf vague libère de l'acétylcholine sur le cœur : le rythme ralentit instantanément sans attendre l'adrénaline.
+  \item \textbf{4 à 7 s (Sudation sympathique).} \hl{Activation cutanée différée} par les fibres sympathiques ($d = +0,25^*$, présente dans la peur mais absente dans le dégoût).
+  \item \textbf{Signature basale de repos.} Les sujets sensibles présentent un rythme cardiaque de repos plus rapide et une \hl{puissance gamma frontale accrue} ($r = 0,13^*$, prédictif d'un jour sur l'autre).
 \end{itemize}
 
 \end{document}
