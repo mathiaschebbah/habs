@@ -210,3 +210,24 @@ diagnostics, and multimodal fusion with Study 07 peripheral / enriched features.
   peripheral/enriched features), and `PhysioJEPA` fusion + cross-modal
   forecasting + complete paired bootstrap gains against Study 07 on the exact
   frozen split `habs-ssl-2026-11-24-b`.
+
+## 8. Outcomes & Provenance (completed 2026-11-24)
+
+**Execution provenance (zero deviations from frozen split `habs-ssl-2026-11-24-b`; GPU Job 2 split into three clean stages `ssl_jepa_primary`, `ssl_jepa_abl_modwin`, `ssl_jepa_abl_stratscale` after an initial combined run hit the 60-min HABS wall, with identical `SSL_EPOCHS = 55` and zero hyperparameter retuning):**
+
+| Stage | Workflow run | Azure job suffix | Runtime | Aggregate output |
+|---|---|---|---:|---|
+| Feasibility & channel audit (`ssl_audit`) | `45292917269` | `20261123T235620-00e2c8` | 1m36s | `docs/research/ssl/results/ssl_audit.json` |
+| 5-model pretrained EEG extraction (`ssl_fm_extract`) | `45298106955` | `20261124T003421-3db784` | 4m36s | `docs/research/ssl/results/fm_extract.json` |
+| CPU scoring: Study 07 baselines + 5 FMs (`fm_only`) | `45301849557` | CPU (`decoding.yml`) | 65m | `docs/research/ssl/results/fm_and_study07.json` |
+| GPU primary 3-seed suite (`ssl_jepa_primary`) | `45318379365` | `20261124T031819-5ce48e` | 54m02s | `docs/research/ssl/results/ssl_jepa_primary.json` |
+| CPU fusion, leak-free B→B forecast & paired CIs (`jepa_fusion`) | `45325148215` | CPU (`decoding.yml`) | 20m14s | `docs/research/ssl/results/jepa_fusion.json` |
+| GPU modality & window ablations (`ssl_jepa_abl_modwin`) | `45325142935` | `20261124T041620-9db6a5` | 42m37s | `docs/research/ssl/results/ssl_jepa_abl_modwin.json` |
+| GPU strategy, rest & data-scale ablations (`ssl_jepa_abl_stratscale`) | `45330241665` | `20261124T050106-797908` | 35m10s | `docs/research/ssl/results/ssl_jepa_abl_stratscale.json` |
+
+**Headline scientific outcome (double dissociation):**
+1. **No generalization gain over Study 07 linear baselines on double-unseen subjective stress (`test_new_both`, $n=30$ eligible people, 18 unseen themes):** Study 07 `sequence_plus_enriched` = **0.6222 [0.566, 0.678]** and `enriched_full` = **0.5955 [0.524, 0.660]** (0 GPU-min) outperform or match every pretrained EEG foundation model (`LaBraM raw_pc 0.6076`, gain vs S07 EEG `+0.0195 [-0.038, +0.084]`; `REVE-base 0.5459`; `EEGPT 0.5420`; `CBraMod 0.5404`; `Signal-JEPA 0.4925` collapsed `erank=1.10`), every 3-seed supervised neural baseline (`EEGNet 0.5784`, `EEGConformer 0.5831`, `MultimodalConformer_Scratch 0.5569`), `PhysioJEPA` (`0.5586` frozen / `0.5595` fine-tuned; `[0,10)s` window ablation `0.5908`), and every `FM/JEPA + Study 07` fusion (all paired 95% CIs spanning zero: `-0.036` to `+0.008`).
+2. **Strong scaling and genuine temporal dynamics on objective physiology:** On cross-modal `EEG [0,5)s -> Body [5,10)s` forecasting in 86 unseen people, pretrained EEG scale drives monotonic gains from handcrafted S07 EEG (`HR +0.168, SC +0.051, Resp +0.066`) and leak-free 53-h `PhysioJEPA` (`+0.159, +0.063, +0.053`) up to 60,000-h `REVE-base` (`HR +0.255 [+0.216, +0.297]`, `SC +0.136`, `Resp +0.213`, non-overlapping CIs). `PhysioJEPA` learns non-collapsed latents (`erank 122/128`), beats matched-capacity `Scratch` on continuous affect (`dev mean_rho 0.079 vs 0.056`, `test_new_both 0.096 vs 0.055`) and seed stability (`±0.001`), achieves the highest positional-encoding-free directed temporal dynamics (`pre/vid 0.922`, `early/late 0.680`, `arrow_of_time 0.802`), and collapses to pure chance (`0.556 -> 0.484`) under temporal shuffling.
+3. **Methodological findings:** (a) raw multimodal/EEG embeddings carry 26%–53% subject-identity variance (cross-day Day 1→Day 2 unseen-person top-1 ID up to `45.4%` for `PhysioJEPA` and `31.9%` for `REVE-base`), directly worsened by removing `pre_rms` scaling (`R^2_subj 0.449 -> 0.533`, `test_new_both 0.556 -> 0.524`); (b) single-pass Transformers exhibit a trivial `1.000` positional-encoding shortcut on temporal probes unless evaluated in equal-length isolated windows; (c) subtracting a noisy 3-s `z_ref` embedding inflates variance compared to person-centering active video tokens; (d) at ~53 h HABS scale, latent JEPA does not outperform raw-signal MAE reconstruction (`0.558 / 0.573`), and adding 9.5 h dev resting-state windows yields only a marginal `+0.002 / +0.005` shift.
+
+Full French report and bilingual figures: [`docs/research/ssl/RESULTS.md`](../docs/research/ssl/RESULTS.md) and [`docs/research/ssl/figures/`](../docs/research/ssl/figures).
