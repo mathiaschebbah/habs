@@ -111,7 +111,7 @@ def process(data_dir: Path, out_dir: Path) -> None:
         module = "decoding.ssl_train"
     elif stage == "study09_extract":
         module = "decoding.study09_extract"
-    elif stage == "study09_lora":
+    elif stage in ("study09_lora", "study09_lora_forecast", "study09_lora_mt"):
         module = "decoding.study09_lora"
     elif temporal:
         module = "experiments.02_emotional_carryover"

@@ -61,6 +61,20 @@ def test_lora_zero_init_and_exact_top_equivalence():
     z_l = lora.encode_pooled(h_in)
     assert torch.allclose(z_f, z_l, atol=1e-5)
 
+    # Verify precompute_reve_h22 + precomputed_top=True matches frozen identically
+    h22 = study09_lora.precompute_reve_h22(layers, h_in, torch.device("cpu"))
+    pre = study09_lora.ReveTopAttentionPool(
+        layers,
+        cls_q,
+        embed_dim=dim,
+        n_chans=ch,
+        n_patches=patches,
+        use_lora=False,
+        precomputed_top=True,
+    )
+    z_p = pre.encode_pooled(h22)
+    assert torch.allclose(z_f, z_p, atol=1e-5)
+
     # Verify only LoRA A/B (and pool query/norm) require grad inside lora.layers
     base_grads = [
         n

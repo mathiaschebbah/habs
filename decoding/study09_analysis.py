@@ -100,7 +100,6 @@ def load_study09_tables(
         ("reve_primary", "study09_reve_primary.parquet"),
         ("reve_extra", "study09_reve_extra.parquet"),
         ("fm_reve_s08", "fm_reve.parquet"),
-        ("lora_preds", "study09_lora_preds.parquet"),
     ):
         p = base / fname
         if p.is_file():
@@ -108,6 +107,25 @@ def load_study09_tables(
             aux[key] = table[["trial_id"]].merge(
                 df_x, on="trial_id", how="left", validate="1:1"
             )
+
+    # Merge split or combined LoRA prediction parquets seamlessly
+    lora_parts = []
+    for fname in (
+        "study09_lora_preds.parquet",
+        "study09_lora_forecast_preds.parquet",
+        "study09_lora_mt_preds.parquet",
+    ):
+        p = base / fname
+        if p.is_file():
+            lora_parts.append(pd.read_parquet(p))
+    if lora_parts:
+        merged_l = table[["trial_id"]].copy()
+        for df_l in lora_parts:
+            keep = ["trial_id"] + [c for c in df_l.columns if c not in merged_l.columns]
+            merged_l = merged_l.merge(
+                df_l[keep], on="trial_id", how="left", validate="1:1"
+            )
+        aux["lora_preds"] = merged_l
     return table, aux
 
 

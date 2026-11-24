@@ -144,19 +144,24 @@ class ReveTopAttentionPool(nn.Module):
         n_patches: int = 9,
         pool_patch_slice: tuple[int, int] | None = None,
         use_lora: bool = True,
+        precomputed_top: bool = False,
         lora_r: int = LORA_RANK,
         lora_alpha: float = LORA_ALPHA,
         lora_dropout: float = LORA_DROPOUT,
     ) -> None:
         super().__init__()
-        self.layers = copy.deepcopy(top_layers)
-        for p in self.layers.parameters():
-            p.requires_grad = False
         self.use_lora = bool(use_lora)
-        if self.use_lora:
-            inject_lora_into_layers(
-                self.layers, r=lora_r, alpha=lora_alpha, dropout=lora_dropout
-            )
+        self.precomputed_top = bool(precomputed_top) and (not self.use_lora)
+        if self.precomputed_top:
+            self.layers = nn.ModuleList()
+        else:
+            self.layers = copy.deepcopy(top_layers)
+            for p in self.layers.parameters():
+                p.requires_grad = False
+            if self.use_lora:
+                inject_lora_into_layers(
+                    self.layers, r=lora_r, alpha=lora_alpha, dropout=lora_dropout
+                )
         self.embed_dim = int(embed_dim)
         self.n_chans = int(n_chans)
         self.n_patches = int(n_patches)
@@ -167,7 +172,9 @@ class ReveTopAttentionPool(nn.Module):
     def encode_pooled(self, h_in: torch.Tensor) -> torch.Tensor:
         """Forward ``h_in`` (B, C*H, E) through top layers and pool -> (B, 2*E)."""
         x = h_in
-        if self.use_lora:
+        if self.precomputed_top:
+            x = x.detach()
+        elif self.use_lora:
             for attn, ff in self.layers:
                 x = attn(x) + x
                 x = ff(x) + x
@@ -358,6 +365,7 @@ def train_eval_forecast_fold(
     device: torch.device,
     *,
     use_lora: bool = True,
+    precomputed_top: bool = False,
     lora_r: int = LORA_RANK,
     seed: int = 0,
     epochs: int = FORECAST_EPOCHS,
@@ -421,6 +429,7 @@ def train_eval_forecast_fold(
         n_patches=n_patches,
         pool_patch_slice=(min(4, n_patches - 1), n_patches),
         use_lora=use_lora,
+        precomputed_top=precomputed_top,
         lora_r=lora_r,
     )
     net = ForecastResidualHead(backbone, body_dim=zb_sub.shape[1], n_targets=n_t).to(
@@ -562,6 +571,7 @@ def train_eval_multitask_fold(
     device: torch.device,
     *,
     use_lora: bool = True,
+    precomputed_top: bool = False,
     use_ranking: bool = True,
     lora_r: int = LORA_RANK,
     seed: int = 0,
@@ -603,6 +613,7 @@ def train_eval_multitask_fold(
         n_patches=n_patches,
         pool_patch_slice=None,
         use_lora=use_lora,
+        precomputed_top=precomputed_top,
         lora_r=lora_r,
     )
     net = MultitaskAffectHead(backbone).to(device)
@@ -798,6 +809,31 @@ def precompute_reve_h16(
     return store
 
 
+@torch.inference_mode()
+def precompute_reve_h22(
+    top_layers: nn.ModuleList,
+    h16: torch.Tensor,
+    device: torch.device,
+    *,
+    batch_size: int = 64,
+) -> torch.Tensor:
+    """Pass frozen ``h16`` through ``top_layers`` once so frozen heads skip 6 layers."""
+    layers = copy.deepcopy(top_layers).to(device).eval()
+    store = torch.empty_like(h16)
+    for s in range(0, len(h16), batch_size):
+        e = min(len(h16), s + batch_size)
+        x = h16[s:e].to(device)
+        with torch.autocast(
+            device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"
+        ):
+            for attn, ff in layers:
+                x = attn(x) + x
+                x = ff(x) + x
+        store[s:e] = x.to(dtype=store.dtype)
+    del layers
+    return store
+
+
 def _load_dev_causal_arrays(
     trials_dev: pd.DataFrame, raw_dir: Path, *, workers: int = 20
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, list[str]]:
@@ -851,6 +887,16 @@ def main() -> None:
     raw_dir = Path(os.environ["HABS_DATA_ROOT"])
     out_dir = Path(os.environ["HABS_ANALYSIS_OUT"])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    cfg_path = Path(__file__).resolve().parent.parent / "run_config.json"
+    stage = (
+        json.loads(cfg_path.read_text()).get("stage", "study09_lora")
+        if cfg_path.is_file()
+        else "study09_lora"
+    )
+    run_part_a = stage in ("study09_lora", "study09_lora_forecast")
+    run_part_b = stage in ("study09_lora", "study09_lora_mt")
+    json_name = f"{stage}.json"
+    parquet_name = f"{stage}_preds.parquet"
 
     trials = pd.read_csv(
         out_dir / "data" / "aligned_trials.csv.gz", dtype={"participant_id": str}
@@ -868,7 +914,8 @@ def main() -> None:
     )
     load_s = round(time.perf_counter() - t_load0, 2)
     print(
-        f"Loaded {n_dev} dev trials ({len(body_cols)} body cols) in {load_s}s",
+        f"[{stage}] Loaded {n_dev} dev trials ({len(body_cols)} body cols) "
+        f"in {load_s}s",
         flush=True,
     )
 
@@ -886,6 +933,7 @@ def main() -> None:
     preds_df_cols: dict[str, object] = {"trial_id": dev_df["trial_id"].to_numpy()}
     report: dict = {
         "study": "09_reve_lora_dev_nested_cv",
+        "stage": stage,
         "salt": study09_protocol.STUDY09_BASE_SALT,
         "scope": "dev_only_outer_3x3_blocked_person_x_theme",
         "gpu_name": torch.cuda.get_device_name(0)
@@ -909,283 +957,310 @@ def main() -> None:
 
     def _ckpt() -> None:
         report["total_elapsed_seconds"] = round(time.perf_counter() - t_all, 2)
-        (pub / "study09_lora.json").write_text(
+        (pub / json_name).write_text(
             json.dumps(report, indent=1, default=lambda x: None)
         )
 
     # ------------------------------------------------------------------
     # PART A: Primary Causal Forecasting LoRA (M2_LoRA vs M2_FrozenHead vs M0)
     # ------------------------------------------------------------------
-    print("=== PART A: Precomputing REVE h16 on causal [-3.2, +5.0) s ===", flush=True)
-    t_h0 = time.perf_counter()
-    h16_past = precompute_reve_h16(reve, base_pos, eeg_past, device)
-    h16_past_s = round(time.perf_counter() - t_h0, 2)
-    h16_past_gb = round(h16_past.element_size() * h16_past.nelement() / (1024**3), 2)
-    report["forecasting"]["h16_precompute_s"] = h16_past_s
-    report["forecasting"]["h16_vram_gb"] = h16_past_gb
-    print(
-        f"h16_past: {tuple(h16_past.shape)} ({h16_past_gb} GB) in {h16_past_s}s",
-        flush=True,
-    )
-
-    m0_ref_oof = np.full((n_dev, len(FORECAST_TARGETS)), np.nan, dtype=np.float32)
-    for var_name, use_lora, seeds_use in (
-        ("reve_forecast_frozen_head", False, SEEDS),
-        ("reve_forecast_lora", True, SEEDS),
-    ):
-        seed_oofs = []
-        total_gpu_s = 0.0
-        peak_vram = 0.0
-        n_train_p = 0
-        for seed in seeds_use:
-            oof_m2 = np.full((n_dev, len(FORECAST_TARGETS)), np.nan, dtype=np.float32)
-            for p in range(3):
-                for t in range(3):
-                    ev_idx = np.where((pf == p) & (tf == t))[0]
-                    tr_idx = np.where((pf != p) & (tf != t))[0]
-                    p_m0, p_m2, st = train_eval_forecast_fold(
-                        top_layers_cpu,
-                        cls_query_cpu,
-                        h16_past,
-                        x_body,
-                        y_tgt,
-                        dev_df,
-                        tr_idx,
-                        ev_idx,
-                        device,
-                        use_lora=use_lora,
-                        seed=seed * 100 + p * 3 + t,
-                        n_patches=9,
-                    )
-                    if seed == 0 and not use_lora:
-                        m0_ref_oof[ev_idx] = p_m0
-                    oof_m2[ev_idx] = p_m2
-                    total_gpu_s += st["gpu_s"]
-                    peak_vram = max(peak_vram, st["peak_vram_gb"])
-                    n_train_p = st["n_trainable"]
-            seed_oofs.append(oof_m2)
-            for k_i, tname in enumerate(FORECAST_TARGETS):
-                preds_df_cols[f"{var_name}_s{seed}_{tname}"] = oof_m2[:, k_i]
-
-        ens_oof = np.mean(np.stack(seed_oofs, axis=0), axis=0).astype(np.float32)
-        for k_i, tname in enumerate(FORECAST_TARGETS):
-            preds_df_cols[f"{var_name}_ens_{tname}"] = ens_oof[:, k_i]
-            if not use_lora:
-                preds_df_cols[f"m0_ref_{tname}"] = m0_ref_oof[:, k_i]
-
-        # Summarize per target + paired M2 - M0
-        tgt_res = {}
-        for k_i, tname in enumerate(FORECAST_TARGETS):
-            s_m0, pp_m0 = study09_protocol.summarize_forecast(
-                dev_df, y_tgt[:, k_i], m0_ref_oof[:, k_i]
-            )
-            s_ens, pp_ens = study09_protocol.summarize_forecast(
-                dev_df, y_tgt[:, k_i], ens_oof[:, k_i]
-            )
-            seed_rs = []
-            for so in seed_oofs:
-                sm, _ = study09_protocol.summarize_forecast(
-                    dev_df, y_tgt[:, k_i], so[:, k_i], draws=200
-                )
-                seed_rs.append(sm["r"]["mean"])
-            tgt_res[tname] = {
-                "m0_summary": s_m0,
-                "ensemble_summary": s_ens,
-                "paired_vs_m0": study09_protocol.paired_forecast_comparison(
-                    pp_ens, pp_m0
-                ),
-                "seed_r_mean": round(float(np.mean(seed_rs)), 4),
-                "seed_r_sd": round(float(np.std(seed_rs, ddof=1)), 4)
-                if len(seed_rs) > 1
-                else 0.0,
-                "seed_r_per_seed": seed_rs,
-            }
-        report["forecasting"][var_name] = {
-            "use_lora": use_lora,
-            "n_trainable_params": n_train_p,
-            "seeds": list(seeds_use),
-            "total_gpu_seconds": round(total_gpu_s, 2),
-            "peak_vram_gb": round(peak_vram, 2),
-            "targets": tgt_res,
-        }
-        dr_hr = tgt_res[FORECAST_TARGETS[0]]["paired_vs_m0"]["delta_r"]["mean"]
-        dr_sc = tgt_res[FORECAST_TARGETS[1]]["paired_vs_m0"]["delta_r"]["mean"]
-        dr_re = tgt_res[FORECAST_TARGETS[2]]["paired_vs_m0"]["delta_r"]["mean"]
+    if run_part_a:
         print(
-            f"  DONE {var_name}: HR d_r={dr_hr}, SC d_r={dr_sc}, "
-            f"Resp d_r={dr_re} ({total_gpu_s:.1f}s)",
+            "=== PART A: Precomputing REVE h16/h22 on causal [-3.2, +5.0) s ===",
             flush=True,
         )
-        _ckpt()
+        t_h0 = time.perf_counter()
+        h16_past = precompute_reve_h16(reve, base_pos, eeg_past, device)
+        h22_past = precompute_reve_h22(top_layers_cpu, h16_past, device)
+        h16_past_s = round(time.perf_counter() - t_h0, 2)
+        h16_past_gb = round(
+            h16_past.element_size() * h16_past.nelement() / (1024**3), 2
+        )
+        report["forecasting"]["h16_precompute_s"] = h16_past_s
+        report["forecasting"]["h16_vram_gb"] = h16_past_gb
+        print(
+            f"h16/h22_past: {tuple(h16_past.shape)} ({h16_past_gb} GB each) in "
+            f"{h16_past_s}s",
+            flush=True,
+        )
+        if not run_part_b:
+            del reve, pos_bank, eeg_vid10
+            gc.collect()
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
 
-    del h16_past, eeg_past
-    gc.collect()
-    if device.type == "cuda":
-        torch.cuda.empty_cache()
+        m0_ref_oof = np.full((n_dev, len(FORECAST_TARGETS)), np.nan, dtype=np.float32)
+        for var_name, use_lora, seeds_use in (
+            ("reve_forecast_frozen_head", False, SEEDS),
+            ("reve_forecast_lora", True, SEEDS),
+        ):
+            h_use = h16_past if use_lora else h22_past
+            pre_top = not use_lora
+            seed_oofs = []
+            total_gpu_s = 0.0
+            peak_vram = 0.0
+            n_train_p = 0
+            for seed in seeds_use:
+                oof_m2 = np.full(
+                    (n_dev, len(FORECAST_TARGETS)), np.nan, dtype=np.float32
+                )
+                for p in range(3):
+                    for t in range(3):
+                        ev_idx = np.where((pf == p) & (tf == t))[0]
+                        tr_idx = np.where((pf != p) & (tf != t))[0]
+                        p_m0, p_m2, st = train_eval_forecast_fold(
+                            top_layers_cpu,
+                            cls_query_cpu,
+                            h_use,
+                            x_body,
+                            y_tgt,
+                            dev_df,
+                            tr_idx,
+                            ev_idx,
+                            device,
+                            use_lora=use_lora,
+                            precomputed_top=pre_top,
+                            seed=seed * 100 + p * 3 + t,
+                            n_patches=9,
+                        )
+                        if seed == 0 and not use_lora:
+                            m0_ref_oof[ev_idx] = p_m0
+                        oof_m2[ev_idx] = p_m2
+                        total_gpu_s += st["gpu_s"]
+                        peak_vram = max(peak_vram, st["peak_vram_gb"])
+                        n_train_p = st["n_trainable"]
+                seed_oofs.append(oof_m2)
+                for k_i, tname in enumerate(FORECAST_TARGETS):
+                    preds_df_cols[f"{var_name}_s{seed}_{tname}"] = oof_m2[:, k_i]
+
+            ens_oof = np.mean(np.stack(seed_oofs, axis=0), axis=0).astype(np.float32)
+            for k_i, tname in enumerate(FORECAST_TARGETS):
+                preds_df_cols[f"{var_name}_ens_{tname}"] = ens_oof[:, k_i]
+                if not use_lora:
+                    preds_df_cols[f"m0_ref_{tname}"] = m0_ref_oof[:, k_i]
+
+            tgt_res = {}
+            for k_i, tname in enumerate(FORECAST_TARGETS):
+                s_m0, pp_m0 = study09_protocol.summarize_forecast(
+                    dev_df, y_tgt[:, k_i], m0_ref_oof[:, k_i]
+                )
+                s_ens, pp_ens = study09_protocol.summarize_forecast(
+                    dev_df, y_tgt[:, k_i], ens_oof[:, k_i]
+                )
+                seed_rs = []
+                for so in seed_oofs:
+                    sm, _ = study09_protocol.summarize_forecast(
+                        dev_df, y_tgt[:, k_i], so[:, k_i], draws=200
+                    )
+                    seed_rs.append(sm["r"]["mean"])
+                tgt_res[tname] = {
+                    "m0_summary": s_m0,
+                    "ensemble_summary": s_ens,
+                    "paired_vs_m0": study09_protocol.paired_forecast_comparison(
+                        pp_ens, pp_m0
+                    ),
+                    "seed_r_mean": round(float(np.mean(seed_rs)), 4),
+                    "seed_r_sd": round(float(np.std(seed_rs, ddof=1)), 4)
+                    if len(seed_rs) > 1
+                    else 0.0,
+                    "seed_r_per_seed": seed_rs,
+                }
+            report["forecasting"][var_name] = {
+                "use_lora": use_lora,
+                "n_trainable_params": n_train_p,
+                "seeds": list(seeds_use),
+                "total_gpu_seconds": round(total_gpu_s, 2),
+                "peak_vram_gb": round(peak_vram, 2),
+                "targets": tgt_res,
+            }
+            dr_hr = tgt_res[FORECAST_TARGETS[0]]["paired_vs_m0"]["delta_r"]["mean"]
+            dr_sc = tgt_res[FORECAST_TARGETS[1]]["paired_vs_m0"]["delta_r"]["mean"]
+            dr_re = tgt_res[FORECAST_TARGETS[2]]["paired_vs_m0"]["delta_r"]["mean"]
+            print(
+                f"  DONE {var_name}: HR d_r={dr_hr}, SC d_r={dr_sc}, "
+                f"Resp d_r={dr_re} ({total_gpu_s:.1f}s)",
+                flush=True,
+            )
+            _ckpt()
+
+        del h16_past, h22_past, eeg_past
+        gc.collect()
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
 
     # ------------------------------------------------------------------
     # PART B: Secondary Multitask Affect + Intra-Subject Ranking (Req 9)
     # ------------------------------------------------------------------
-    print("=== PART B: Precomputing REVE h16 on causal [0.0, 10.0) s ===", flush=True)
-    t_h1 = time.perf_counter()
-    h16_vid = precompute_reve_h16(reve, base_pos, eeg_vid10, device)
-    h16_vid_s = round(time.perf_counter() - t_h1, 2)
-    h16_vid_gb = round(h16_vid.element_size() * h16_vid.nelement() / (1024**3), 2)
-    report["multitask_affect"]["h16_precompute_s"] = h16_vid_s
-    report["multitask_affect"]["h16_vram_gb"] = h16_vid_gb
-    print(
-        f"h16_vid: {tuple(h16_vid.shape)} ({h16_vid_gb} GB) in {h16_vid_s}s", flush=True
-    )
-
-    # Free full 22-layer REVE before running top-6 LoRA loops
-    del reve, pos_bank, eeg_vid10
-    gc.collect()
-    if device.type == "cuda":
-        torch.cuda.empty_cache()
-
-    mt_specs = (
-        ("reve_mt_frozen_rank", False, True, LORA_RANK, SEEDS),
-        ("reve_mt_lora_rank", True, True, LORA_RANK, SEEDS),
-        ("reve_mt_lora_norank", True, False, LORA_RANK, (0,)),
-        ("reve_mt_lora_r4", True, True, 4, (0,)),
-    )
-    frozen_ref_pp: dict[str, float] | None = None
-    for m_name, use_lora, use_rank, r_val, seeds_use in mt_specs:
-        seed_preds = []
-        seed_aucs, seed_va_aucs, seed_rhos = [], [], []
-        total_gpu_s = 0.0
-        peak_vram = 0.0
-        n_train_p = 0
-        for seed in seeds_use:
-            oof = {
-                k: np.full(n_dev, np.nan, dtype=np.float32)
-                for k in ("stress", "stress_va", "valence", "arousal")
-            }
-            for p in range(3):
-                for t in range(3):
-                    ev_idx = np.where((pf == p) & (tf == t))[0]
-                    tr_idx = np.where((pf != p) & (tf != t))[0]
-                    pr, st = train_eval_multitask_fold(
-                        top_layers_cpu,
-                        cls_query_cpu,
-                        h16_vid,
-                        dev_df,
-                        tr_idx,
-                        ev_idx,
-                        device,
-                        use_lora=use_lora,
-                        use_ranking=use_rank,
-                        lora_r=r_val,
-                        seed=seed * 100 + p * 3 + t,
-                        n_patches=11,
-                    )
-                    for k in oof:
-                        oof[k][ev_idx] = pr[k]
-                    total_gpu_s += st["gpu_s"]
-                    peak_vram = max(peak_vram, st["peak_vram_gb"])
-                    n_train_p = st["n_trainable"]
-            seed_preds.append(oof)
-            for k in oof:
-                preds_df_cols[f"{m_name}_s{seed}_{k}"] = oof[k]
-            st_d = ssl_eval.evaluate_stress(
-                dev_df, pd.Series(oof["stress"], index=dev_df.index), draws=200
-            )
-            st_v = ssl_eval.evaluate_stress(
-                dev_df, pd.Series(oof["stress_va"], index=dev_df.index), draws=200
-            )
-            aff_s = ssl_eval.evaluate_valence_arousal(
-                dev_df,
-                pd.Series(oof["valence"], index=dev_df.index),
-                pd.Series(oof["arousal"], index=dev_df.index),
-                draws=200,
-            )
-            seed_aucs.append(st_d["stress"]["auc"])
-            seed_va_aucs.append(st_v["stress"]["auc"])
-            seed_rhos.append(aff_s["mean_rho"])
-
-        ens = {
-            k: np.mean(np.stack([sp[k] for sp in seed_preds], axis=0), axis=0).astype(
-                np.float32
-            )
-            for k in ("stress", "stress_va", "valence", "arousal")
-        }
-        for k in ens:
-            preds_df_cols[f"{m_name}_ens_{k}"] = ens[k]
-
-        res_dir = ssl_eval.evaluate_stress(
-            dev_df,
-            pd.Series(ens["stress"], index=dev_df.index),
-            return_per_person=True,
-        )
-        pp_dir = res_dir.pop("_per_person")
-        res_va = ssl_eval.evaluate_stress(
-            dev_df,
-            pd.Series(ens["stress_va"], index=dev_df.index),
-            return_per_person=True,
-        )
-        pp_va = res_va.pop("_per_person")
-        res_aff = ssl_eval.evaluate_valence_arousal(
-            dev_df,
-            pd.Series(ens["valence"], index=dev_df.index),
-            pd.Series(ens["arousal"], index=dev_df.index),
-        )
-        if m_name == "reve_mt_frozen_rank":
-            frozen_ref_pp = pp_va
-
-        entry = {
-            "use_lora": use_lora,
-            "use_ranking": use_rank,
-            "lora_r": r_val if use_lora else 0,
-            "n_trainable_params": n_train_p,
-            "seeds": list(seeds_use),
-            "total_gpu_seconds": round(total_gpu_s, 2),
-            "peak_vram_gb": round(peak_vram, 2),
-            "seed_stress_direct_auc": {
-                "mean": round(float(np.mean(seed_aucs)), 4),
-                "sd": round(float(np.std(seed_aucs, ddof=1)), 4)
-                if len(seed_aucs) > 1
-                else 0.0,
-                "per_seed": seed_aucs,
-            },
-            "seed_stress_va_auc": {
-                "mean": round(float(np.mean(seed_va_aucs)), 4),
-                "sd": round(float(np.std(seed_va_aucs, ddof=1)), 4)
-                if len(seed_va_aucs) > 1
-                else 0.0,
-                "per_seed": seed_va_aucs,
-            },
-            "seed_mean_rho": {
-                "mean": round(float(np.mean(seed_rhos)), 4),
-                "sd": round(float(np.std(seed_rhos, ddof=1)), 4)
-                if len(seed_rhos) > 1
-                else 0.0,
-                "per_seed": seed_rhos,
-            },
-            "ensemble_stress_direct": res_dir,
-            "ensemble_stress_va": res_va,
-            "ensemble_affect": res_aff,
-        }
-        if frozen_ref_pp is not None and m_name != "reve_mt_frozen_rank":
-            entry["paired_va_vs_frozen_rank"] = ssl_eval.paired_gain_ci(
-                pp_va, frozen_ref_pp
-            )
-            entry["paired_dir_vs_frozen_rank"] = ssl_eval.paired_gain_ci(
-                pp_dir, frozen_ref_pp
-            )
-        report["multitask_affect"][m_name] = entry
+    if run_part_b:
         print(
-            f"  DONE {m_name}: direct_auc={res_dir['stress']['auc']}, "
-            f"va_auc={res_va['stress']['auc']}, rho={res_aff['mean_rho']} "
-            f"({total_gpu_s:.1f}s)",
+            "=== PART B: Precomputing REVE h16/h22 on causal [0.0, 10.0) s ===",
             flush=True,
         )
-        _ckpt()
+        t_h1 = time.perf_counter()
+        h16_vid = precompute_reve_h16(reve, base_pos, eeg_vid10, device)
+        h22_vid = precompute_reve_h22(top_layers_cpu, h16_vid, device)
+        h16_vid_s = round(time.perf_counter() - t_h1, 2)
+        h16_vid_gb = round(h16_vid.element_size() * h16_vid.nelement() / (1024**3), 2)
+        report["multitask_affect"]["h16_precompute_s"] = h16_vid_s
+        report["multitask_affect"]["h16_vram_gb"] = h16_vid_gb
+        print(
+            f"h16/h22_vid: {tuple(h16_vid.shape)} ({h16_vid_gb} GB each) "
+            f"in {h16_vid_s}s",
+            flush=True,
+        )
+
+        # Free full 22-layer REVE before running top-6 LoRA loops
+        del reve, pos_bank, eeg_vid10
+        gc.collect()
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+
+        mt_specs = (
+            ("reve_mt_frozen_rank", False, True, LORA_RANK, SEEDS),
+            ("reve_mt_lora_rank", True, True, LORA_RANK, SEEDS),
+            ("reve_mt_lora_norank", True, False, LORA_RANK, (0,)),
+            ("reve_mt_lora_r4", True, True, 4, (0,)),
+        )
+        frozen_ref_pp: dict[str, float] | None = None
+        for m_name, use_lora, use_rank, r_val, seeds_use in mt_specs:
+            h_use = h16_vid if use_lora else h22_vid
+            pre_top = not use_lora
+            seed_preds = []
+            seed_aucs, seed_va_aucs, seed_rhos = [], [], []
+            total_gpu_s = 0.0
+            peak_vram = 0.0
+            n_train_p = 0
+            for seed in seeds_use:
+                oof = {
+                    k: np.full(n_dev, np.nan, dtype=np.float32)
+                    for k in ("stress", "stress_va", "valence", "arousal")
+                }
+                for p in range(3):
+                    for t in range(3):
+                        ev_idx = np.where((pf == p) & (tf == t))[0]
+                        tr_idx = np.where((pf != p) & (tf != t))[0]
+                        pr, st = train_eval_multitask_fold(
+                            top_layers_cpu,
+                            cls_query_cpu,
+                            h_use,
+                            dev_df,
+                            tr_idx,
+                            ev_idx,
+                            device,
+                            use_lora=use_lora,
+                            precomputed_top=pre_top,
+                            use_ranking=use_rank,
+                            lora_r=r_val,
+                            seed=seed * 100 + p * 3 + t,
+                            n_patches=11,
+                        )
+                        for k in oof:
+                            oof[k][ev_idx] = pr[k]
+                        total_gpu_s += st["gpu_s"]
+                        peak_vram = max(peak_vram, st["peak_vram_gb"])
+                        n_train_p = st["n_trainable"]
+                seed_preds.append(oof)
+                for k in oof:
+                    preds_df_cols[f"{m_name}_s{seed}_{k}"] = oof[k]
+                st_d = ssl_eval.evaluate_stress(
+                    dev_df, pd.Series(oof["stress"], index=dev_df.index), draws=200
+                )
+                st_v = ssl_eval.evaluate_stress(
+                    dev_df, pd.Series(oof["stress_va"], index=dev_df.index), draws=200
+                )
+                aff_s = ssl_eval.evaluate_valence_arousal(
+                    dev_df,
+                    pd.Series(oof["valence"], index=dev_df.index),
+                    pd.Series(oof["arousal"], index=dev_df.index),
+                    draws=200,
+                )
+                seed_aucs.append(st_d["stress"]["auc"])
+                seed_va_aucs.append(st_v["stress"]["auc"])
+                seed_rhos.append(aff_s["mean_rho"])
+
+            ens = {
+                k: np.mean(
+                    np.stack([sp[k] for sp in seed_preds], axis=0), axis=0
+                ).astype(np.float32)
+                for k in ("stress", "stress_va", "valence", "arousal")
+            }
+            for k in ens:
+                preds_df_cols[f"{m_name}_ens_{k}"] = ens[k]
+
+            res_dir = ssl_eval.evaluate_stress(
+                dev_df,
+                pd.Series(ens["stress"], index=dev_df.index),
+                return_per_person=True,
+            )
+            pp_dir = res_dir.pop("_per_person")
+            res_va = ssl_eval.evaluate_stress(
+                dev_df,
+                pd.Series(ens["stress_va"], index=dev_df.index),
+                return_per_person=True,
+            )
+            pp_va = res_va.pop("_per_person")
+            res_aff = ssl_eval.evaluate_valence_arousal(
+                dev_df,
+                pd.Series(ens["valence"], index=dev_df.index),
+                pd.Series(ens["arousal"], index=dev_df.index),
+            )
+            if m_name == "reve_mt_frozen_rank":
+                frozen_ref_pp = pp_va
+
+            entry = {
+                "use_lora": use_lora,
+                "use_ranking": use_rank,
+                "lora_r": r_val if use_lora else 0,
+                "n_trainable_params": n_train_p,
+                "seeds": list(seeds_use),
+                "total_gpu_seconds": round(total_gpu_s, 2),
+                "peak_vram_gb": round(peak_vram, 2),
+                "seed_stress_direct_auc": {
+                    "mean": round(float(np.mean(seed_aucs)), 4),
+                    "sd": round(float(np.std(seed_aucs, ddof=1)), 4)
+                    if len(seed_aucs) > 1
+                    else 0.0,
+                    "per_seed": seed_aucs,
+                },
+                "seed_stress_va_auc": {
+                    "mean": round(float(np.mean(seed_va_aucs)), 4),
+                    "sd": round(float(np.std(seed_va_aucs, ddof=1)), 4)
+                    if len(seed_va_aucs) > 1
+                    else 0.0,
+                    "per_seed": seed_va_aucs,
+                },
+                "seed_mean_rho": {
+                    "mean": round(float(np.mean(seed_rhos)), 4),
+                    "sd": round(float(np.std(seed_rhos, ddof=1)), 4)
+                    if len(seed_rhos) > 1
+                    else 0.0,
+                    "per_seed": seed_rhos,
+                },
+                "ensemble_stress_direct": res_dir,
+                "ensemble_stress_va": res_va,
+                "ensemble_affect": res_aff,
+            }
+            if frozen_ref_pp is not None and m_name != "reve_mt_frozen_rank":
+                entry["paired_va_vs_frozen_rank"] = ssl_eval.paired_gain_ci(
+                    pp_va, frozen_ref_pp
+                )
+                entry["paired_dir_vs_frozen_rank"] = ssl_eval.paired_gain_ci(
+                    pp_dir, frozen_ref_pp
+                )
+            report["multitask_affect"][m_name] = entry
+            print(
+                f"  DONE {m_name}: direct_auc={res_dir['stress']['auc']}, "
+                f"va_auc={res_va['stress']['auc']}, rho={res_aff['mean_rho']} "
+                f"({total_gpu_s:.1f}s)",
+                flush=True,
+            )
+            _ckpt()
 
     pd.DataFrame(preds_df_cols).to_parquet(
-        feat_dir / "study09_lora_preds.parquet", compression="zstd"
+        feat_dir / parquet_name, compression="zstd"
     )
     _ckpt()
-    print(f"Study 09 LoRA complete in {report['total_elapsed_seconds']}s", flush=True)
+    print(f"[{stage}] complete in {report['total_elapsed_seconds']}s", flush=True)
 
 
 if __name__ == "__main__":
