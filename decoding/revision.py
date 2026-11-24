@@ -1611,6 +1611,7 @@ def _build_phase_features(
     add_ecg_morph=False,
     add_eeg_spatial=False,
     add_eeg_tvar=False,
+    person_center=True,
 ):
     """Assemble 4-phase physiological features with explicit t->t+1 transitions."""
     cols = {}
@@ -1700,10 +1701,12 @@ def _build_phase_features(
             cols[f"eeg_maxjump_l_{b}"] = frame[f"eeg_maxjump_late_{b}"]
 
     x = pd.DataFrame(cols, index=frame.index)
+    if not person_center:
+        return x
     return _person_centre(x, frame["participant_id"].to_numpy())
 
 
-def _build_multiscale_temporal_features(frame):
+def _build_multiscale_temporal_features(frame, *, person_center=True):
     """Explicit temporal-structure representation over the 15-s multivariate series.
 
     Applies causal multi-scale temporal operators (first differences t->t+1,
@@ -1769,6 +1772,8 @@ def _build_multiscale_temporal_features(frame):
         feats[f"tconv_{k_i}_mean"] = conv.mean(axis=1)
 
     x = pd.DataFrame(feats, index=frame.index)
+    if not person_center:
+        return x
     return _person_centre(x, frame["participant_id"].to_numpy())
 
 
@@ -1802,8 +1807,10 @@ def _eval_model_spec(frame, x, builder_kind="logreg"):
                     StandardScaler(),
                     RidgeCV(alphas=np.logspace(0, 4, 9)),
                 ).fit(xtr, ya)
+                sd_pv = max(float(np.std(pipe_v.predict(xtr))), 1e-6)
+                sd_pa = max(float(np.std(pipe_a.predict(xtr))), 1e-6)
                 pv, pa = pipe_v.predict(xev), pipe_a.predict(xev)
-                sc = pa / max(pa.std(), 1e-6) - pv / max(pv.std(), 1e-6)
+                sc = pa / sd_pa - pv / sd_pv
             elif builder_kind == "gbdt":
                 clf = HistGradientBoostingClassifier(
                     max_iter=120,

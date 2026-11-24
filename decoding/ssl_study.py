@@ -60,9 +60,13 @@ def _body_late_targets(frame: pd.DataFrame) -> dict[str, np.ndarray]:
     return targets
 
 
-def _study07_phase4_modality(frame: pd.DataFrame, modality: str) -> pd.DataFrame:
-    """Extract EEG-only or Body-only 4-phase Study-07 features (person-centered)."""
-    full = revision._build_phase_features(frame, add_deltas=True)
+def _study07_phase4_modality(
+    frame: pd.DataFrame, modality: str, *, person_center: bool = False
+) -> pd.DataFrame:
+    """Extract EEG-only or Body-only 4-phase Study-07 features."""
+    full = revision._build_phase_features(
+        frame, add_deltas=True, person_center=person_center
+    )
     if modality == "eeg":
         cols = [c for c in full.columns if c.startswith("eeg_")]
     elif modality == "body":
@@ -72,7 +76,9 @@ def _study07_phase4_modality(frame: pd.DataFrame, modality: str) -> pd.DataFrame
     return full[cols]
 
 
-def _study07_enriched_eeg(frame: pd.DataFrame) -> pd.DataFrame:
+def _study07_enriched_eeg(
+    frame: pd.DataFrame, *, person_center: bool = False
+) -> pd.DataFrame:
     """Strongest handcrafted EEG-only Study-07 representation (4-phase+spatial+tvar)."""
     full = revision._build_phase_features(
         frame,
@@ -80,6 +86,7 @@ def _study07_enriched_eeg(frame: pd.DataFrame) -> pd.DataFrame:
         add_ecg_morph=False,
         add_eeg_spatial=True,
         add_eeg_tvar=True,
+        person_center=person_center,
     )
     cols = [c for c in full.columns if c.startswith("eeg_")]
     return full[cols]
@@ -128,32 +135,41 @@ def _strip_private(d: dict) -> dict:
 def run_study07_baselines(
     frame: pd.DataFrame,
 ) -> tuple[dict, dict, dict, pd.DataFrame, pd.DataFrame]:
-    """Re-evaluate Study-07 linear & sequence baselines on the Study-08 split."""
-    x_1s = timecourse._features(frame, "all", 10)
-    x_p4 = revision._build_phase_features(frame)
-    x_p4_eeg = _study07_phase4_modality(frame, "eeg")
-    x_p4_body = _study07_phase4_modality(frame, "body")
-    x_enr_eeg = _study07_enriched_eeg(frame)
+    """Re-evaluate Study-07 linear & sequence baselines on the Study-08 split.
+
+    Study 09 fix: extract raw uncentered matrices (``person_center=False``) and
+    delegate centering to ``probe_representation_all_regimes`` so person means
+    are computed strictly inside each fold/regime, never across splits.
+    """
+    x_1s = timecourse._features(frame, "all", 10, person_center=False)
+    x_p4 = revision._build_phase_features(frame, person_center=False)
+    x_p4_eeg = _study07_phase4_modality(frame, "eeg", person_center=False)
+    x_p4_body = _study07_phase4_modality(frame, "body", person_center=False)
+    x_enr_eeg = _study07_enriched_eeg(frame, person_center=False)
     x_enr_full = revision._build_phase_features(
         frame,
         add_deltas=True,
         add_ecg_morph=True,
         add_eeg_spatial=True,
         add_eeg_tvar=True,
+        person_center=False,
     )
-    x_seq = revision._build_multiscale_temporal_features(frame)
+    x_seq = revision._build_multiscale_temporal_features(frame, person_center=False)
     x_seq_full = pd.concat([x_enr_full, x_seq], axis=1)
 
     # First evaluate primary references so all other models get paired gain CIs
     enr_full_res, _ = ssl_eval.probe_representation_all_regimes(
-        frame, x_enr_full.to_numpy(np.float32), person_center=False, max_pca=512
+        frame,
+        x_enr_full.to_numpy(np.float32),
+        normalization_protocol="fold_isolated_session",
+        max_pca=512,
     )
     ref_full_pp = enr_full_res["_per_person_va"]
 
     enr_eeg_res, _ = ssl_eval.probe_representation_all_regimes(
         frame,
         x_enr_eeg.to_numpy(np.float32),
-        person_center=False,
+        normalization_protocol="fold_isolated_session",
         max_pca=512,
         ref_per_person=ref_full_pp,
     )
@@ -174,7 +190,7 @@ def run_study07_baselines(
         res, _ = ssl_eval.probe_representation_all_regimes(
             frame,
             df_x.to_numpy(np.float32),
-            person_center=False,
+            normalization_protocol="fold_isolated_session",
             max_pca=512,
             ref_per_person=ref_full_pp,
         )
@@ -281,20 +297,18 @@ def evaluate_foundation_models(
         )
 
         # 3. Multimodal fusion: FM delta + Study-07 Body and + Study-07 Enriched Full
-        x_delta_c = ssl_eval.person_center_matrix(
-            x_delta, frame["participant_id"].to_numpy()
-        )
+        # Study 09 fix: fold-isolated session centering instead of global transductive.
         res_plus_body, _ = ssl_eval.probe_representation_all_regimes(
             frame,
-            np.hstack([x_delta_c, x_body_np]),
-            person_center=False,
+            np.hstack([x_delta, x_body_np]),
+            normalization_protocol="fold_isolated_session",
             max_pca=192,
             ref_per_person=ref_full_pp,
         )
         res_plus_enr, _ = ssl_eval.probe_representation_all_regimes(
             frame,
-            np.hstack([x_delta_c, x_enr_np]),
-            person_center=False,
+            np.hstack([x_delta, x_enr_np]),
+            normalization_protocol="fold_isolated_session",
             max_pca=256,
             ref_per_person=ref_full_pp,
         )
@@ -375,13 +389,15 @@ def evaluate_jepa_fusion_and_paired_gains(
         ze_eeg = merged[
             [c for c in merged if c.startswith("jepa_z_eeg_early_")]
         ].to_numpy(np.float32)
-        x_delta_c = ssl_eval.person_center_matrix(
-            np.hstack([ze - zr, zl - zr, zl - ze]), frame["participant_id"].to_numpy()
-        )
         res_fuse, _ = ssl_eval.probe_representation_all_regimes(
             frame,
-            np.hstack([x_delta_c, x_enr_full.to_numpy(np.float32)]),
-            person_center=False,
+            np.hstack(
+                [
+                    np.hstack([ze - zr, zl - zr, zl - ze]),
+                    x_enr_full.to_numpy(np.float32),
+                ]
+            ),
+            normalization_protocol="fold_isolated_session",
             max_pca=256,
             ref_per_person=ref_full_pp,
         )

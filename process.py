@@ -109,6 +109,10 @@ def process(data_dir: Path, out_dir: Path) -> None:
         "ssl_jepa_abl_stratscale",
     ):
         module = "decoding.ssl_train"
+    elif stage == "study09_extract":
+        module = "decoding.study09_extract"
+    elif stage == "study09_lora":
+        module = "decoding.study09_lora"
     elif temporal:
         module = "experiments.02_emotional_carryover"
     else:

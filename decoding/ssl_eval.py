@@ -276,11 +276,113 @@ def evaluate_valence_arousal(
     return res
 
 
-def person_center_matrix(x: np.ndarray, people: np.ndarray) -> np.ndarray:
-    """Subtract each participant's own mean column-wise (handling NaNs safely)."""
-    df = pd.DataFrame(x)
-    centered = df - df.groupby(people).transform("mean")
-    return centered.to_numpy(dtype=np.float32)
+def person_center_matrix(
+    x: np.ndarray,
+    people: np.ndarray,
+    *,
+    prior_mean: np.ndarray | None = None,
+    shrinkage: float = 0.0,
+) -> np.ndarray:
+    """Subtract each participant's column-wise mean within the given subset ONLY.
+
+    WARNING (Study 09 audit)
+    ------------------------
+    Never call this across train and evaluation splits or across theme folds.
+    For strict cold-start inference, do not apply per-subject batch centering at
+    all; for causal unlabeled personalization, use ``causal_person_center`` which
+    only accesses strictly past trials ``< i`` of the same participant.
+    """
+    arr = np.asarray(x, dtype=np.float64)
+    df = pd.DataFrame(arr)
+    grp = df.groupby(people, sort=False)
+    means = grp.transform("mean").to_numpy(dtype=np.float64)
+    if shrinkage > 0.0:
+        counts = grp.transform("count").to_numpy(dtype=np.float64)
+        mu0 = (
+            np.asarray(prior_mean, dtype=np.float64)[None, :]
+            if prior_mean is not None
+            else np.nanmean(arr, axis=0, keepdims=True)
+        )
+        mu0 = np.where(np.isfinite(mu0), mu0, 0.0)
+        means = np.where(np.isfinite(means), means, mu0)
+        est = (counts * means + shrinkage * mu0) / np.maximum(counts + shrinkage, 1e-8)
+        return (arr - est).astype(np.float32)
+    return (arr - means).astype(np.float32)
+
+
+def causal_person_center(
+    x: np.ndarray,
+    people: np.ndarray,
+    order_keys: pd.DataFrame | None = None,
+    *,
+    prior_mean: np.ndarray | None = None,
+    shrinkage: float = 5.0,
+    rest_baseline: dict[str, np.ndarray] | None = None,
+    rest_weight: float = 3.0,
+) -> np.ndarray:
+    """Strictly causal online Empirical-Bayes person centering (Protocol B1).
+
+    For trial ``i`` of participant ``p`` (ordered chronologically), subtracts an
+    unlabeled baseline estimated strictly from ``p``'s resting-state vector (if
+    provided) and strictly past trials ``< i`` of ``p``, shrunk toward the
+    training-fold population mean ``prior_mean``. Never reads trial ``i`` itself
+    or any future trial ``j > i``.
+    """
+    arr = np.asarray(x, dtype=np.float64)
+    n, d = arr.shape
+    mu0 = (
+        np.asarray(prior_mean, dtype=np.float64).reshape(d)
+        if prior_mean is not None
+        else np.zeros(d, dtype=np.float64)
+    )
+    mu0 = np.where(np.isfinite(mu0), mu0, 0.0)
+    out = np.empty((n, d), dtype=np.float32)
+
+    # Sort indices chronologically within each participant (stable tie-break).
+    if order_keys is not None and len(order_keys) == n:
+        sort_cols = [
+            c
+            for c in ("recorded_day", "event_order", "onset_s")
+            if c in order_keys.columns
+        ]
+        if sort_cols:
+            order_df = order_keys[sort_cols].copy()
+            order_df["_pos"] = np.arange(n)
+            order_df["_pid"] = np.asarray(people, dtype=str)
+            grouped = order_df.sort_values(
+                ["_pid", *sort_cols, "_pos"], kind="mergesort"
+            ).groupby("_pid", sort=False)["_pos"]
+        else:
+            grouped = pd.Series(np.arange(n)).groupby(
+                np.asarray(people, dtype=str), sort=False
+            )
+    else:
+        grouped = pd.Series(np.arange(n)).groupby(
+            np.asarray(people, dtype=str), sort=False
+        )
+
+    for pid, idx_series in grouped:
+        idx = idx_series.to_numpy(dtype=int)
+        running_sum = np.zeros(d, dtype=np.float64)
+        running_cnt = np.zeros(d, dtype=np.float64)
+        if rest_baseline is not None and str(pid) in rest_baseline:
+            rb = np.asarray(rest_baseline[str(pid)], dtype=np.float64).reshape(d)
+            ok_r = np.isfinite(rb)
+            running_sum = np.where(ok_r, rest_weight * rb, 0.0)
+            running_cnt = np.where(ok_r, rest_weight, 0.0)
+        for pos in idx:
+            # Estimate baseline strictly BEFORE observing trial ``pos``
+            est = (running_sum + shrinkage * mu0) / np.maximum(
+                running_cnt + shrinkage, 1e-8
+            )
+            row = arr[pos]
+            out[pos] = (row - est).astype(np.float32)
+            fin = np.isfinite(row)
+            running_sum = np.where(
+                fin, running_sum + np.where(fin, row, 0.0), running_sum
+            )
+            running_cnt = np.where(fin, running_cnt + 1.0, running_cnt)
+    return out
 
 
 def _fit_linear_probes(
@@ -290,7 +392,12 @@ def _fit_linear_probes(
     *,
     max_pca: int = 128,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Fit balanced LogReg (stress) + RidgeCV (valence, arousal, V&A stress)."""
+    """Fit balanced LogReg (stress) + RidgeCV (valence, arousal, V&A stress).
+
+    All scalers, imputers, PCA projections, and V&A standardization factors
+    ``(sd_pv_tr, sd_pa_tr)`` are fitted strictly on ``x_tr`` (never using
+    ``x_ev`` batch statistics), guaranteeing single-trial cold-start invariance.
+    """
     steps = [SimpleImputer(strategy="median"), StandardScaler()]
     if x_tr.shape[1] > max_pca and x_tr.shape[0] > max_pca + 10:
         steps.append(PCA(n_components=max_pca, random_state=0))
@@ -318,9 +425,14 @@ def _fit_linear_probes(
             ppl
         ).transform("mean")
         alphas = np.logspace(0, 4, 9)
-        pv = RidgeCV(alphas=alphas).fit(z_tr, yv.to_numpy(float)).predict(z_ev)
-        pa = RidgeCV(alphas=alphas).fit(z_tr, ya.to_numpy(float)).predict(z_ev)
-        sc_va = pa / max(float(np.std(pa)), 1e-6) - pv / max(float(np.std(pv)), 1e-6)
+        rv = RidgeCV(alphas=alphas).fit(z_tr, yv.to_numpy(float))
+        ra = RidgeCV(alphas=alphas).fit(z_tr, ya.to_numpy(float))
+        # Fit scaling strictly on training predictions (zero eval-batch leakage!)
+        sd_pv = max(float(np.std(rv.predict(z_tr))), 1e-6)
+        sd_pa = max(float(np.std(ra.predict(z_tr))), 1e-6)
+        pv = rv.predict(z_ev)
+        pa = ra.predict(z_ev)
+        sc_va = pa / sd_pa - pv / sd_pv
     return sc_log, sc_va, pv, pa
 
 
@@ -329,6 +441,7 @@ def probe_representation_all_regimes(
     x_mat: np.ndarray,
     *,
     person_center: bool = True,
+    normalization_protocol: str | None = None,
     eval_sealed: bool = True,
     max_pca: int = 128,
     draws: int = DRAWS,
@@ -336,12 +449,55 @@ def probe_representation_all_regimes(
 ) -> tuple[dict, dict[str, pd.Series]]:
     """Run leak-free 3x3 dev cross-fit and (optionally) sealed-test linear probing.
 
-    Returns ``(metrics_dict, predictions_dict)`` with stress (LogReg & V&A Ridge),
-    valence, and arousal scores across dev and sealed-test regimes.
+    Normalization protocols
+    -----------------------
+    - ``"cold_start"`` (default if ``person_center=False``): zero per-subject
+      history used at evaluation time (strictly invariant to single-trial eval).
+    - ``"causal_online"``: strictly past-only Empirical-Bayes shrunk personal
+      centering inside each fold (Protocol B1).
+    - ``"fold_isolated_session"`` (default if ``person_center=True``): centers
+      train strictly within train and eval strictly within each evaluation fold
+      or regime (never crossing train/eval or theme folds; explicitly tagged as
+      session-level unlabeled history, Protocol B2).
+    - ``"legacy_global"``: reproduces Study-08 global transductive centering for
+      audit comparisons only.
     """
-    x_use = np.asarray(x_mat, dtype=np.float32)
-    if person_center:
-        x_use = person_center_matrix(x_use, frame["participant_id"].to_numpy())
+    x_raw = np.asarray(x_mat, dtype=np.float32)
+    proto = normalization_protocol
+    if proto is None:
+        proto = "fold_isolated_session" if person_center else "cold_start"
+
+    def _prepare_fold(
+        tr_idx: np.ndarray, ev_idx: np.ndarray
+    ) -> tuple[np.ndarray, np.ndarray]:
+        if proto == "legacy_global":
+            x_g = person_center_matrix(x_raw, frame["participant_id"].to_numpy())
+            return x_g[tr_idx], x_g[ev_idx]
+        if proto == "cold_start":
+            return x_raw[tr_idx], x_raw[ev_idx]
+        if proto == "causal_online":
+            mu_tr = np.nanmean(x_raw[tr_idx], axis=0)
+            mu_tr = np.where(np.isfinite(mu_tr), mu_tr, 0.0)
+            x_tr_c = person_center_matrix(
+                x_raw[tr_idx], frame.iloc[tr_idx]["participant_id"].to_numpy()
+            )
+            x_ev_c = causal_person_center(
+                x_raw[ev_idx],
+                frame.iloc[ev_idx]["participant_id"].to_numpy(),
+                frame.iloc[ev_idx],
+                prior_mean=mu_tr,
+                shrinkage=5.0,
+            )
+            return x_tr_c, x_ev_c
+        if proto == "fold_isolated_session":
+            x_tr_c = person_center_matrix(
+                x_raw[tr_idx], frame.iloc[tr_idx]["participant_id"].to_numpy()
+            )
+            x_ev_c = person_center_matrix(
+                x_raw[ev_idx], frame.iloc[ev_idx]["participant_id"].to_numpy()
+            )
+            return x_tr_c, x_ev_c
+        raise ValueError(f"Unknown normalization_protocol: {proto}")
 
     dev_mask = (frame["split"] == "dev").to_numpy()
     dev_idx = np.where(dev_mask)[0]
@@ -360,10 +516,11 @@ def probe_representation_all_regimes(
             tr_local = (pf != p) & (tf != t)
             if ev_local.sum() == 0 or tr_local.sum() < 20:
                 continue
+            x_tr_f, x_ev_f = _prepare_fold(dev_idx[tr_local], dev_idx[ev_local])
             sl, sv, pv, pa = _fit_linear_probes(
-                x_use[dev_idx[tr_local]],
+                x_tr_f,
                 dev_df.iloc[tr_local],
-                x_use[dev_idx[ev_local]],
+                x_ev_f,
                 max_pca=max_pca,
             )
             dev_log[ev_local] = sl
@@ -372,8 +529,9 @@ def probe_representation_all_regimes(
             dev_a[ev_local] = pa
 
     out: dict = {
-        "n_features": int(x_use.shape[1]),
-        "person_centered": bool(person_center),
+        "n_features": int(x_raw.shape[1]),
+        "person_centered": bool(proto != "cold_start"),
+        "normalization_protocol": proto,
     }
     preds_all: dict[str, pd.Series] = {}
 
@@ -410,13 +568,25 @@ def probe_representation_all_regimes(
     if eval_sealed:
         test_idx = np.where(~dev_mask)[0]
         test_df = frame.iloc[test_idx]
-        sl, sv, pv, pa = _fit_linear_probes(
-            x_use[dev_idx], dev_df, x_use[test_idx], max_pca=max_pca
-        )
-        ts_log = pd.Series(sl, index=test_df.index)
-        ts_va = pd.Series(sv, index=test_df.index)
-        tpv = pd.Series(pv, index=test_df.index)
-        tpa = pd.Series(pa, index=test_df.index)
+        ts_log = pd.Series(np.nan, index=test_df.index, dtype=float)
+        ts_va = pd.Series(np.nan, index=test_df.index, dtype=float)
+        tpv = pd.Series(np.nan, index=test_df.index, dtype=float)
+        tpa = pd.Series(np.nan, index=test_df.index, dtype=float)
+
+        # Evaluate each regime strictly isolated (never mixing test_new_both with
+        # test_new_person or dev with test_new_video during centering!)
+        for regime in common.REGIMES:
+            reg_global = np.where((frame["split"] == regime).to_numpy())[0]
+            if len(reg_global) == 0:
+                continue
+            x_tr_f, x_ev_f = _prepare_fold(dev_idx, reg_global)
+            sl, sv, pv, pa = _fit_linear_probes(x_tr_f, dev_df, x_ev_f, max_pca=max_pca)
+            reg_index = frame.index[reg_global]
+            ts_log.loc[reg_index] = sl
+            ts_va.loc[reg_index] = sv
+            tpv.loc[reg_index] = pv
+            tpa.loc[reg_index] = pa
+
         preds_all["test_logreg"] = ts_log
         preds_all["test_ridge_va"] = ts_va
         preds_all["test_valence"] = tpv

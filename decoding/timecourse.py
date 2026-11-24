@@ -127,8 +127,8 @@ def curves(table):
     return out
 
 
-def _features(frame, family, seconds, mode="change"):
-    """Bins from onset to ``seconds``, centred per person.
+def _features(frame, family, seconds, mode="change", *, person_center=True):
+    """Bins from onset to ``seconds``, optionally centred per person.
 
     ``change`` subtracts each trial's pre-onset mean (the protocol), ``level``
     keeps raw values, and ``pre`` uses only the three pre-onset seconds.
@@ -144,6 +144,8 @@ def _features(frame, family, seconds, mode="change"):
             values = corrected(frame, signal)[:, ONSET : ONSET + seconds]
         columns.append(pd.DataFrame(values, index=frame.index).add_prefix(f"{signal}_"))
     x = pd.concat(columns, axis=1)
+    if not person_center:
+        return x
     return x - x.groupby(frame["participant_id"].to_numpy()).transform("mean")
 
 

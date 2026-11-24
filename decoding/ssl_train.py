@@ -272,6 +272,17 @@ def train_supervised_eeg_model(
 
     model.load_state_dict(best_state)
     model.eval()
+    # Fit V&A SDs strictly on internal val set (no eval-batch leak)
+    val_v, val_a = [], []
+    with torch.inference_mode():
+        for s in range(0, len(val_sub), BATCH_SIZE):
+            sl = slice(s, min(len(val_sub), s + BATCH_SIZE))
+            out_v = model(_get_eeg10(val_sub[sl]))
+            val_v.append(out_v["valence"].float().cpu().numpy())
+            val_a.append(out_v["arousal"].float().cpu().numpy())
+    sd_v = max(float(np.std(np.concatenate(val_v))) if val_v else 1.0, 1e-6)
+    sd_a = max(float(np.std(np.concatenate(val_a))) if val_a else 1.0, 1e-6)
+
     n_ev = len(eval_idx)
     p_s = np.zeros(n_ev, dtype=np.float32)
     p_v = np.zeros(n_ev, dtype=np.float32)
@@ -287,7 +298,7 @@ def train_supervised_eeg_model(
             p_a[s:e] = out["arousal"].float().cpu().numpy()
             embeds[s:e] = out["embed"].float().cpu().numpy()
 
-    p_va = p_a / max(float(np.std(p_a)), 1e-6) - p_v / max(float(np.std(p_v)), 1e-6)
+    p_va = p_a / sd_a - p_v / sd_v
     elapsed = time.perf_counter() - t0
     peak_gb = (
         torch.cuda.max_memory_allocated(device) / (1024**3)
@@ -748,6 +759,31 @@ def train_supervised_multimodal(
 
     model.load_state_dict(best_state)
     model.eval()
+    # Fit V&A SDs strictly on internal val set (no eval-batch leak)
+    val_v, val_a = [], []
+    with torch.inference_mode():
+        for s in range(0, len(val_sub), BATCH_SIZE):
+            sl = slice(s, min(len(val_sub), s + BATCH_SIZE))
+            batch_v = _slice_batch(
+                data,
+                val_sub[sl],
+                device,
+                time_slice=time_slice,
+                use_fixed_eeg=use_fixed_eeg,
+            )
+            with torch.autocast(
+                device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"
+            ):
+                out_v = model.supervised_forward(
+                    batch_v,
+                    active_modalities=active_modalities,
+                    use_delta=(time_slice[0] == 0),
+                )
+            val_v.append(out_v["valence"].float().cpu().numpy())
+            val_a.append(out_v["arousal"].float().cpu().numpy())
+    sd_v = max(float(np.std(np.concatenate(val_v))) if val_v else 1.0, 1e-6)
+    sd_a = max(float(np.std(np.concatenate(val_a))) if val_a else 1.0, 1e-6)
+
     n_ev = len(eval_idx)
     p_s = np.zeros(n_ev, dtype=np.float32)
     p_v = np.zeros(n_ev, dtype=np.float32)
@@ -776,7 +812,7 @@ def train_supervised_multimodal(
             p_a[s:e] = out["arousal"].float().cpu().numpy()
             embeds[s:e] = out["embed"].float().cpu().numpy()
 
-    p_va = p_a / max(float(np.std(p_a)), 1e-6) - p_v / max(float(np.std(p_v)), 1e-6)
+    p_va = p_a / sd_a - p_v / sd_v
     elapsed = time.perf_counter() - t0
     peak_gb = (
         torch.cuda.max_memory_allocated(device) / (1024**3)
@@ -1111,11 +1147,9 @@ def run_jepa_variant(
                 use_fixed_eeg=use_fixed_eeg,
             )
             embed_key = "embed_delta" if time_slice[0] == 0 else "embed_raw"
-            x_dev_c = ssl_eval.person_center_matrix(
-                rep_dev[embed_key], dev_df["participant_id"].to_numpy()
-            )
+            x_dev_raw = rep_dev[embed_key]
 
-            # Evaluate the 3 theme folds of held-out person_fold p
+            # Evaluate the 3 theme folds of held-out person_fold p (fold-isolated)
             for t in range(3):
                 ev_loc = (pf == p) & (tf == t)
                 tr_loc = (pf != p) & (tf != t)
@@ -1128,8 +1162,16 @@ def run_jepa_variant(
                         dtype=bool,
                     )
                     tr_loc = tr_loc & tr_sub_mask
+                x_tr_c = ssl_eval.person_center_matrix(
+                    x_dev_raw[tr_loc],
+                    dev_df.iloc[tr_loc]["participant_id"].to_numpy(),
+                )
+                x_ev_c = ssl_eval.person_center_matrix(
+                    x_dev_raw[ev_loc],
+                    dev_df.iloc[ev_loc]["participant_id"].to_numpy(),
+                )
                 sl, sv, pv, pa = ssl_eval._fit_linear_probes(
-                    x_dev_c[tr_loc], dev_df.iloc[tr_loc], x_dev_c[ev_loc], max_pca=128
+                    x_tr_c, dev_df.iloc[tr_loc], x_ev_c, max_pca=128
                 )
                 dev_log[ev_loc] = sl
                 dev_va[ev_loc] = sv
@@ -1198,12 +1240,31 @@ def run_jepa_variant(
             use_fixed_eeg=use_fixed_eeg,
         )
         embed_key = "embed_delta" if time_slice[0] == 0 else "embed_raw"
-        x_all_c = ssl_eval.person_center_matrix(
-            rep_all[embed_key], frame["participant_id"].to_numpy()
+        x_tr_full_c = ssl_eval.person_center_matrix(
+            rep_all[embed_key][pre_full],
+            frame.iloc[pre_full]["participant_id"].to_numpy(),
         )
-        sl_t, sv_t, pv_t, pa_t = ssl_eval._fit_linear_probes(
-            x_all_c[pre_full], frame.iloc[pre_full], x_all_c[test_idx], max_pca=128
-        )
+        sl_t = np.full(len(test_idx), np.nan, dtype=float)
+        sv_t = np.full(len(test_idx), np.nan, dtype=float)
+        pv_t = np.full(len(test_idx), np.nan, dtype=float)
+        pa_t = np.full(len(test_idx), np.nan, dtype=float)
+        test_df_sub = frame.iloc[test_idx]
+        for regime in common.REGIMES:
+            rm_loc = (test_df_sub["split"] == regime).to_numpy()
+            if not rm_loc.any():
+                continue
+            reg_idx = test_idx[rm_loc]
+            x_ev_reg_c = ssl_eval.person_center_matrix(
+                rep_all[embed_key][reg_idx],
+                frame.iloc[reg_idx]["participant_id"].to_numpy(),
+            )
+            r_sl, r_sv, r_pv, r_pa = ssl_eval._fit_linear_probes(
+                x_tr_full_c, frame.iloc[pre_full], x_ev_reg_c, max_pca=128
+            )
+            sl_t[rm_loc] = r_sl
+            sv_t[rm_loc] = r_sv
+            pv_t[rm_loc] = r_pv
+            pa_t[rm_loc] = r_pa
         dev_frozen = {
             "stress": dev_log,
             "stress_va": dev_va,
@@ -1307,45 +1368,55 @@ def run_jepa_variant(
                 use_fixed_eeg=use_fixed_eeg,
                 shuffle_time_seed=20261124,
             )
-            x_shuf_c = ssl_eval.person_center_matrix(
-                rep_shuf["embed_delta"],
-                frame.iloc[test_idx]["participant_id"].to_numpy(),
-            )
-            sl_sh, sv_sh, pv_sh, pa_sh = ssl_eval._fit_linear_probes(
-                x_all_c[pre_full], frame.iloc[pre_full], x_shuf_c, max_pca=128
-            )
             test_df = frame.iloc[test_idx]
             shuf_out = {}
             for regime in common.REGIMES:
                 rm = (test_df["split"] == regime).to_numpy()
                 sub = test_df[rm]
+                if len(sub) == 0:
+                    continue
+                x_shuf_c = ssl_eval.person_center_matrix(
+                    rep_shuf["embed_delta"][rm],
+                    sub["participant_id"].to_numpy(),
+                )
+                sl_sh, sv_sh, _, _ = ssl_eval._fit_linear_probes(
+                    x_tr_full_c, frame.iloc[pre_full], x_shuf_c, max_pca=128
+                )
                 shuf_out[regime] = {
                     "stress_va_shuffled": ssl_eval.evaluate_stress(
-                        sub, pd.Series(sv_sh[rm], index=sub.index)
+                        sub, pd.Series(sv_sh, index=sub.index)
                     )["stress"],
                     "stress_logreg_shuffled": ssl_eval.evaluate_stress(
-                        sub, pd.Series(sl_sh[rm], index=sub.index)
+                        sub, pd.Series(sl_sh, index=sub.index)
                     )["stress"],
                 }
             diagnostics["temporal_shuffle_test"] = shuf_out
 
-            # Also compare raw embed (without subtracting z_ref) on sealed test
-            x_raw_c = ssl_eval.person_center_matrix(
-                rep_all["embed_raw"], frame["participant_id"].to_numpy()
-            )
-            sl_r, sv_r, _, _ = ssl_eval._fit_linear_probes(
-                x_raw_c[pre_full], frame.iloc[pre_full], x_raw_c[test_idx], max_pca=128
+            # Compare raw embed (no ref sub) on sealed test (regime-isolated)
+            x_raw_tr_c = ssl_eval.person_center_matrix(
+                rep_all["embed_raw"][pre_full],
+                frame.iloc[pre_full]["participant_id"].to_numpy(),
             )
             raw_probe = {}
             for regime in common.REGIMES:
                 rm = (test_df["split"] == regime).to_numpy()
                 sub = test_df[rm]
+                if len(sub) == 0:
+                    continue
+                reg_idx = test_idx[rm]
+                x_raw_ev_c = ssl_eval.person_center_matrix(
+                    rep_all["embed_raw"][reg_idx],
+                    sub["participant_id"].to_numpy(),
+                )
+                sl_r, sv_r, _, _ = ssl_eval._fit_linear_probes(
+                    x_raw_tr_c, frame.iloc[pre_full], x_raw_ev_c, max_pca=128
+                )
                 raw_probe[regime] = {
                     "stress_va_no_ref_sub": ssl_eval.evaluate_stress(
-                        sub, pd.Series(sv_r[rm], index=sub.index)
+                        sub, pd.Series(sv_r, index=sub.index)
                     )["stress"],
                     "stress_logreg_no_ref_sub": ssl_eval.evaluate_stress(
-                        sub, pd.Series(sl_r[rm], index=sub.index)
+                        sub, pd.Series(sl_r, index=sub.index)
                     )["stress"],
                 }
             diagnostics["probe_without_ref_subtraction"] = raw_probe
