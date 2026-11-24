@@ -495,13 +495,27 @@ def sample_jepa_mask(
                 )
                 target_mask[i] = (time_ids >= start) & (time_ids < start + n_mask)
             else:
-                # Cross-modal prediction: predict body from EEG or EEG from body
-                # on post-onset window t >= 3 (or second half if shorter)
+                # Cross-modal prediction across whichever modalities are active
                 t0 = 3 if t_max >= 8 else max(1, t_max // 3)
-                if int(torch.randint(0, 2, (1,), generator=generator).item()) == 0:
-                    target_mask[i] = (mod_ids != 0) & (time_ids >= t0)
+                uniq_mods = torch.unique(mod_ids)
+                if len(uniq_mods) >= 2:
+                    if (0 in uniq_mods) and len(uniq_mods) == 4:
+                        if (
+                            int(torch.randint(0, 2, (1,), generator=generator).item())
+                            == 0
+                        ):
+                            target_mask[i] = (mod_ids != 0) & (time_ids >= t0)
+                        else:
+                            target_mask[i] = (mod_ids == 0) & (time_ids >= t0)
+                    else:
+                        pick = int(
+                            torch.randint(
+                                0, len(uniq_mods), (1,), generator=generator
+                            ).item()
+                        )
+                        target_mask[i] = (mod_ids == uniq_mods[pick]) & (time_ids >= t0)
                 else:
-                    target_mask[i] = (mod_ids == 0) & (time_ids >= t0)
+                    target_mask[i] = time_ids >= t0
         else:
             raise ValueError(f"Unknown SSL strategy: {strategy}")
 
@@ -570,12 +584,10 @@ class PhysioJEPA(nn.Module):
         tau = self.cfg.ema_end - (self.cfg.ema_end - self.cfg.ema_start) * 0.5 * (
             1.0 + math.cos(math.pi * min(max(progress, 0.0), 1.0))
         )
-        for p_ctx, p_tgt in zip(
-            self.context_encoder.parameters(),
-            self.target_encoder.parameters(),
-            strict=True,
-        ):
-            p_tgt.data.mul_(tau).add_(p_ctx.data, alpha=1.0 - tau)
+        ctx_params = list(self.context_encoder.parameters())
+        tgt_params = list(self.target_encoder.parameters())
+        for i, p_ctx in enumerate(ctx_params):
+            tgt_params[i].data.mul_(tau).add_(p_ctx.data, alpha=1.0 - tau)
         return tau
 
     def ssl_loss(

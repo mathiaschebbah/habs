@@ -9,14 +9,14 @@ on:
     inputs:
       study:
         type: choice
-        options: [affect, stress, timecourse, person, revision]
+        options: [affect, stress, timecourse, person, revision, ssl_study]
         default: stress
       refs:
         description: "Space-separated experiment commit SHAs"
         required: true
       split:
         type: choice
-        options: [dev, test, correlates, curves, latency_test, latency_dev, explore, ocular, emotions, habituation, hrv, audit, main, hep, noise, criterion, emotion_models, fixed_video, sensitivity, sensitivity_controls, ecg_morphology, hep_raw, sequence_models, criterion_full]
+        options: [dev, test, correlates, curves, latency_test, latency_dev, explore, ocular, emotions, habituation, hrv, audit, main, hep, noise, criterion, emotion_models, fixed_video, sensitivity, sensitivity_controls, ecg_morphology, hep_raw, sequence_models, criterion_full, fm_only, jepa_fusion]
         default: dev
         description: "dev = search objective; test = one-time sealed evaluation of all refs together; correlates = stress feature differences on dev"
       source_job:
@@ -73,7 +73,7 @@ jobs:
           STUDY: ${{ inputs.study }}
         run: |
           mkdir -p candidates
-          [ "$STUDY" = timecourse ] || [ "$STUDY" = person ] || [ "$STUDY" = revision ] && exit 0  # analyses only, no model file
+          [ "$STUDY" = timecourse ] || [ "$STUDY" = person ] || [ "$STUDY" = revision ] || [ "$STUDY" = ssl_study ] && exit 0  # analyses only, no model file
           for ref in $REFS; do git show "$ref:decoding/models/$STUDY.py" > "candidates/$ref.py"; done
           ls candidates
       - uses: azure/login@v2

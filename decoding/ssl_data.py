@@ -243,7 +243,9 @@ def _extract_body_multirate(
     return ecg_out, eda_out, resp_out, valid_body
 
 
-def normalize_eeg_windows(eeg_uv: np.ndarray, *, mode: str = "pre_rms") -> np.ndarray:
+def normalize_eeg_windows(
+    eeg_uv: np.ndarray, *, mode: str = "pre_rms", return_scale: bool = False
+) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
     """Normalize ``(N, 62, T, 128)`` EEG microvolts without future leakage.
 
     Modes
@@ -257,7 +259,11 @@ def normalize_eeg_windows(eeg_uv: np.ndarray, *, mode: str = "pre_rms") -> np.nd
       Shortcut ablation).
     """
     if mode == "fixed":
-        return np.clip(eeg_uv / 25.0, -10.0, 10.0).astype(np.float16)
+        arr = np.clip(eeg_uv / 25.0, -10.0, 10.0).astype(np.float16)
+        if return_scale:
+            scale = np.full((len(eeg_uv), eeg_uv.shape[1]), 25.0, dtype=np.float16)
+            return arr, scale
+        return arr
     if mode == "pre_rms":
         pre = eeg_uv[:, :, :3, :]  # (N, 62, 3, 128)
         rms = np.sqrt(np.mean(pre.astype(np.float32) ** 2, axis=(2, 3), keepdims=True))
@@ -267,7 +273,10 @@ def normalize_eeg_windows(eeg_uv: np.ndarray, *, mode: str = "pre_rms") -> np.nd
         )
         scale = np.where(rms > 1.0, rms, fallback)
         scale = np.maximum(scale, 5.0)
-        return np.clip(eeg_uv / scale, -10.0, 10.0).astype(np.float16)
+        arr = np.clip(eeg_uv / scale, -10.0, 10.0).astype(np.float16)
+        if return_scale:
+            return arr, scale[:, :, 0, 0].astype(np.float16)
+        return arr
     raise ValueError(f"Unknown EEG norm mode: {mode}")
 
 
@@ -293,9 +302,13 @@ def _worker_recording(args: tuple[str, list[dict], str]) -> dict:
 
     ecg, eda, resp, valid_body = _extract_body_multirate(curated, onsets)
     valid = np.concatenate([valid_eeg[:, None, :], valid_body], axis=1)  # (N, 4, 15)
+    eeg_normed, eeg_scale = normalize_eeg_windows(
+        eeg_uv, mode=eeg_norm, return_scale=True
+    )
     return {
         "trial_ids": trial_ids,
-        "eeg": normalize_eeg_windows(eeg_uv, mode=eeg_norm),
+        "eeg": eeg_normed,
+        "eeg_scale": eeg_scale,
         "ecg": ecg.astype(np.float16),
         "eda": eda.astype(np.float16),
         "resp": resp.astype(np.float16),
@@ -316,6 +329,7 @@ def load_dataset_multimodal(
     n = len(trials)
 
     eeg = np.zeros((n, len(CANONICAL_62), WIN_SECONDS, EEG_FS), dtype=np.float16)
+    eeg_scale = np.ones((n, len(CANONICAL_62)), dtype=np.float16)
     ecg = np.zeros((n, 2, WIN_SECONDS, ECG_FS), dtype=np.float16)
     eda = np.zeros((n, 2, WIN_SECONDS, SLOW_FS), dtype=np.float16)
     resp = np.zeros((n, 2, WIN_SECONDS, SLOW_FS), dtype=np.float16)
@@ -331,6 +345,7 @@ def load_dataset_multimodal(
         for idx, part in enumerate(pool.map(_worker_recording, jobs), 1):
             positions = np.array([id_to_pos[t] for t in part["trial_ids"]], dtype=int)
             eeg[positions] = part["eeg"]
+            eeg_scale[positions] = part["eeg_scale"]
             ecg[positions] = part["ecg"]
             eda[positions] = part["eda"]
             resp[positions] = part["resp"]
@@ -340,6 +355,7 @@ def load_dataset_multimodal(
 
     return {
         "eeg": eeg,
+        "eeg_scale": eeg_scale,
         "ecg": ecg,
         "eda": eda,
         "resp": resp,
