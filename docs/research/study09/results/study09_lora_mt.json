@@ -1,0 +1,929 @@
+{
+ "study": "09_reve_lora_dev_nested_cv",
+ "stage": "study09_lora_mt",
+ "salt": "habs-ssl-2026-11-24-b",
+ "scope": "dev_only_outer_3x3_blocked_person_x_theme",
+ "gpu_name": "NVIDIA H100 NVL",
+ "n_dev_trials": 12693,
+ "n_dev_people": 228,
+ "n_dev_themes": 66,
+ "n_body_features": 57,
+ "lora_start_layer": 16,
+ "lora_rank": 8,
+ "lora_alpha": 16.0,
+ "load_seconds": 120.41,
+ "forecasting": {},
+ "multitask_affect": {
+  "h16_precompute_s": 18.42,
+  "h16_vram_gb": 8.26,
+  "reve_mt_frozen_rank": {
+   "use_lora": false,
+   "use_ranking": true,
+   "lora_r": 0,
+   "n_trainable_params": 135171,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "total_gpu_seconds": 76.72,
+   "peak_vram_gb": 16.8,
+   "seed_stress_direct_auc": {
+    "mean": 0.552,
+    "sd": 0.0142,
+    "per_seed": [
+     0.5682,
+     0.5414,
+     0.5465
+    ]
+   },
+   "seed_stress_va_auc": {
+    "mean": 0.546,
+    "sd": 0.0265,
+    "per_seed": [
+     0.5527,
+     0.5686,
+     0.5168
+    ]
+   },
+   "seed_mean_rho": {
+    "mean": 0.0592,
+    "sd": 0.024,
+    "per_seed": [
+     0.0663,
+     0.0789,
+     0.0324
+    ]
+   },
+   "ensemble_stress_direct": {
+    "stress": {
+     "auc": 0.5551,
+     "ci95": [
+      0.5378,
+      0.5717
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5696,
+     "ci95": [
+      0.5489,
+      0.5908
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5348,
+     "ci95": [
+      0.5141,
+      0.5559
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5546,
+     "ci95": [
+      0.5251,
+      0.582
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5531,
+     "ci95": [
+      0.5266,
+      0.5781
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5199,
+     "ci95_weighted": [
+      0.5015,
+      0.5371
+     ],
+     "auc_unweighted": 0.5123,
+     "ci95_unweighted": [
+      0.4925,
+      0.5298
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4926,
+     "ci95_weighted": [
+      0.4599,
+      0.536
+     ],
+     "auc_unweighted": 0.531,
+     "ci95_unweighted": [
+      0.4885,
+      0.5747
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5384,
+    "average_precision": 0.3107,
+    "n_trials": 12693
+   },
+   "ensemble_stress_va": {
+    "stress": {
+     "auc": 0.5564,
+     "ci95": [
+      0.5404,
+      0.5719
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5686,
+     "ci95": [
+      0.5472,
+      0.5898
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5427,
+     "ci95": [
+      0.5215,
+      0.5636
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5509,
+     "ci95": [
+      0.5235,
+      0.5792
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5716,
+     "ci95": [
+      0.546,
+      0.5975
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5236,
+     "ci95_weighted": [
+      0.5058,
+      0.5419
+     ],
+     "auc_unweighted": 0.5268,
+     "ci95_unweighted": [
+      0.5079,
+      0.5444
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4886,
+     "ci95_weighted": [
+      0.4482,
+      0.5425
+     ],
+     "auc_unweighted": 0.552,
+     "ci95_unweighted": [
+      0.5049,
+      0.5988
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5487,
+    "average_precision": 0.3163,
+    "n_trials": 12693
+   },
+   "ensemble_affect": {
+    "valence": {
+     "within_person_rho": 0.0645,
+     "rho_ci95": [
+      0.0431,
+      0.0864
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.5333,
+     "auc_ci95": [
+      0.5195,
+      0.5467
+     ],
+     "auc_people": 228,
+     "pooled_gt5_auc": 0.5223
+    },
+    "arousal": {
+     "within_person_rho": 0.086,
+     "rho_ci95": [
+      0.0628,
+      0.1103
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.548,
+     "auc_ci95": [
+      0.5317,
+      0.5642
+     ],
+     "auc_people": 218,
+     "pooled_gt5_auc": 0.531
+    },
+    "mean_rho": 0.0752
+   }
+  },
+  "reve_mt_lora_rank": {
+   "use_lora": true,
+   "use_ranking": true,
+   "lora_r": 8,
+   "n_trainable_params": 282627,
+   "seeds": [
+    0,
+    1,
+    2
+   ],
+   "total_gpu_seconds": 1665.02,
+   "peak_vram_gb": 21.99,
+   "seed_stress_direct_auc": {
+    "mean": 0.546,
+    "sd": 0.0136,
+    "per_seed": [
+     0.5444,
+     0.5603,
+     0.5333
+    ]
+   },
+   "seed_stress_va_auc": {
+    "mean": 0.5408,
+    "sd": 0.0206,
+    "per_seed": [
+     0.5231,
+     0.5634,
+     0.536
+    ]
+   },
+   "seed_mean_rho": {
+    "mean": 0.0482,
+    "sd": 0.0342,
+    "per_seed": [
+     0.0178,
+     0.0852,
+     0.0417
+    ]
+   },
+   "ensemble_stress_direct": {
+    "stress": {
+     "auc": 0.5449,
+     "ci95": [
+      0.5281,
+      0.5617
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5576,
+     "ci95": [
+      0.535,
+      0.5795
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5352,
+     "ci95": [
+      0.5153,
+      0.5561
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5394,
+     "ci95": [
+      0.5101,
+      0.5714
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5554,
+     "ci95": [
+      0.5304,
+      0.5813
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5113,
+     "ci95_weighted": [
+      0.4927,
+      0.5288
+     ],
+     "auc_unweighted": 0.5033,
+     "ci95_unweighted": [
+      0.4824,
+      0.5232
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4969,
+     "ci95_weighted": [
+      0.4595,
+      0.535
+     ],
+     "auc_unweighted": 0.5234,
+     "ci95_unweighted": [
+      0.4721,
+      0.5709
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5336,
+    "average_precision": 0.3085,
+    "n_trials": 12693
+   },
+   "ensemble_stress_va": {
+    "stress": {
+     "auc": 0.5495,
+     "ci95": [
+      0.5324,
+      0.5668
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5567,
+     "ci95": [
+      0.5353,
+      0.5789
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5543,
+     "ci95": [
+      0.535,
+      0.5751
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5429,
+     "ci95": [
+      0.5134,
+      0.5721
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5689,
+     "ci95": [
+      0.5436,
+      0.5948
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.519,
+     "ci95_weighted": [
+      0.4995,
+      0.5365
+     ],
+     "auc_unweighted": 0.5123,
+     "ci95_unweighted": [
+      0.4926,
+      0.5307
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.5036,
+     "ci95_weighted": [
+      0.4649,
+      0.5484
+     ],
+     "auc_unweighted": 0.5457,
+     "ci95_unweighted": [
+      0.4951,
+      0.5973
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5395,
+    "average_precision": 0.3126,
+    "n_trials": 12693
+   },
+   "ensemble_affect": {
+    "valence": {
+     "within_person_rho": 0.0501,
+     "rho_ci95": [
+      0.0274,
+      0.0728
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.5273,
+     "auc_ci95": [
+      0.513,
+      0.5409
+     ],
+     "auc_people": 228,
+     "pooled_gt5_auc": 0.5191
+    },
+    "arousal": {
+     "within_person_rho": 0.0749,
+     "rho_ci95": [
+      0.0507,
+      0.0985
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.549,
+     "auc_ci95": [
+      0.5311,
+      0.566
+     ],
+     "auc_people": 218,
+     "pooled_gt5_auc": 0.5282
+    },
+    "mean_rho": 0.0625
+   },
+   "paired_va_vs_frozen_rank": {
+    "gain": -0.0069,
+    "ci95": [
+     -0.0211,
+     0.007
+    ],
+    "n": 208
+   },
+   "paired_dir_vs_frozen_rank": {
+    "gain": -0.0115,
+    "ci95": [
+     -0.0247,
+     0.0018
+    ],
+    "n": 208
+   }
+  },
+  "reve_mt_lora_norank": {
+   "use_lora": true,
+   "use_ranking": false,
+   "lora_r": 8,
+   "n_trainable_params": 282627,
+   "seeds": [
+    0
+   ],
+   "total_gpu_seconds": 555.22,
+   "peak_vram_gb": 21.76,
+   "seed_stress_direct_auc": {
+    "mean": 0.5482,
+    "sd": 0.0,
+    "per_seed": [
+     0.5482
+    ]
+   },
+   "seed_stress_va_auc": {
+    "mean": 0.5089,
+    "sd": 0.0,
+    "per_seed": [
+     0.5089
+    ]
+   },
+   "seed_mean_rho": {
+    "mean": 0.0026,
+    "sd": 0.0,
+    "per_seed": [
+     0.0026
+    ]
+   },
+   "ensemble_stress_direct": {
+    "stress": {
+     "auc": 0.5482,
+     "ci95": [
+      0.5305,
+      0.5655
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5462,
+     "ci95": [
+      0.524,
+      0.5671
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5362,
+     "ci95": [
+      0.5154,
+      0.5573
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5467,
+     "ci95": [
+      0.5162,
+      0.5758
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5515,
+     "ci95": [
+      0.5244,
+      0.5785
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5129,
+     "ci95_weighted": [
+      0.4943,
+      0.5298
+     ],
+     "auc_unweighted": 0.5067,
+     "ci95_unweighted": [
+      0.4886,
+      0.5238
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4693,
+     "ci95_weighted": [
+      0.4371,
+      0.5022
+     ],
+     "auc_unweighted": 0.4907,
+     "ci95_unweighted": [
+      0.445,
+      0.5338
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5296,
+    "average_precision": 0.3065,
+    "n_trials": 12693
+   },
+   "ensemble_stress_va": {
+    "stress": {
+     "auc": 0.5089,
+     "ci95": [
+      0.4904,
+      0.5279
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5096,
+     "ci95": [
+      0.4885,
+      0.5314
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5407,
+     "ci95": [
+      0.5189,
+      0.5622
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5324,
+     "ci95": [
+      0.5008,
+      0.5637
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.4766,
+     "ci95": [
+      0.45,
+      0.503
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.522,
+     "ci95_weighted": [
+      0.5025,
+      0.5394
+     ],
+     "auc_unweighted": 0.5327,
+     "ci95_unweighted": [
+      0.512,
+      0.5523
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4985,
+     "ci95_weighted": [
+      0.4473,
+      0.568
+     ],
+     "auc_unweighted": 0.5595,
+     "ci95_unweighted": [
+      0.5017,
+      0.6183
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5064,
+    "average_precision": 0.2849,
+    "n_trials": 12693
+   },
+   "ensemble_affect": {
+    "valence": {
+     "within_person_rho": 0.0298,
+     "rho_ci95": [
+      0.0042,
+      0.054
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.5096,
+     "auc_ci95": [
+      0.4942,
+      0.5249
+     ],
+     "auc_people": 228,
+     "pooled_gt5_auc": 0.5007
+    },
+    "arousal": {
+     "within_person_rho": -0.0247,
+     "rho_ci95": [
+      -0.0499,
+      -0.0008
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.493,
+     "auc_ci95": [
+      0.473,
+      0.5116
+     ],
+     "auc_people": 218,
+     "pooled_gt5_auc": 0.4965
+    },
+    "mean_rho": 0.0026
+   },
+   "paired_va_vs_frozen_rank": {
+    "gain": -0.0475,
+    "ci95": [
+     -0.066,
+     -0.0298
+    ],
+    "n": 208
+   },
+   "paired_dir_vs_frozen_rank": {
+    "gain": -0.0082,
+    "ci95": [
+     -0.023,
+     0.0058
+    ],
+    "n": 208
+   }
+  },
+  "reve_mt_lora_r4": {
+   "use_lora": true,
+   "use_ranking": true,
+   "lora_r": 4,
+   "n_trainable_params": 208899,
+   "seeds": [
+    0
+   ],
+   "total_gpu_seconds": 569.44,
+   "peak_vram_gb": 21.99,
+   "seed_stress_direct_auc": {
+    "mean": 0.5563,
+    "sd": 0.0,
+    "per_seed": [
+     0.5563
+    ]
+   },
+   "seed_stress_va_auc": {
+    "mean": 0.5476,
+    "sd": 0.0,
+    "per_seed": [
+     0.5476
+    ]
+   },
+   "seed_mean_rho": {
+    "mean": 0.0446,
+    "sd": 0.0,
+    "per_seed": [
+     0.0446
+    ]
+   },
+   "ensemble_stress_direct": {
+    "stress": {
+     "auc": 0.5563,
+     "ci95": [
+      0.5394,
+      0.5727
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5585,
+     "ci95": [
+      0.5372,
+      0.5799
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.5568,
+     "ci95": [
+      0.5363,
+      0.5787
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.5569,
+     "ci95": [
+      0.5269,
+      0.5858
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5753,
+     "ci95": [
+      0.5499,
+      0.6
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5298,
+     "ci95_weighted": [
+      0.5137,
+      0.5464
+     ],
+     "auc_unweighted": 0.5323,
+     "ci95_unweighted": [
+      0.5119,
+      0.5522
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4932,
+     "ci95_weighted": [
+      0.4525,
+      0.5411
+     ],
+     "auc_unweighted": 0.5179,
+     "ci95_unweighted": [
+      0.4626,
+      0.571
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5472,
+    "average_precision": 0.3189,
+    "n_trials": 12693
+   },
+   "ensemble_stress_va": {
+    "stress": {
+     "auc": 0.5476,
+     "ci95": [
+      0.5297,
+      0.5654
+     ],
+     "people": 208
+    },
+    "strict": {
+     "auc": 0.5506,
+     "ci95": [
+      0.5288,
+      0.5729
+     ],
+     "people": 172
+    },
+    "vs_excitement": {
+     "auc": 0.562,
+     "ci95": [
+      0.5415,
+      0.5831
+     ],
+     "people": 195
+    },
+    "vs_calm_negative": {
+     "auc": 0.557,
+     "ci95": [
+      0.5296,
+      0.5859
+     ],
+     "people": 125
+    },
+    "vs_relaxed": {
+     "auc": 0.5612,
+     "ci95": [
+      0.5348,
+      0.5887
+     ],
+     "people": 173
+    },
+    "same_video": {
+     "auc_weighted": 0.5329,
+     "ci95_weighted": [
+      0.5149,
+      0.5517
+     ],
+     "auc_unweighted": 0.5421,
+     "ci95_unweighted": [
+      0.5224,
+      0.5624
+     ],
+     "videos": 117,
+     "pairs": 118663
+    },
+    "same_video_vs_calm": {
+     "auc_weighted": 0.4752,
+     "ci95_weighted": [
+      0.4112,
+      0.5511
+     ],
+     "auc_unweighted": 0.5307,
+     "ci95_unweighted": [
+      0.4716,
+      0.5906
+     ],
+     "videos": 37,
+     "pairs": 4250
+    },
+    "pooled_auc": 0.5484,
+    "average_precision": 0.3208,
+    "n_trials": 12693
+   },
+   "ensemble_affect": {
+    "valence": {
+     "within_person_rho": 0.045,
+     "rho_ci95": [
+      0.0214,
+      0.0688
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.5241,
+     "auc_ci95": [
+      0.5097,
+      0.5379
+     ],
+     "auc_people": 228,
+     "pooled_gt5_auc": 0.5215
+    },
+    "arousal": {
+     "within_person_rho": 0.0443,
+     "rho_ci95": [
+      0.0195,
+      0.0679
+     ],
+     "rho_people": 228,
+     "within_person_auc": 0.5299,
+     "auc_ci95": [
+      0.5119,
+      0.5465
+     ],
+     "auc_people": 218,
+     "pooled_gt5_auc": 0.5196
+    },
+    "mean_rho": 0.0446
+   },
+   "paired_va_vs_frozen_rank": {
+    "gain": -0.0088,
+    "ci95": [
+     -0.025,
+     0.007
+    ],
+    "n": 208
+   },
+   "paired_dir_vs_frozen_rank": {
+    "gain": -0.0001,
+    "ci95": [
+     -0.0143,
+     0.0133
+    ],
+    "n": 208
+   }
+  }
+ },
+ "total_elapsed_seconds": 3076.09
+}
