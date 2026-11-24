@@ -79,37 +79,65 @@ def _set_seed(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def _to_device_store(
+    data: dict[str, np.ndarray], device: torch.device
+) -> dict[str, torch.Tensor | np.ndarray]:
+    """Pin float16/bool multimodal arrays once in H100 HBM3 (~6.3 GB / 93 GB)."""
+    out: dict[str, torch.Tensor | np.ndarray] = {}
+    for k, v in data.items():
+        if isinstance(v, np.ndarray) and v.dtype.kind in ("f", "b", "i", "u"):
+            out[k] = torch.from_numpy(v).to(device, non_blocking=True)
+        else:
+            out[k] = v
+    return out
+
+
+def _index_tensor(
+    arr: np.ndarray | torch.Tensor,
+    idx: np.ndarray | torch.Tensor,
+    device: torch.device,
+    *,
+    dtype: torch.dtype | None = None,
+) -> torch.Tensor:
+    """Gather rows from either a GPU-resident tensor or a CPU NumPy array."""
+    if isinstance(arr, torch.Tensor):
+        idx_t = (
+            idx
+            if isinstance(idx, torch.Tensor)
+            else torch.as_tensor(idx, dtype=torch.long, device=arr.device)
+        )
+        out = arr.index_select(0, idx_t)
+        return (
+            out.to(device=device, dtype=dtype) if dtype is not None else out.to(device)
+        )
+    idx_np = idx.cpu().numpy() if isinstance(idx, torch.Tensor) else idx
+    t = torch.from_numpy(arr[idx_np])
+    return (
+        t.to(device=device, dtype=dtype, non_blocking=True)
+        if dtype is not None
+        else t.to(device, non_blocking=True)
+    )
+
+
 def _slice_batch(
-    data: dict[str, np.ndarray],
-    idx: np.ndarray,
+    data: dict[str, np.ndarray | torch.Tensor],
+    idx: np.ndarray | torch.Tensor,
     device: torch.device,
     *,
     time_slice: tuple[int, int] = (0, 15),
     use_fixed_eeg: bool = False,
     shuffle_time_rng: np.random.Generator | None = None,
 ) -> dict[str, torch.Tensor]:
-    """Build GPU tensor batch from RAM float16 arrays with optional slicing/shuffle."""
+    """Build GPU tensor batch from HBM3-resident tensors (or CPU arrays in tests)."""
     t0, t1 = time_slice
-    eeg = torch.from_numpy(data["eeg"][idx, :, t0:t1, :]).to(
-        device, dtype=torch.float32, non_blocking=True
-    )
+    eeg = _index_tensor(data["eeg"], idx, device, dtype=torch.float32)[:, :, t0:t1, :]
     if use_fixed_eeg:
-        sc = torch.from_numpy(data["eeg_scale"][idx]).to(
-            device, dtype=torch.float32, non_blocking=True
-        )
+        sc = _index_tensor(data["eeg_scale"], idx, device, dtype=torch.float32)
         eeg = torch.clamp(eeg * sc[:, :, None, None] / 25.0, -10.0, 10.0)
-    ecg = torch.from_numpy(data["ecg"][idx, :, t0:t1, :]).to(
-        device, dtype=torch.float32, non_blocking=True
-    )
-    eda = torch.from_numpy(data["eda"][idx, :, t0:t1, :]).to(
-        device, dtype=torch.float32, non_blocking=True
-    )
-    resp = torch.from_numpy(data["resp"][idx, :, t0:t1, :]).to(
-        device, dtype=torch.float32, non_blocking=True
-    )
-    valid = torch.from_numpy(data["valid"][idx, :, t0:t1]).to(
-        device, dtype=torch.bool, non_blocking=True
-    )
+    ecg = _index_tensor(data["ecg"], idx, device, dtype=torch.float32)[:, :, t0:t1, :]
+    eda = _index_tensor(data["eda"], idx, device, dtype=torch.float32)[:, :, t0:t1, :]
+    resp = _index_tensor(data["resp"], idx, device, dtype=torch.float32)[:, :, t0:t1, :]
+    valid = _index_tensor(data["valid"], idx, device, dtype=torch.bool)[:, :, t0:t1]
     if shuffle_time_rng is not None:
         t_len = t1 - t0
         perm = torch.from_numpy(shuffle_time_rng.permutation(t_len)).to(device)
@@ -186,10 +214,10 @@ def train_supervised_eeg_model(
     best_state = copy.deepcopy(model.state_dict())
 
     def _get_eeg10(indices: np.ndarray) -> torch.Tensor:
-        # Bins 3..13 correspond to [0, 10) s -> (B, 62, 1280)
-        x = torch.from_numpy(data["eeg"][indices, :, 3:13, :]).to(
-            device, dtype=torch.float32, non_blocking=True
-        )
+        # Bins 3..13 correspond to [0, 10) s -> (B, 62, 1280) directly in HBM3
+        x = _index_tensor(data["eeg"], indices, device, dtype=torch.float32)[
+            :, :, 3:13, :
+        ]
         return x.reshape(x.shape[0], x.shape[1], -1)
 
     for _ in range(epochs):
@@ -1298,14 +1326,31 @@ def main() -> None:
 
     workers = min(20, os.cpu_count() or 8)
     t_load0 = time.perf_counter()
-    data = load_dataset_multimodal(trials, raw_dir, eeg_norm="pre_rms", workers=workers)
-    resting = load_dev_resting_windows(
+    data_cpu = load_dataset_multimodal(
+        trials, raw_dir, eeg_norm="pre_rms", workers=workers
+    )
+    resting_cpu = load_dev_resting_windows(
         raw_dir, dev_people, eeg_norm="pre_rms", workers=workers
     )
     load_s = round(time.perf_counter() - t_load0, 2)
+    mod_valid_frac = {
+        nm: round(float(data_cpu["valid"][:, i, :].mean()), 4)
+        for i, nm in enumerate(("eeg", "ecg", "eda", "resp"))
+    }
+    n_rest_win = int(len(resting_cpu["eeg"]))
+    if device.type == "cuda":
+        data = _to_device_store(data_cpu, device)
+        resting = _to_device_store(resting_cpu, device)
+        del data_cpu, resting_cpu
+        gc.collect()
+        ds_vram = round(torch.cuda.memory_allocated(device) / (1024**3), 2)
+    else:
+        data = data_cpu
+        resting = resting_cpu
+        ds_vram = 0.0
     print(
         f"Data loaded in {load_s}s: trials={len(frame)}, "
-        f"dev_resting_windows={len(resting['eeg'])}",
+        f"dev_resting_windows={n_rest_win}, dataset_vram_gb={ds_vram}",
         flush=True,
     )
 
@@ -1316,11 +1361,9 @@ def main() -> None:
         if torch.cuda.is_available()
         else "cpu",
         "data_load_seconds": load_s,
-        "dev_resting_windows": int(len(resting["eeg"])),
-        "modality_valid_fraction": {
-            nm: round(float(data["valid"][:, i, :].mean()), 4)
-            for i, nm in enumerate(("eeg", "ecg", "eda", "resp"))
-        },
+        "dataset_vram_gb": ds_vram,
+        "dev_resting_windows": n_rest_win,
+        "modality_valid_fraction": mod_valid_frac,
         "splits": common.summary(frame),
         "primary_models": {},
         "ablations": {
@@ -1330,6 +1373,15 @@ def main() -> None:
             "data_scale": {},
         },
     }
+    pub = out_dir / "public"
+    pub.mkdir(parents=True, exist_ok=True)
+
+    def _checkpoint_json() -> None:
+        report["total_elapsed_seconds"] = round(time.perf_counter() - t_all, 2)
+        (pub / "ssl_jepa_suite.json").write_text(
+            json.dumps(report, indent=1, default=lambda x: None)
+        )
+
     all_preds: dict[str, object] = {"trial_id": frame["trial_id"].to_numpy()}
 
     # ------------------------------------------------------------------
@@ -1375,6 +1427,7 @@ def main() -> None:
         pd.DataFrame(emb_cols).to_parquet(
             feat_dir / "jepa_embeddings.parquet", compression="zstd"
         )
+    _checkpoint_json()
 
     # ------------------------------------------------------------------
     # 2. Modality Ablations (seed 0, fold-isolated)
@@ -1398,6 +1451,7 @@ def main() -> None:
         )
         report["ablations"]["modality"][mod_name] = res
         all_preds.update(pcols)
+    _checkpoint_json()
 
     # ------------------------------------------------------------------
     # 3. Temporal Window Ablations (seed 0, fold-isolated)
@@ -1419,6 +1473,7 @@ def main() -> None:
         )
         report["ablations"]["window"][win_name] = res
         all_preds.update(pcols)
+    _checkpoint_json()
 
     # ------------------------------------------------------------------
     # 4. Pretraining Strategy & Identity-Shortcut Ablations (seed 0)
@@ -1446,6 +1501,7 @@ def main() -> None:
         )
         report["ablations"]["strategy"][strat_name] = res
         all_preds.update(pcols)
+    _checkpoint_json()
 
     # ------------------------------------------------------------------
     # 5. Data-Size Scaling Ablation (10%, 25%, 50% of dev participants)
@@ -1486,12 +1542,7 @@ def main() -> None:
     pd.DataFrame(all_preds).to_parquet(
         feat_dir / "jepa_preds.parquet", compression="zstd"
     )
-
-    report["total_elapsed_seconds"] = round(time.perf_counter() - t_all, 2)
-    pub = out_dir / "public"
-    pub.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(report, indent=1, default=lambda x: None)
-    (pub / "ssl_jepa_suite.json").write_text(text)
+    _checkpoint_json()
     print(
         f"COMPLETED Study 08 GPU suite in {report['total_elapsed_seconds']}s!",
         flush=True,

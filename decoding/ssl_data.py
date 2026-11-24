@@ -19,6 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pyedflib
+from scipy.fft import next_fast_len
 from scipy.signal import butter, hilbert, resample_poly, sosfiltfilt
 
 from decoding.extract import (
@@ -189,7 +190,10 @@ def _extract_body_multirate(
     if eda is not None and eda_fs >= 10:
         cond, _ = eda_to_conductance(eda, eda_unit, max_invalid_fraction=1.0)
         w_sc = _windows(cond, eda_fs, onsets, WIN_START_S, float(WIN_SECONDS))
-        finite_tr = np.isfinite(w_sc).all(axis=1) & (np.nanmin(w_sc, axis=1) > 0.0)
+        fin_all = np.isfinite(w_sc).all(axis=1)
+        finite_tr = np.zeros(n_trials, dtype=bool)
+        if fin_all.any():
+            finite_tr[fin_all] = w_sc[fin_all].min(axis=1) > 0.0
         if finite_tr.any():
             sc_scale = _robust_scale(cond[np.isfinite(cond)], floor=0.05)
             # Causal per-trial baseline-referenced log conductance + derivative
@@ -211,7 +215,7 @@ def _extract_body_multirate(
             eda_out[:, 1] = dsc_norm.astype(np.float32)
             valid_body[:, 1, :] = finite_tr[:, None]
 
-    # 3. Respiration: 0.1-1.0 Hz waveform + Hilbert amplitude envelope
+    # 3. Respiration: 0.1-1.0 Hz waveform + fast FFT Hilbert amplitude envelope
     if resp is not None and resp_fs >= 10 and np.isfinite(resp).all():
         y_r = sosfiltfilt(
             butter(2, (0.1, 1.0), btype="bandpass", fs=resp_fs, output="sos"),
@@ -220,7 +224,8 @@ def _extract_body_multirate(
         r_scale = _robust_scale(y_r)
         if r_scale > 0:
             y_rn = np.clip(y_r / r_scale, -8.0, 8.0)
-            env_r = np.abs(hilbert(y_rn))
+            n_fast = next_fast_len(len(y_rn))
+            env_r = np.abs(hilbert(y_rn, N=n_fast)[: len(y_rn)])
             env_rn = np.clip(
                 (env_r - np.median(env_r)) / _robust_scale(env_r), -5.0, 8.0
             )
