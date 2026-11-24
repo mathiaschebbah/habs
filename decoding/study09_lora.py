@@ -771,7 +771,7 @@ def train_eval_multitask_fold(
 # ---------------------------------------------------------------------------
 
 
-@torch.inference_mode()
+@torch.no_grad()
 def precompute_reve_h16(
     model: nn.Module,
     base_pos: torch.Tensor,
@@ -809,7 +809,7 @@ def precompute_reve_h16(
     return store
 
 
-@torch.inference_mode()
+@torch.no_grad()
 def precompute_reve_h22(
     top_layers: nn.ModuleList,
     h16: torch.Tensor,
