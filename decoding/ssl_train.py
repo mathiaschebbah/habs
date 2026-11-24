@@ -1452,20 +1452,21 @@ def main() -> None:
         else "ssl_jepa_suite"
     )
     run_primary = stage in ("ssl_jepa_primary", "ssl_jepa_suite")
-    run_ablations = stage in ("ssl_jepa_ablations", "ssl_jepa_suite")
-    out_json_name = (
-        "ssl_jepa_primary.json"
-        if stage == "ssl_jepa_primary"
-        else (
-            "ssl_jepa_ablations.json"
-            if stage == "ssl_jepa_ablations"
-            else "ssl_jepa_suite.json"
-        )
+    run_modwin = stage in (
+        "ssl_jepa_abl_modwin",
+        "ssl_jepa_ablations",
+        "ssl_jepa_suite",
     )
+    run_stratscale = stage in (
+        "ssl_jepa_abl_stratscale",
+        "ssl_jepa_ablations",
+        "ssl_jepa_suite",
+    )
+    out_json_name = f"{stage}.json"
     preds_pq_name = (
-        "jepa_ablation_preds.parquet"
-        if stage == "ssl_jepa_ablations"
-        else "jepa_preds.parquet"
+        "jepa_preds.parquet"
+        if stage in ("ssl_jepa_primary", "ssl_jepa_suite")
+        else f"{stage}_preds.parquet"
     )
 
     trials = pd.read_csv(
@@ -1484,7 +1485,7 @@ def main() -> None:
         load_dev_resting_windows(
             raw_dir, dev_people, eeg_norm="pre_rms", workers=workers
         )
-        if run_ablations
+        if run_stratscale
         else None
     )
     load_s = round(time.perf_counter() - t_load0, 2)
@@ -1589,7 +1590,7 @@ def main() -> None:
             )
         _checkpoint_json()
 
-    if run_ablations:
+    if run_modwin:
         # ------------------------------------------------------------------
         # 2. Modality Ablations (seed 0, fold-isolated)
         # ------------------------------------------------------------------
@@ -1636,6 +1637,7 @@ def main() -> None:
             all_preds.update(pcols)
         _checkpoint_json()
 
+    if run_stratscale:
         # ------------------------------------------------------------------
         # 4. Pretraining Strategy & Identity-Shortcut Ablations (seed 0)
         # ------------------------------------------------------------------
