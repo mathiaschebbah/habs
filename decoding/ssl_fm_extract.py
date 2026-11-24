@@ -92,7 +92,7 @@ def _worker_eeg_256hz(args: tuple[str, list[dict]]) -> dict:
         try:
             adj_onsets = onsets + offset
             ch_present = np.zeros(n_ch, dtype=bool)
-            bad_trial = np.zeros(n_trials, dtype=bool)
+            bad_ch_count = np.zeros(n_trials, dtype=np.int32)
             with pyedflib.EdfReader(str(path)) as reader:
                 labels = reader.getSignalLabels()
                 lbl_map = {lbl.upper(): i for i, lbl in enumerate(labels)}
@@ -135,12 +135,12 @@ def _worker_eeg_256hz(args: tuple[str, list[dict]]) -> dict:
                     res[bad] = 0.0
                     eeg_out[:, c_i, :] = res.astype(np.float32)
                     ch_present[c_i] = True
-                    bad_trial |= bad
+                    bad_ch_count += bad.astype(np.int32)
 
             if ch_present.sum() >= 30:
                 car = eeg_out[:, ch_present, :].mean(axis=1, keepdims=True)
                 eeg_out[:, ch_present, :] -= car
-                valid = ~bad_trial
+                valid = bad_ch_count <= int(0.20 * ch_present.sum())
                 break
         except (OSError, ValueError):
             continue
@@ -412,10 +412,14 @@ def _extract_sjepa(
     with torch.inference_mode():
         for start in range(0, n, batch_size):
             end = min(n, start + batch_size)
-            x = torch.from_numpy(eeg_256[start:end, keep_idx, : 14 * 256]).to(
-                device, dtype=torch.float32
+            x = (
+                torch.from_numpy(
+                    np.ascontiguousarray(eeg_256[start:end, keep_idx, : 14 * 256])
+                )
+                .to(device, dtype=torch.float32)
+                .contiguous()
             )
-            x = TAF.resample(x, 256, 128)[..., : 14 * 128]
+            x = TAF.resample(x, 256, 128)[..., : 14 * 128].contiguous()
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 out = model(x, return_features=True)
             feats = out["features"].float()  # (B, n_ch * n_t, 64)

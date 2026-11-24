@@ -82,7 +82,7 @@ def _extract_eeg_128hz(
     n_ch = len(CANONICAL_62)
     eeg_out = np.zeros((n_trials, n_ch, WIN_SECONDS, target_fs), dtype=np.float32)
     ch_present = np.zeros(n_ch, dtype=bool)
-    bad_sec = np.zeros((n_trials, WIN_SECONDS), dtype=bool)
+    bad_ch_count = np.zeros((n_trials, WIN_SECONDS), dtype=np.int32)
 
     with pyedflib.EdfReader(str(path)) as reader:
         labels = reader.getSignalLabels()
@@ -109,25 +109,24 @@ def _extract_eeg_128hz(
                 )
             sig = sosfiltfilt(sos_cache[fs_key], sig)
             win = _windows(sig, fs, onsets, WIN_START_S, float(WIN_SECONDS))
-            # Blank non-finite or saturated (>500 uV ptp in full window) trials
+            # Blank non-finite or saturated (>500 uV ptp) channels per second
             finite_mask = np.isfinite(win).all(axis=1)
             win_clean = np.where(np.isfinite(win), win, 0.0)
             res = _resample_2d(win_clean, fs, target_fs, n_raw_target)
             res = res.reshape(n_trials, WIN_SECONDS, target_fs)
-            # Flag per-second saturation (>500 uV ptp) or flatline (<0.01 uV std)
             ptp = np.ptp(res, axis=-1)
             sd = np.std(res, axis=-1)
             sec_bad = (~finite_mask[:, None]) | (ptp > 500.0) | (sd < 0.01)
             res[sec_bad] = 0.0
             eeg_out[:, c_i, :, :] = res.astype(np.float32)
             ch_present[c_i] = True
-            bad_sec |= sec_bad
+            bad_ch_count += sec_bad.astype(np.int32)
 
     # Common average reference across present channels (idempotent for PREPROCESSED)
     if ch_present.sum() >= 30:
         car = eeg_out[:, ch_present, :, :].mean(axis=1, keepdims=True)
         eeg_out[:, ch_present, :, :] -= car
-        valid = ~bad_sec
+        valid = bad_ch_count <= int(0.20 * ch_present.sum())
     else:
         valid = np.zeros((n_trials, WIN_SECONDS), dtype=bool)
     return eeg_out, valid
