@@ -1,5 +1,5 @@
 {
-  "stage": "ssl_fm_extract",
+  "stage": "ssl_jepa_suite",
   "seed": 20261108,
   "primary_cohort": 2,
   "exploratory_cohorts": [
