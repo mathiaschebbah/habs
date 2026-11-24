@@ -138,3 +138,39 @@ Pour un essai $i$, avec un **mur causal strict à $t = 5{,}000\text{ s}$** (zér
 | 4. Figures vérifiables + Rapport FR + Article LaTeX compilé | `docs/research/study09/make_figures.py`, `docs/paper/study09_fr.tex` | Local CPU + `pdflatex` | ~5 min | `docs/research/study09/figures/*.png`, `RESULTS.md`, `docs/paper/study09_fr.pdf` |
 
 **Discipline épistémique finale :** tout résultat (positif, partiel ou négatif) sera rapporté fidèlement sans retuning a posteriori sur le test exposé ni interprétation causale abusive.
+
+---
+
+## 8. Journal d'exécution, déviations documentées et verdicts finaux (2026-11-24)
+
+### 8.1 Traçabilité complète des commits, jobs H100 et runs CPU
+
+| Étape | Commit `main` | Workflow / Run ID | Job Azure (si GPU) | Statut & durée | Artefact vérifié |
+|---|---|---|---|---|---|
+| 0. Audit 07–08 & Protocole pré-enregistré | `51a2f34` | — | — | Gelé avant calcul | `journal/09_eeg_predictive_physiology.md` |
+| 1. Corrections normalisation + moteur protocole + extracteur causal | `041834c` | `check.yml` `45373700606` | — | Vert (lint + pytest) | `decoding/ssl_eval.py`, `study09_protocol.py`, `study09_extract.py` |
+| 2. Job GPU 1 (`study09_extract`, 508 enreg., mur causal `t = 5 s`) | `041834c` | `submit.yml` `45373700881` | `20261124T102049-806609` | Succès (`401,9 s`, 1,21 Go) | `study09_extract_audit.json` + 4 parquets privés |
+| 3. Suite LoRA + analyse CPU Modules 1–7 | `7b9d2ec` / `cc08f9c` | `check.yml` `45375512645` & `45375964439` | — | Verts (PyTorch + lint) | `decoding/study09_lora.py`, `study09_analysis.py` |
+| 4. Job CPU `controls` (Module 3 : AC1–AC3, TC1, NC1–NC4) | `cc08f9c` | `decoding.yml` `45376313147` | — | Succès (`3 140,5 s`) | `controls_metrics.json` (commit `052d964`) |
+| 5. Job GPU 2 combiné (interrompu à 60 min) | `cc08f9c` | `submit.yml` `45377861542` | `20261124T104721-98a25e` | Timeout 60 min (`MaxWallClockTimeExceeded`) | Déviation D1 ci-dessous |
+| 6. Cache exact `h22` + scission LoRA `forecast`/`mt` + fix `@torch.no_grad()` | `b5a0daf` / `737f3ed` | `check.yml` `45461907796` | — | Vert (72 tests + lint) | `decoding/study09_lora.py`, `tests/test_study09_lora.py` |
+| 7. Job GPU 2a (`study09_lora_forecast`, 3 seeds) | `737f3ed` | `submit.yml` `45464064105` | `20261124T185220-c4b80a` | Succès (`1 556,3 s`, 17,83 Go) | `study09_lora_forecast.json` (commit `f925ee1`) |
+| 8. Job GPU 2b (`study09_lora_mt`, 3 seeds + ablations) | `f925ee1` | `submit.yml` `45469670576` | `20261124T192421-6dd730` | Succès (`3 076,1 s`, 21,99 Go) | `study09_lora_mt.json` (commit `d171e2e`) |
+| 9. Job CPU `audit_forecast` (Modules 1–2 : audit + 18 délais + GBDT + B0–B2 + 5×5) | `f925ee1` | `decoding.yml` `45469678954` | — | Succès (`6 726,5 s`) | `audit_forecast_metrics.json` |
+| 10. Job CPU `secondary` (Modules 4–7 : LoRA + Trait/État + Oculo + H5) | `f925ee1` | `decoding.yml` `45479219132` | — | Succès (`2 399,7 s`) | `secondary_metrics.json` (commit `0960448`) |
+
+### 8.2 Déviations opérationnelles documentées (zéro changement d'hypothèses ni de seuils)
+
+- **D1 — Scission du Job GPU 2 et cache exact `h22` :** le premier essai combiné `study09_lora` (`20261124T104721-98a25e`) a terminé toute la Partie A et `reve_mt_frozen_rank` avant d'atteindre la limite murale de 60 min d'Azure Batch en fin de `reve_mt_lora_rank`. Nous avons ajouté un précalcul exact `h22` pour les têtes gelées (mathématiquement identique au bit près, vérifié par `test_lora_zero_init_and_exact_top_equivalence` sous `@torch.no_grad()`) et scindé l'exécution en deux jobs propres `study09_lora_forecast` (`25,9 min`) et `study09_lora_mt` (`51,3 min`) avec les mêmes hyperparamètres, seeds et plis.
+- **D2 — Accélération vectorisée du prétraitement CPU (commit `052d964`) :** remplacement de `SimpleImputer(strategy="median")` (`np.ma.argsort`) par une médiane NumPy vectorisée + PCA randomisée `float32` (gain 3,5× de vitesse, écart numérique $< 10^{-5}$, 100 % des tests identiques) afin que `audit_forecast` tienne sous le plafond de 120 min (`112,1 min`).
+- **D3 — Oculométrie (H4) :** la porte pré-enregistrée stricte sur le réflexe pupillaire moyen (`|t| > 4, p < 10⁻⁴`) a échoué globalement (`t = -1,259, p = 0,209` ; seule la cohorte 3 passe avec `t = -5,65`), mais la courbe évoquée de vitesse du regard par tranches de 0,25 s a démontré un alignement exact à `t = 0,00 s` (`+121 px/s`). Nous avons donc enregistré explicitement `gate_passed = false` tout en exécutant des baselines exploratoires simples étiquetées `gaze_onset_verified_exploratory` (résultat : nulles en stress `0,5058`, et contrôle de confusion validé sur l'ECG `+0,0088`).
+
+### 8.3 Verdicts finaux sur H1–H5
+
+- **H1 (Principale) :** **Confirmée statistiquement sur l'ECG (amplitude modeste, sous le seuil pratique `+0,015` sur `FC[5 ; 10)` mais franchi sur $\Delta\mathrm{FC}$ pur `+0,0182`), réfutée sur EDA et respiration.** ECG `M2_reve_resid − M0 = +0,0089 [+0,0054 ; +0,0125]`, `M2_reve_joint = +0,0110 [+0,0065 ; +0,0156]` (71,4 % sujets améliorés), `5×5 = +0,0120`, `M2_gbdt − M0_gbdt = +0,0063 [+0,0021 ; +0,0102]`, garde 2 s `+0,0089`, garde 5 s `+0,0038`, intact sous `AC1–AC3` (`+0,0070` à `+0,0110`), oculo (`+0,0088`), `TC1` (`+0,0073`), `NC1` nul (`−0,0003`), `NC3` nul (`−0,0010`), `NC4` détruit (`+0,0041`), `NC2` strictement idiosyncrasique (`réel − autre spectateur = +0,0242`, intra-vidéo `+0,0065`). EDA : `−0,0097` (GBDT `−0,0155`). Respiration : `+0,0008` (`M0_gbdt = 0,7036`, `M2_gbdt − M0_gbdt = −0,0008`).
+- **H2 (LoRA & Ranking) :** **Réfutée pour LoRA** (`−0,0069` vs tête gelée, `−0,0114` vs probe linéaire gelé, coût GPU ×21,7), **fortement confirmée pour la perte de ranking intra-sujet** (`+0,0406 [+0,0266 ; +0,0544]` vs `norank`).
+- **H3 (Trait / État) :** **Partiellement confirmée** (débruitage `state_only_shrinkage` bat soustraction aveugle `0,5605` vs `0,5551`, améliore $\bar{\rho}$ `0,0822`, AUC poolée `0,5425` et Brier `0,2479`, baisse $R^2$ identité `51,0 % → 36,9 %`), **réfutée** sur la prédiction de sensibilité-trait stress depuis le sous-espace trait EEG (`trait_only` AUC `0,4992`, $\rho_{\text{trait}} = -0,113$).
+- **H4 (Oculométrie) :** Porte pupillaire stricte **échouée** (`gate_passed = false`) ; synchronisation prouvée par la vitesse du regard (`+121 px/s` à `t = 0 s`, couverture `96,5 %`, $r_{\text{binoc}} = 0,852$) ; baselines exploratoires nulles en stress (`0,5058`).
+- **H5 (Stacking OOF) :** **Réfutée** (abstention propre sur EDA ; aucun gain en stacking imbriqué sur stress `−0,0084`, ECG `−0,0011` ni respiration `−0,0057`).
+
+Rapport complet : `docs/research/study09/RESULTS.md` ; figures : `docs/research/study09/figures/` ; article scientifique : `docs/paper/study09_fr.pdf`.
