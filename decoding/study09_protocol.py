@@ -316,34 +316,68 @@ def fit_predict_nested_ridge(
     if not clean_pca_grid:
         clean_pca_grid = [None]
 
+    # Fit Imputer + Scaler + max_pca ONCE per inner fold (PCA components are
+    # nested/ordered, so slicing [:, :nc] is mathematically exact and 3x faster!)
+    non_none_pcas = [c for c in clean_pca_grid if c is not None]
+    need_full = None in clean_pca_grid
+    max_inner_pca = max(non_none_pcas) if non_none_pcas else None
+
+    inner_cache: list[
+        tuple[
+            np.ndarray,
+            np.ndarray,
+            np.ndarray | None,
+            np.ndarray | None,
+            np.ndarray | None,
+            np.ndarray | None,
+        ]
+    ] = []
+    for p in range(inner_k):
+        for t in range(inner_k):
+            ev_m = (ipf == p) & (itf == t)
+            tr_m = (ipf != p) & (itf != t)
+            if ev_m.sum() == 0 or tr_m.sum() < 15:
+                continue
+            z_tr_full_i = z_ev_full_i = z_tr_pca_i = z_ev_pca_i = None
+            if need_full:
+                z_tr_full_i, z_ev_full_i = _preprocess_fit_transform(
+                    sub_x[tr_m], sub_x[ev_m], max_pca=None
+                )
+            if max_inner_pca is not None:
+                if z_tr_full_i is not None and z_tr_full_i.shape[1] > max_inner_pca:
+                    pca_i = PCA(n_components=max_inner_pca, random_state=0)
+                    z_tr_pca_i = pca_i.fit_transform(z_tr_full_i)
+                    z_ev_pca_i = pca_i.transform(z_ev_full_i)
+                else:
+                    z_tr_pca_i, z_ev_pca_i = _preprocess_fit_transform(
+                        sub_x[tr_m], sub_x[ev_m], max_pca=max_inner_pca
+                    )
+            inner_cache.append(
+                (ev_m, sub_y[tr_m], z_tr_full_i, z_ev_full_i, z_tr_pca_i, z_ev_pca_i)
+            )
+
     best_score = float("inf")
     best_cfg: tuple[int | None, float] = (clean_pca_grid[0], alphas[len(alphas) // 2])
     best_oof_sub = np.full(len(sub_x), np.nan, dtype=float)
 
     for n_pca in clean_pca_grid:
-        # Compute fold-isolated SVD once per inner block across all alphas!
         oof_by_alpha = {a: np.full(len(sub_x), np.nan, dtype=float) for a in alphas}
-        for p in range(inner_k):
-            for t in range(inner_k):
-                ev_m = (ipf == p) & (itf == t)
-                tr_m = (ipf != p) & (itf != t)
-                if ev_m.sum() == 0 or tr_m.sum() < 15:
-                    continue
-                z_tr_i, z_ev_i = _preprocess_fit_transform(
-                    sub_x[tr_m], sub_x[ev_m], max_pca=n_pca
-                )
-                y_tr_i = sub_y[tr_m]
-                y_mean = float(np.mean(y_tr_i))
-                yc = y_tr_i - y_mean
-                x_mean = np.mean(z_tr_i, axis=0, keepdims=True)
-                xc = z_tr_i - x_mean
-                u, s, vt = np.linalg.svd(xc, full_matrices=False)
-                uty = u.T @ yc
-                xe_c = z_ev_i - x_mean
-                for a in alphas:
-                    d_vec = s / (s * s + a)
-                    coef = vt.T @ (d_vec * uty)
-                    oof_by_alpha[a][ev_m] = y_mean + xe_c @ coef
+        for ev_m, y_tr_i, ztf, zef, ztp, zep in inner_cache:
+            if n_pca is None:
+                z_tr_i, z_ev_i = ztf, zef
+            else:
+                z_tr_i, z_ev_i = ztp[:, :n_pca], zep[:, :n_pca]
+            y_mean = float(np.mean(y_tr_i))
+            yc = y_tr_i - y_mean
+            x_mean = np.mean(z_tr_i, axis=0, keepdims=True)
+            xc = z_tr_i - x_mean
+            u, s, vt = np.linalg.svd(xc, full_matrices=False)
+            uty = u.T @ yc
+            xe_c = z_ev_i - x_mean
+            for a in alphas:
+                d_vec = s / (s * s + a)
+                coef = vt.T @ (d_vec * uty)
+                oof_by_alpha[a][ev_m] = y_mean + xe_c @ coef
 
         for a in alphas:
             loss = _within_person_mse(sub_y, oof_by_alpha[a], ppl)
