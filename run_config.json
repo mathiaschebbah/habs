@@ -1,5 +1,5 @@
 {
-  "stage": "ssl_audit",
+  "stage": "ssl_fm_extract",
   "seed": 20261108,
   "primary_cohort": 2,
   "exploratory_cohorts": [

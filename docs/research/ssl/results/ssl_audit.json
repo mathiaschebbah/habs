@@ -1,0 +1,203 @@
+{
+  "study": "08_ssl_audit",
+  "elapsed_seconds": 394.81,
+  "runtime": {
+    "cpu_count": 40,
+    "packages": {
+      "torch": "2.14.1+cu126",
+      "torchaudio": "2.11.0+cu126",
+      "torchvision": "0.29.1+cu126",
+      "einops": null,
+      "timm": null,
+      "safetensors": null,
+      "huggingface_hub": null,
+      "transformers": null,
+      "braindecode": null,
+      "mne": "1.13.2",
+      "scipy": "1.17.1",
+      "sklearn": "1.9.1"
+    },
+    "ram_gb": 314.69,
+    "disk_out_dir_free_gb": 83.39,
+    "disk_tmp_free_gb": 24.14,
+    "gpu": {
+      "cuda_available": true,
+      "cuda_version": "12.6",
+      "cudnn_version": 91002,
+      "device_name": "NVIDIA H100 NVL",
+      "vram_gb": 93.09,
+      "bf16_supported": true,
+      "device_count": 1
+    },
+    "huggingface_network": {
+      "reachable": true,
+      "status": 200,
+      "latency_ms": 142.0,
+      "bytes_read": 164
+    }
+  },
+  "splits": {
+    "habs-ssl-2026-11-24": {
+      "dev": {
+        "trials": 14809,
+        "people": 248,
+        "themes": 67,
+        "eligible_stress_people": 228,
+        "multi_day_people": 140
+      },
+      "test_new_both": {
+        "trials": 921,
+        "people": 66,
+        "themes": 17,
+        "eligible_stress_people": 29,
+        "multi_day_people": 36
+      },
+      "test_new_person": {
+        "trials": 3875,
+        "people": 66,
+        "themes": 67,
+        "eligible_stress_people": 58,
+        "multi_day_people": 36
+      },
+      "test_new_video": {
+        "trials": 3369,
+        "people": 246,
+        "themes": 17,
+        "eligible_stress_people": 98,
+        "multi_day_people": 140
+      },
+      "dev_person_folds": {
+        "0": 78,
+        "1": 70,
+        "2": 100
+      },
+      "dev_theme_folds": {
+        "0": 22,
+        "1": 20,
+        "2": 25
+      }
+    },
+    "habs-ssl-2026-11-24-b": {
+      "dev": {
+        "trials": 12693,
+        "people": 228,
+        "themes": 66,
+        "eligible_stress_people": 208,
+        "multi_day_people": 124
+      },
+      "test_new_both": {
+        "trials": 1481,
+        "people": 86,
+        "themes": 18,
+        "eligible_stress_people": 30,
+        "multi_day_people": 52
+      },
+      "test_new_person": {
+        "trials": 4934,
+        "people": 86,
+        "themes": 66,
+        "eligible_stress_people": 78,
+        "multi_day_people": 52
+      },
+      "test_new_video": {
+        "trials": 3866,
+        "people": 228,
+        "themes": 18,
+        "eligible_stress_people": 71,
+        "multi_day_people": 124
+      },
+      "dev_person_folds": {
+        "0": 62,
+        "1": 80,
+        "2": 86
+      },
+      "dev_theme_folds": {
+        "0": 25,
+        "1": 17,
+        "2": 24
+      }
+    },
+    "habs-ssl-2026-11-24-c": {
+      "dev": {
+        "trials": 14394,
+        "people": 244,
+        "themes": 71,
+        "eligible_stress_people": 222,
+        "multi_day_people": 139
+      },
+      "test_new_both": {
+        "trials": 902,
+        "people": 70,
+        "themes": 13,
+        "eligible_stress_people": 28,
+        "multi_day_people": 37
+      },
+      "test_new_person": {
+        "trials": 4135,
+        "people": 70,
+        "themes": 71,
+        "eligible_stress_people": 63,
+        "multi_day_people": 37
+      },
+      "test_new_video": {
+        "trials": 3543,
+        "people": 244,
+        "themes": 13,
+        "eligible_stress_people": 121,
+        "multi_day_people": 139
+      },
+      "dev_person_folds": {
+        "0": 68,
+        "1": 86,
+        "2": 90
+      },
+      "dev_theme_folds": {
+        "0": 21,
+        "1": 23,
+        "2": 27
+      }
+    }
+  },
+  "recordings": {
+    "emotion_video": {
+      "n_recordings": 508,
+      "preprocessed_found": 506,
+      "exact_canonical_62": 506,
+      "exact_canonical_62_order": 506,
+      "has_body_in_preprocessed": 506,
+      "eeg_sfreq_counts": {
+        "1000": 501,
+        "999": 5,
+        "998": 2
+      },
+      "total_duration_hours": 175.94,
+      "missing_channel_hist": {},
+      "errors": 0
+    },
+    "unlabeled_tasks": {
+      "resting-state": {
+        "total_preprocessed_files": 590,
+        "total_curated_files": 590,
+        "in_audited_people_files": 527,
+        "dev_only_files": 416,
+        "dev_only_people": 248,
+        "dev_only_exact_62ch": 416,
+        "dev_only_hours": 11.09
+      },
+      "artefact": {
+        "total_preprocessed_files": 223,
+        "total_curated_files": 222,
+        "in_audited_people_files": 194,
+        "dev_only_files": 152,
+        "dev_only_people": 152,
+        "dev_only_exact_62ch": 152,
+        "dev_only_hours": 9.03
+      }
+    }
+  },
+  "n_trials_total": 22974,
+  "n_people_total": 314,
+  "n_videos_total": 252,
+  "trial_hours_10s": 63.82,
+  "trial_hours_15s": 95.72
+}

@@ -99,6 +99,10 @@ def process(data_dir: Path, out_dir: Path) -> None:
         module = "decoding.rich_extract"
     elif stage == "ssl_audit":
         module = "decoding.ssl_audit"
+    elif stage == "ssl_fm_extract":
+        module = "decoding.ssl_fm_extract"
+    elif stage == "ssl_jepa_suite":
+        module = "decoding.ssl_train"
     elif temporal:
         module = "experiments.02_emotional_carryover"
     else:
