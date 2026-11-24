@@ -522,6 +522,107 @@ def extract_jepa_features(
     }
 
 
+@torch.inference_mode()
+def extract_jepa_window_isolated(
+    model: PhysioJEPA,
+    data: dict[str, np.ndarray | torch.Tensor],
+    indices: np.ndarray,
+    device: torch.device,
+    *,
+    active_modalities: tuple[int, ...] = (0, 1, 2, 3),
+    use_fixed_eeg: bool = False,
+    use_target_encoder: bool = True,
+) -> dict[str, np.ndarray]:
+    """Encode equal-length windows independently with identical positional embeddings.
+
+    Prevents the Transformer's additive ``time_emb`` from acting as a trivial
+    positional-encoding shortcut when probing ``pre_vs_video``, ``early_vs_late``,
+    and ``arrow_of_time``.
+
+    - 3-s matched windows (all receive ``time_emb[0:3]``): ``ref [-3, 0)``,
+      ``early3 [0, 3)``, ``late3 [7, 10)``.
+    - 5-s matched windows (both receive ``time_emb[0:5]``): ``early5 [0, 5)``,
+      ``late5 [5, 10)``.
+    """
+    model.eval()
+    enc = model.target_encoder if use_target_encoder else model.context_encoder
+    n = len(indices)
+    d = model.cfg.d_model
+    windows = {
+        "ref3": (0, 3),
+        "early3": (3, 6),
+        "late3": (10, 13),
+        "early5": (3, 8),
+        "late5": (8, 13),
+    }
+    out = {k: np.zeros((n, d), dtype=np.float32) for k in windows}
+    for key, t_sl in windows.items():
+        for s in range(0, n, BATCH_SIZE):
+            e = min(n, s + BATCH_SIZE)
+            batch = _slice_batch(
+                data,
+                indices[s:e],
+                device,
+                time_slice=t_sl,
+                use_fixed_eeg=use_fixed_eeg,
+            )
+            with torch.autocast(
+                device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"
+            ):
+                z, valid, _, _ = enc(batch, active_modalities=active_modalities)
+                v = valid.float().unsqueeze(-1)
+                pooled = (z.float() * v).sum(dim=1) / v.sum(dim=1).clamp(min=1.0)
+            out[key][s:e] = pooled.cpu().numpy()
+    return out
+
+
+@torch.inference_mode()
+def extract_jepa_eeg_only_early(
+    model: PhysioJEPA,
+    data: dict[str, np.ndarray | torch.Tensor],
+    indices: np.ndarray,
+    device: torch.device,
+    *,
+    use_fixed_eeg: bool = False,
+    use_target_encoder: bool = True,
+) -> np.ndarray:
+    """Extract leak-free EEG-only early ``[0, 5) s`` delta for brain->body forecasting.
+
+    Runs the frozen target encoder strictly on ``active_modalities=(0,)`` (EEG
+    only) and ``time_slice=(0, 8)`` (``[-3, 5) s``) so no peripheral modality and
+    no future time step ``t >= 5 s`` can ever leak through self-attention into
+    the early EEG embedding used to forecast late ``[5, 10) s`` autonomic state.
+    """
+    model.eval()
+    enc = model.target_encoder if use_target_encoder else model.context_encoder
+    n = len(indices)
+    d = model.cfg.d_model
+    out = np.zeros((n, d), dtype=np.float32)
+    for s in range(0, n, BATCH_SIZE):
+        e = min(n, s + BATCH_SIZE)
+        batch = _slice_batch(
+            data,
+            indices[s:e],
+            device,
+            time_slice=(0, 8),
+            use_fixed_eeg=use_fixed_eeg,
+        )
+        with torch.autocast(
+            device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"
+        ):
+            z, valid, _, _ = enc(batch, active_modalities=(0,))
+            # Shape is (B, 8, D): bins 0:3 are [-3, 0) ref, bins 3:8 are [0, 5) early
+            v = valid.float().unsqueeze(-1)
+            z_ref = (z[:, :3, :].float() * v[:, :3, :]).sum(dim=1) / v[:, :3, :].sum(
+                dim=1
+            ).clamp(min=1.0)
+            z_early = (z[:, 3:8, :].float() * v[:, 3:8, :]).sum(dim=1) / v[
+                :, 3:8, :
+            ].sum(dim=1).clamp(min=1.0)
+        out[s:e] = (z_early - z_ref).cpu().numpy()
+    return out
+
+
 def train_supervised_multimodal(
     data: dict[str, np.ndarray],
     frame: pd.DataFrame,
@@ -628,7 +729,9 @@ def train_supervised_multimodal(
                     device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"
                 ):
                     out = model.supervised_forward(
-                        batch, active_modalities=active_modalities, use_delta=True
+                        batch,
+                        active_modalities=active_modalities,
+                        use_delta=(time_slice[0] == 0),
                     )
                     vl = (
                         F.binary_cross_entropy_with_logits(
@@ -1147,7 +1250,24 @@ def run_jepa_variant(
 
         # Representation diagnostics & temporal shuffle test on seed 0
         if run_diagnostics and seed == seeds[0]:
-            exported_embeds = rep_all
+            exported_embeds = dict(rep_all)
+            if 0 in active_modalities:
+                # Strictly EEG-only, strictly t < 5 s (zero peripheral/future leakage!)
+                exported_embeds["z_eeg_early"] = extract_jepa_eeg_only_early(
+                    jepa_full,
+                    data,
+                    all_idx,
+                    device,
+                    use_fixed_eeg=use_fixed_eeg,
+                )
+            iso = extract_jepa_window_isolated(
+                jepa_full,
+                data,
+                all_idx,
+                device,
+                active_modalities=active_modalities,
+                use_fixed_eeg=use_fixed_eeg,
+            )
             unseen_df = frame[frame["split"].isin(["test_new_both", "test_new_person"])]
             unseen_pos = np.where(
                 frame["split"].isin(["test_new_both", "test_new_person"]).to_numpy()
@@ -1166,8 +1286,14 @@ def run_jepa_variant(
                 "subject_identity_all_crossday_delta": ssl_eval.probe_subject_identity(
                     frame, rep_all["z_vid"] - rep_all["z_ref"]
                 ),
-                "temporal_dynamics": ssl_eval.probe_temporal_dynamics(
+                "temporal_dynamics_single_pass": ssl_eval.probe_temporal_dynamics(
                     frame, rep_all["z_ref"], rep_all["z_early"], rep_all["z_late"]
+                ),
+                "temporal_dynamics_iso_3s": ssl_eval.probe_temporal_dynamics(
+                    frame, iso["ref3"], iso["early3"], iso["late3"]
+                ),
+                "temporal_dynamics_iso_5s": ssl_eval.probe_temporal_dynamics(
+                    frame, iso["ref3"], iso["early5"], iso["late5"]
                 ),
             }
             # Temporal-shuffle degradation check on sealed test!
@@ -1311,11 +1437,36 @@ def run_jepa_variant(
 
 
 def main() -> None:
-    """Execute complete Study-08 GPU training, ablation, and diagnostic suite."""
+    """Execute Study-08 GPU training, ablation, and diagnostic stages."""
     t_all = time.perf_counter()
     raw_dir = Path(os.environ["HABS_DATA_ROOT"])
     out_dir = Path(os.environ["HABS_ANALYSIS_OUT"])
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if device.type == "cuda":
+        torch.backends.cudnn.benchmark = True
+
+    cfg_path = Path(__file__).resolve().parent.parent / "run_config.json"
+    stage = (
+        json.loads(cfg_path.read_text()).get("stage", "ssl_jepa_suite")
+        if cfg_path.is_file()
+        else "ssl_jepa_suite"
+    )
+    run_primary = stage in ("ssl_jepa_primary", "ssl_jepa_suite")
+    run_ablations = stage in ("ssl_jepa_ablations", "ssl_jepa_suite")
+    out_json_name = (
+        "ssl_jepa_primary.json"
+        if stage == "ssl_jepa_primary"
+        else (
+            "ssl_jepa_ablations.json"
+            if stage == "ssl_jepa_ablations"
+            else "ssl_jepa_suite.json"
+        )
+    )
+    preds_pq_name = (
+        "jepa_ablation_preds.parquet"
+        if stage == "ssl_jepa_ablations"
+        else "jepa_preds.parquet"
+    )
 
     trials = pd.read_csv(
         out_dir / "data" / "aligned_trials.csv.gz", dtype={"participant_id": str}
@@ -1329,18 +1480,24 @@ def main() -> None:
     data_cpu = load_dataset_multimodal(
         trials, raw_dir, eeg_norm="pre_rms", workers=workers
     )
-    resting_cpu = load_dev_resting_windows(
-        raw_dir, dev_people, eeg_norm="pre_rms", workers=workers
+    resting_cpu = (
+        load_dev_resting_windows(
+            raw_dir, dev_people, eeg_norm="pre_rms", workers=workers
+        )
+        if run_ablations
+        else None
     )
     load_s = round(time.perf_counter() - t_load0, 2)
     mod_valid_frac = {
         nm: round(float(data_cpu["valid"][:, i, :].mean()), 4)
         for i, nm in enumerate(("eeg", "ecg", "eda", "resp"))
     }
-    n_rest_win = int(len(resting_cpu["eeg"]))
+    n_rest_win = int(len(resting_cpu["eeg"])) if resting_cpu is not None else 0
     if device.type == "cuda":
         data = _to_device_store(data_cpu, device)
-        resting = _to_device_store(resting_cpu, device)
+        resting = (
+            _to_device_store(resting_cpu, device) if resting_cpu is not None else None
+        )
         del data_cpu, resting_cpu
         gc.collect()
         ds_vram = round(torch.cuda.memory_allocated(device) / (1024**3), 2)
@@ -1349,13 +1506,14 @@ def main() -> None:
         resting = resting_cpu
         ds_vram = 0.0
     print(
-        f"Data loaded in {load_s}s: trials={len(frame)}, "
+        f"Stage={stage} | Data loaded in {load_s}s: trials={len(frame)}, "
         f"dev_resting_windows={n_rest_win}, dataset_vram_gb={ds_vram}",
         flush=True,
     )
 
     report: dict = {
-        "study": "08_ssl_jepa_suite",
+        "study": f"08_{stage}",
+        "stage": stage,
         "salt": STUDY08_SALT,
         "gpu_name": torch.cuda.get_device_name(0)
         if torch.cuda.is_available()
@@ -1375,10 +1533,12 @@ def main() -> None:
     }
     pub = out_dir / "public"
     pub.mkdir(parents=True, exist_ok=True)
+    feat_dir = out_dir / "features"
+    feat_dir.mkdir(parents=True, exist_ok=True)
 
     def _checkpoint_json() -> None:
         report["total_elapsed_seconds"] = round(time.perf_counter() - t_all, 2)
-        (pub / "ssl_jepa_suite.json").write_text(
+        (pub / out_json_name).write_text(
             json.dumps(report, indent=1, default=lambda x: None)
         )
 
@@ -1387,164 +1547,163 @@ def main() -> None:
     # ------------------------------------------------------------------
     # 1. Multi-seed Primary Benchmark (3 seeds: 0, 1, 2)
     # ------------------------------------------------------------------
-    print("=== BLOCK 1: Multi-seed Primary Models ===", flush=True)
-    for m_name, m_kind in (
-        ("eegnet", "eegnet"),
-        ("eeg_conformer", "eeg_conformer"),
-        ("multimodal_conformer_scratch", "multimodal_scratch"),
-    ):
-        res, pcols = run_supervised_cv_and_test(
-            m_name, m_kind, data, frame, device, seeds=SEEDS
-        )
-        report["primary_models"][m_name] = res
-        all_preds.update(pcols)
+    if run_primary:
+        print("=== BLOCK 1: Multi-seed Primary Models ===", flush=True)
+        for m_name, m_kind in (
+            ("eegnet", "eegnet"),
+            ("eeg_conformer", "eeg_conformer"),
+            ("multimodal_conformer_scratch", "multimodal_scratch"),
+        ):
+            res, pcols = run_supervised_cv_and_test(
+                m_name, m_kind, data, frame, device, seeds=SEEDS
+            )
+            report["primary_models"][m_name] = res
+            all_preds.update(pcols)
+            _checkpoint_json()
 
-    jepa_res, jepa_pcols, jepa_embeds = run_jepa_variant(
-        "physio_jepa",
-        data,
-        frame,
-        device,
-        strategy="jepa_crossmodal",
-        active_modalities=(0, 1, 2, 3),
-        time_slice=(0, 15),
-        use_fixed_eeg=False,
-        seeds=SEEDS,
-        run_finetune=True,
-        run_diagnostics=True,
-    )
-    report["primary_models"]["physio_jepa"] = jepa_res
-    all_preds.update(jepa_pcols)
-
-    # Export flagship PhysioJEPA embeddings privately for Job-3 fusion & forecasting
-    feat_dir = out_dir / "features"
-    feat_dir.mkdir(parents=True, exist_ok=True)
-    if jepa_embeds is not None:
-        emb_cols: dict[str, object] = {"trial_id": frame["trial_id"].to_numpy()}
-        for key in ("z_ref", "z_early", "z_late", "z_eeg_early"):
-            arr = jepa_embeds[key].astype(np.float32)
-            for j in range(arr.shape[1]):
-                emb_cols[f"jepa_{key}_{j}"] = arr[:, j]
-        pd.DataFrame(emb_cols).to_parquet(
-            feat_dir / "jepa_embeddings.parquet", compression="zstd"
-        )
-    _checkpoint_json()
-
-    # ------------------------------------------------------------------
-    # 2. Modality Ablations (seed 0, fold-isolated)
-    # ------------------------------------------------------------------
-    print("=== BLOCK 2: Modality Ablations ===", flush=True)
-    for mod_name, mod_tuple in (
-        ("eeg_only", (0,)),
-        ("body_only", (1, 2, 3)),
-        ("eeg_ecg", (0, 1)),
-        ("eeg_eda", (0, 2)),
-        ("eeg_resp", (0, 3)),
-    ):
-        res, pcols, _ = run_jepa_variant(
-            f"mod_{mod_name}",
-            data,
-            frame,
-            device,
-            strategy="jepa_masked" if len(mod_tuple) == 1 else "jepa_crossmodal",
-            active_modalities=mod_tuple,
-            seeds=(0,),
-        )
-        report["ablations"]["modality"][mod_name] = res
-        all_preds.update(pcols)
-    _checkpoint_json()
-
-    # ------------------------------------------------------------------
-    # 3. Temporal Window Ablations (seed 0, fold-isolated)
-    # ------------------------------------------------------------------
-    print("=== BLOCK 3: Temporal Window Ablations ===", flush=True)
-    for win_name, t_sl in (
-        ("early_0_5s", (3, 8)),
-        ("video_0_10s", (3, 13)),
-        ("pre_video_m3_10s", (0, 13)),
-    ):
-        res, pcols, _ = run_jepa_variant(
-            f"win_{win_name}",
+        jepa_res, jepa_pcols, jepa_embeds = run_jepa_variant(
+            "physio_jepa",
             data,
             frame,
             device,
             strategy="jepa_crossmodal",
-            time_slice=t_sl,
-            seeds=(0,),
+            active_modalities=(0, 1, 2, 3),
+            time_slice=(0, 15),
+            use_fixed_eeg=False,
+            seeds=SEEDS,
+            run_finetune=True,
+            run_diagnostics=True,
         )
-        report["ablations"]["window"][win_name] = res
-        all_preds.update(pcols)
-    _checkpoint_json()
+        report["primary_models"]["physio_jepa"] = jepa_res
+        all_preds.update(jepa_pcols)
 
-    # ------------------------------------------------------------------
-    # 4. Pretraining Strategy & Identity-Shortcut Ablations (seed 0)
-    # ------------------------------------------------------------------
-    print("=== BLOCK 4: Pretraining Strategy Ablations ===", flush=True)
-    for strat_name, kwargs in (
-        ("jepa_future", {"strategy": "jepa_future"}),
-        ("jepa_masked", {"strategy": "jepa_masked"}),
-        ("mae_recon", {"strategy": "mae_recon"}),
-        (
-            "jepa_fixed_raw_norm",
-            {
-                "strategy": "jepa_crossmodal",
-                "use_fixed_eeg": True,
-                "run_diagnostics": True,
-            },
-        ),
-        (
-            "jepa_plus_rest",
-            {"strategy": "jepa_crossmodal", "resting_data": resting},
-        ),
-    ):
-        res, pcols, _ = run_jepa_variant(
-            f"strat_{strat_name}", data, frame, device, seeds=(0,), **kwargs
-        )
-        report["ablations"]["strategy"][strat_name] = res
-        all_preds.update(pcols)
-    _checkpoint_json()
+        # Export flagship PhysioJEPA embeddings privately for Job-3 fusion/forecast
+        if jepa_embeds is not None:
+            emb_cols: dict[str, object] = {"trial_id": frame["trial_id"].to_numpy()}
+            for key in ("z_ref", "z_early", "z_late", "z_eeg_early"):
+                arr = jepa_embeds[key].astype(np.float32)
+                for j in range(arr.shape[1]):
+                    emb_cols[f"jepa_{key}_{j}"] = arr[:, j]
+            pd.DataFrame(emb_cols).to_parquet(
+                feat_dir / "jepa_embeddings.parquet", compression="zstd"
+            )
+        _checkpoint_json()
 
-    # ------------------------------------------------------------------
-    # 5. Data-Size Scaling Ablation (10%, 25%, 50% of dev participants)
-    # ------------------------------------------------------------------
-    print("=== BLOCK 5: Data-Size Scaling Ablation ===", flush=True)
-    dev_ppl_sorted = sorted(dev_people)
-    rng_sc = np.random.default_rng(20261124)
-    perm_ppl = rng_sc.permutation(dev_ppl_sorted).tolist()
-    for frac in (0.10, 0.25, 0.50):
-        n_keep = max(12, int(round(frac * len(perm_ppl))))
-        sub_ppl = set(perm_ppl[:n_keep])
-        tag = f"pct_{int(round(frac * 100))}"
-        res_j, _, _ = run_jepa_variant(
-            f"scale_jepa_{tag}",
-            data,
-            frame,
-            device,
-            strategy="jepa_crossmodal",
-            seeds=(0,),
-            sub_dev_people=sub_ppl,
-        )
-        res_s, _ = run_supervised_cv_and_test(
-            f"scale_scratch_{tag}",
-            "multimodal_scratch",
-            data,
-            frame,
-            device,
-            seeds=(0,),
-            sub_dev_people=sub_ppl,
-        )
-        report["ablations"]["data_scale"][tag] = {
-            "n_dev_people": n_keep,
-            "physio_jepa_frozen": res_j,
-            "multimodal_scratch": res_s,
-        }
+    if run_ablations:
+        # ------------------------------------------------------------------
+        # 2. Modality Ablations (seed 0, fold-isolated)
+        # ------------------------------------------------------------------
+        print("=== BLOCK 2: Modality Ablations ===", flush=True)
+        for mod_name, mod_tuple in (
+            ("eeg_only", (0,)),
+            ("body_only", (1, 2, 3)),
+            ("eeg_ecg", (0, 1)),
+            ("eeg_eda", (0, 2)),
+            ("eeg_resp", (0, 3)),
+        ):
+            res, pcols, _ = run_jepa_variant(
+                f"mod_{mod_name}",
+                data,
+                frame,
+                device,
+                strategy="jepa_masked" if len(mod_tuple) == 1 else "jepa_crossmodal",
+                active_modalities=mod_tuple,
+                seeds=(0,),
+            )
+            report["ablations"]["modality"][mod_name] = res
+            all_preds.update(pcols)
+        _checkpoint_json()
+
+        # ------------------------------------------------------------------
+        # 3. Temporal Window Ablations (seed 0, fold-isolated)
+        # ------------------------------------------------------------------
+        print("=== BLOCK 3: Temporal Window Ablations ===", flush=True)
+        for win_name, t_sl in (
+            ("early_0_5s", (3, 8)),
+            ("video_0_10s", (3, 13)),
+            ("pre_video_m3_10s", (0, 13)),
+        ):
+            res, pcols, _ = run_jepa_variant(
+                f"win_{win_name}",
+                data,
+                frame,
+                device,
+                strategy="jepa_crossmodal",
+                time_slice=t_sl,
+                seeds=(0,),
+            )
+            report["ablations"]["window"][win_name] = res
+            all_preds.update(pcols)
+        _checkpoint_json()
+
+        # ------------------------------------------------------------------
+        # 4. Pretraining Strategy & Identity-Shortcut Ablations (seed 0)
+        # ------------------------------------------------------------------
+        print("=== BLOCK 4: Pretraining Strategy Ablations ===", flush=True)
+        for strat_name, kwargs in (
+            ("jepa_future", {"strategy": "jepa_future"}),
+            ("jepa_masked", {"strategy": "jepa_masked"}),
+            ("mae_recon", {"strategy": "mae_recon"}),
+            (
+                "jepa_fixed_raw_norm",
+                {
+                    "strategy": "jepa_crossmodal",
+                    "use_fixed_eeg": True,
+                    "run_diagnostics": True,
+                },
+            ),
+            (
+                "jepa_plus_rest",
+                {"strategy": "jepa_crossmodal", "resting_data": resting},
+            ),
+        ):
+            res, pcols, _ = run_jepa_variant(
+                f"strat_{strat_name}", data, frame, device, seeds=(0,), **kwargs
+            )
+            report["ablations"]["strategy"][strat_name] = res
+            all_preds.update(pcols)
+        _checkpoint_json()
+
+        # ------------------------------------------------------------------
+        # 5. Data-Size Scaling Ablation (10%, 25%, 50% of dev participants)
+        # ------------------------------------------------------------------
+        print("=== BLOCK 5: Data-Size Scaling Ablation ===", flush=True)
+        dev_ppl_sorted = sorted(dev_people)
+        rng_sc = np.random.default_rng(20261124)
+        perm_ppl = rng_sc.permutation(dev_ppl_sorted).tolist()
+        for frac in (0.10, 0.25, 0.50):
+            n_keep = max(12, int(round(frac * len(perm_ppl))))
+            sub_ppl = set(perm_ppl[:n_keep])
+            tag = f"pct_{int(round(frac * 100))}"
+            res_j, _, _ = run_jepa_variant(
+                f"scale_jepa_{tag}",
+                data,
+                frame,
+                device,
+                strategy="jepa_crossmodal",
+                seeds=(0,),
+                sub_dev_people=sub_ppl,
+            )
+            res_s, _ = run_supervised_cv_and_test(
+                f"scale_scratch_{tag}",
+                "multimodal_scratch",
+                data,
+                frame,
+                device,
+                seeds=(0,),
+                sub_dev_people=sub_ppl,
+            )
+            report["ablations"]["data_scale"][tag] = {
+                "n_dev_people": n_keep,
+                "physio_jepa_frozen": res_j,
+                "multimodal_scratch": res_s,
+            }
 
     # Save private per-trial predictions table for Job-3 paired bootstrap CIs
-    pd.DataFrame(all_preds).to_parquet(
-        feat_dir / "jepa_preds.parquet", compression="zstd"
-    )
+    pd.DataFrame(all_preds).to_parquet(feat_dir / preds_pq_name, compression="zstd")
     _checkpoint_json()
     print(
-        f"COMPLETED Study 08 GPU suite in {report['total_elapsed_seconds']}s!",
+        f"COMPLETED Study 08 stage={stage} in {report['total_elapsed_seconds']}s!",
         flush=True,
     )
 

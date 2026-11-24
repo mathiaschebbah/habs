@@ -86,6 +86,9 @@ class EEGNet(nn.Module):
 
     Accepts ``(B, C, T)`` at 128 Hz and produces multi-task affective predictions
     ``(stress_logit, valence_pred, arousal_pred)`` plus a trial embedding.
+    Uses mathematically identical 1D temporal and grouped spatial-projection
+    convolutions so H100 Tensor Cores execute without slow 2D ``(1, 63)``
+    cuDNN fallbacks.
     """
 
     def __init__(
@@ -98,30 +101,32 @@ class EEGNet(nn.Module):
         dropout: float = 0.35,
     ) -> None:
         super().__init__()
-        self.block1 = nn.Sequential(
-            nn.Conv2d(
-                1, f1, (1, kernel_length), padding=(0, kernel_length // 2), bias=False
-            ),
-            nn.BatchNorm2d(f1),
-            nn.Conv2d(f1, f1 * d_mult, (n_chans, 1), groups=f1, bias=False),
-            nn.BatchNorm2d(f1 * d_mult),
+        self.n_chans = n_chans
+        self.f1 = f1
+        self.temp_conv = nn.Conv1d(
+            1, f1, kernel_length, padding=kernel_length // 2, bias=False
+        )
+        self.bn1 = nn.BatchNorm2d(f1)
+        self.block1_post = nn.Sequential(
+            nn.Conv1d(f1 * n_chans, f1 * d_mult, 1, groups=f1, bias=False),
+            nn.BatchNorm1d(f1 * d_mult),
             nn.ELU(),
-            nn.AvgPool2d((1, 4)),
+            nn.AvgPool1d(4),
             nn.Dropout(dropout),
         )
         self.block2 = nn.Sequential(
-            nn.Conv2d(
+            nn.Conv1d(
                 f1 * d_mult,
                 f1 * d_mult,
-                (1, 15),
-                padding=(0, 7),
+                15,
+                padding=7,
                 groups=f1 * d_mult,
                 bias=False,
             ),
-            nn.Conv2d(f1 * d_mult, f2, (1, 1), bias=False),
-            nn.BatchNorm2d(f2),
+            nn.Conv1d(f1 * d_mult, f2, 1, bias=False),
+            nn.BatchNorm1d(f2),
             nn.ELU(),
-            nn.AvgPool2d((1, 8)),
+            nn.AvgPool1d(8),
             nn.Dropout(dropout),
         )
         self.embed_dim = f2 * 3
@@ -129,8 +134,12 @@ class EEGNet(nn.Module):
 
     def encode(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Return ``(pooled_embed, seq_tokens)`` from ``x`` of shape ``(B, C, T)``."""
-        h = self.block1(x.unsqueeze(1))
-        h = self.block2(h).squeeze(2)  # (B, F2, T_out)
+        bsz, n_ch, t_len = x.shape
+        h = self.temp_conv(x.reshape(bsz * n_ch, 1, t_len))
+        h = h.reshape(bsz, n_ch, self.f1, t_len).permute(0, 2, 1, 3).contiguous()
+        h = self.bn1(h).reshape(bsz, self.f1 * n_ch, t_len)
+        h = self.block1_post(h)
+        h = self.block2(h)  # (B, F2, T_out)
         seq = h.transpose(1, 2)  # (B, T_out, F2)
         t_mid = max(1, h.shape[-1] // 2)
         early = h[:, :, :t_mid].mean(dim=-1)
@@ -156,7 +165,8 @@ class EEGConformer(nn.Module):
     """Convolutional Transformer for 62-ch EEG (Song et al., IEEE TNSRE 2023).
 
     Combines a temporal-spatial convolutional patch stem with a lightweight
-    Pre-Norm Transformer encoder over time tokens.
+    Pre-Norm Transformer encoder over time tokens. Uses mathematically identical
+    1D temporal + 1x1 spatial GEMM convolutions for fast Tensor Core execution.
     """
 
     def __init__(
@@ -168,15 +178,17 @@ class EEGConformer(nn.Module):
         dropout: float = 0.25,
     ) -> None:
         super().__init__()
-        self.stem = nn.Sequential(
-            nn.Conv2d(1, 40, (1, 25), padding=(0, 12), bias=False),
-            nn.Conv2d(40, 40, (n_chans, 1), bias=False),
-            nn.BatchNorm2d(40),
+        self.n_chans = n_chans
+        self.n_filters = 40
+        self.temp_conv = nn.Conv1d(1, self.n_filters, 25, padding=12, bias=False)
+        self.stem_post = nn.Sequential(
+            nn.Conv1d(self.n_filters * n_chans, self.n_filters, 1, bias=False),
+            nn.BatchNorm1d(self.n_filters),
             nn.ELU(),
-            nn.AvgPool2d((1, 32), stride=(1, 16)),
+            nn.AvgPool1d(32, stride=16),
             nn.Dropout(dropout),
         )
-        self.proj = nn.Linear(40, d_model)
+        self.proj = nn.Linear(self.n_filters, d_model)
         self.pos_emb = nn.Parameter(torch.randn(1, 128, d_model) * 0.02)
         layer = nn.TransformerEncoderLayer(
             d_model=d_model,
@@ -196,7 +208,14 @@ class EEGConformer(nn.Module):
 
     def encode(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Return ``(pooled_embed, seq_tokens)`` from ``x`` of shape ``(B, C, T)``."""
-        h = self.stem(x.unsqueeze(1)).squeeze(2).transpose(1, 2)  # (B, L, 40)
+        bsz, n_ch, t_len = x.shape
+        h = self.temp_conv(x.reshape(bsz * n_ch, 1, t_len))
+        h = (
+            h.reshape(bsz, n_ch, self.n_filters, t_len)
+            .permute(0, 2, 1, 3)
+            .reshape(bsz, self.n_filters * n_ch, t_len)
+        )
+        h = self.stem_post(h).transpose(1, 2)  # (B, L, 40)
         h = self.proj(h)
         seq_len = h.shape[1]
         if seq_len <= self.pos_emb.shape[1]:

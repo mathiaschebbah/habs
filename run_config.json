@@ -1,5 +1,5 @@
 {
-  "stage": "ssl_jepa_suite",
+  "stage": "ssl_jepa_primary",
   "seed": 20261108,
   "primary_cohort": 2,
   "exploratory_cohorts": [

@@ -391,14 +391,16 @@ def evaluate_jepa_fusion_and_paired_gains(
         )
 
     # 2. Exact paired bootstrap gains vs Study-07 enriched_full for every GPU model
-    pred_pq = folder / "jepa_preds.parquet"
-    if pred_pq.is_file():
+    paired = {}
+    dev_m = (frame["split"] == "dev").to_numpy()
+    for pq_name in ("jepa_preds.parquet", "jepa_ablation_preds.parquet"):
+        pred_pq = folder / pq_name
+        if not pred_pq.is_file():
+            continue
         df_p = pd.read_parquet(pred_pq)
         merged_p = frame[["trial_id"]].merge(
             df_p, on="trial_id", how="left", validate="1:1"
         )
-        paired = {}
-        dev_m = (frame["split"] == "dev").to_numpy()
         # Score all ensemble and seed0 stress_va / stress columns
         score_cols = [
             c
@@ -422,6 +424,7 @@ def evaluate_jepa_fusion_and_paired_gains(
                     "vs_study07_eeg": ssl_eval.paired_gain_ci(pmap, ref_eeg_pp[reg]),
                 }
             paired[col] = entry
+    if paired:
         out["paired_gains_vs_study07"] = paired
 
     return out

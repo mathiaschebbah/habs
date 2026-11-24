@@ -100,6 +100,16 @@ def test_ssl_models_and_train_pipeline(monkeypatch):
         assert np.isfinite(rep["embed_delta"]).all()
         assert np.isfinite(rep["embed_raw"]).all()
 
+    # Verify window-isolated dynamics and leak-free EEG-only early extraction
+    iso = ssl_train.extract_jepa_window_isolated(mdl, data, ev, device)
+    assert set(iso.keys()) == {"ref3", "early3", "late3", "early5", "late5"}
+    for arr in iso.values():
+        assert arr.shape == (len(ev), mdl.cfg.d_model)
+        assert np.isfinite(arr).all()
+    eeg_early = ssl_train.extract_jepa_eeg_only_early(mdl, data, ev, device)
+    assert eeg_early.shape == (len(ev), mdl.cfg.d_model)
+    assert np.isfinite(eeg_early).all()
+
     # Verify fine-tuning from pretrained JEPA
     pr_ft, _ = ssl_train.train_supervised_multimodal(
         data, frame, tr, ev, device, pretrained_jepa=mdl, seed=0, epochs=2
