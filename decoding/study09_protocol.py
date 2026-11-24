@@ -237,24 +237,57 @@ def _preprocess_fit_transform(
     x_tr: np.ndarray, x_ev: np.ndarray, *, max_pca: int | None = None
 ) -> tuple[np.ndarray, np.ndarray]:
     """Fold-isolated median imputation, zero-variance guard, standardization, PCA."""
-    x_tr_f = np.asarray(x_tr, dtype=np.float64)
-    x_ev_f = np.asarray(x_ev, dtype=np.float64)
+    x_tr_f = np.asarray(x_tr, dtype=np.float32)
+    x_ev_f = np.asarray(x_ev, dtype=np.float32)
     # Drop all-NaN columns in training fold safely
     valid_cols = np.isfinite(x_tr_f).any(axis=0)
     if not valid_cols.any():
         return np.zeros((len(x_tr_f), 1)), np.zeros((len(x_ev_f), 1))
-    x_tr_f = x_tr_f[:, valid_cols]
-    x_ev_f = x_ev_f[:, valid_cols]
+    x_tr_f = x_tr_f[:, valid_cols].copy()
+    x_ev_f = x_ev_f[:, valid_cols].copy()
 
-    imp = SimpleImputer(strategy="median")
-    scl = StandardScaler()
-    z_tr = scl.fit_transform(imp.fit_transform(x_tr_f))
-    z_ev = scl.transform(imp.transform(x_ev_f))
+    nan_tr = ~np.isfinite(x_tr_f)
+    nan_ev = ~np.isfinite(x_ev_f)
+    if nan_tr.any() or nan_ev.any():
+        need = nan_tr.any(axis=0) | nan_ev.any(axis=0)
+        cidx = np.where(need)[0]
+        th = nan_tr[:, cidx]
+        if th.any():
+            row_ok = ~th.any(axis=1)
+            if row_ok.any() and th[~row_ok].all():
+                meds = np.median(x_tr_f[row_ok][:, cidx], axis=0)
+            else:
+                meds = np.nanmedian(x_tr_f[:, cidx], axis=0)
+        else:
+            meds = np.median(x_tr_f[:, cidx], axis=0)
+        meds = np.where(np.isfinite(meds), meds, 0.0).astype(np.float32)
+        rt, ct = np.where(th)
+        if len(rt):
+            x_tr_f[rt, cidx[ct]] = meds[ct]
+        re, ce = np.where(nan_ev[:, cidx])
+        if len(re):
+            x_ev_f[re, cidx[ce]] = meds[ce]
+
+    mu = x_tr_f.mean(axis=0, keepdims=True)
+    sd = x_tr_f.std(axis=0, keepdims=True)
+    sd = np.where(sd > 1e-8, sd, 1.0)
+    z_tr = (x_tr_f - mu) / sd
+    z_ev = (x_ev_f - mu) / sd
     if max_pca is not None and z_tr.shape[1] > max_pca and z_tr.shape[0] > max_pca + 5:
-        pca = PCA(n_components=max_pca, random_state=0)
+        solver = "randomized" if z_tr.shape[1] >= 128 else "full"
+        pca = (
+            PCA(
+                n_components=max_pca,
+                svd_solver="randomized",
+                iterated_power=3,
+                random_state=0,
+            )
+            if solver == "randomized"
+            else PCA(n_components=max_pca, svd_solver="full", random_state=0)
+        )
         z_tr = pca.fit_transform(z_tr)
         z_ev = pca.transform(z_ev)
-    return z_tr, z_ev
+    return z_tr.astype(np.float64), z_ev.astype(np.float64)
 
 
 def _within_person_mse(
