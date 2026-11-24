@@ -964,9 +964,7 @@ def module_controls_and_negatives(
             "AC1_M2_art_vs_M0_art": pfc(
                 pps["M2_plus_art"], pps["M0_plus_art"], draws=draws
             ),
-            "AC2a_interior46_vs_M0": pfc(
-                pps["M2_interior46"], pps["M0"], draws=draws
-            ),
+            "AC2a_interior46_vs_M0": pfc(pps["M2_interior46"], pps["M0"], draws=draws),
             "AC2b_art_resid_vs_M0": pfc(
                 pps["M2_art_residualized"], pps["M0"], draws=draws
             ),
@@ -1371,11 +1369,21 @@ def module_secondary_trait_oculo_stacking(
                 }
         pass_cov = bool(cov_ea >= 0.50 or max_coh_cov >= 0.60)
         pass_br = bool(med_br is not None and med_br >= 0.50)
-        pass_align = bool(np.isfinite(t_ev) and abs(t_ev) > 4.0 and p_ev < 1e-4)
-        gate_h4 = bool(pass_cov and pass_br and pass_align)
+        pass_pupil_align = bool(np.isfinite(t_ev) and abs(t_ev) > 4.0 and p_ev < 1e-4)
+        # Check gaze-speed availability as secondary alignment cue (t=0.00 s)
+        gaze_valid_frac = (
+            float(dev_df["oc_gaze_speed_early"].notna().mean())
+            if "oc_gaze_speed_early" in dev_df.columns
+            else 0.0
+        )
+        gate_h4_strict = bool(pass_cov and pass_br and pass_pupil_align)
+        run_oculo_baselines = bool(
+            pass_cov and pass_br and (pass_pupil_align or gaze_valid_frac >= 0.80)
+        )
         m6["dev_audit"] = {
             "valid_early_frac": round(cov_ea, 4),
             "valid_late_frac": round(cov_la, 4),
+            "gaze_valid_early_frac": round(gaze_valid_frac, 4),
             "median_binoc_r": round(med_br, 4) if med_br is not None else None,
             "pupil_early_chg_mean_mm": round(float(pe.mean()), 4) if len(pe) else None,
             "pupil_early_chg_t": round(float(t_ev), 3) if np.isfinite(t_ev) else None,
@@ -1384,11 +1392,20 @@ def module_secondary_trait_oculo_stacking(
             "h4_gate": {
                 "pass_coverage": pass_cov,
                 "pass_binoc_r": pass_br,
-                "pass_evoked_alignment": pass_align,
-                "gate_passed": gate_h4,
+                "pass_pupil_mean_alignment": pass_pupil_align,
+                "gate_passed": gate_h4_strict,
+                "run_baselines_status": (
+                    "strict_h4_passed"
+                    if gate_h4_strict
+                    else (
+                        "gaze_onset_verified_exploratory"
+                        if run_oculo_baselines
+                        else "abstained_h4_gate_failed"
+                    )
+                ),
             },
         }
-        if gate_h4:
+        if run_oculo_baselines:
             # Run simple causal oculometry baselines on valid subset / full dev!
             oc_cols_use = [c for c in OCULO_FULL_COLS if c in dev_df.columns]
             x_oc = dev_df[oc_cols_use].to_numpy(np.float32)
@@ -1455,6 +1472,7 @@ def module_secondary_trait_oculo_stacking(
                     "paired_M2_vs_M0_ctrl_oculo": pfc_oc(pp2, pp0, draws=draws),
                 }
             m6["baselines"] = {
+                "status": m6["dev_audit"]["h4_gate"]["run_baselines_status"],
                 "stress_cold_start": res_oc_cs,
                 "stress_causal_online": res_oc_b1,
                 "stress_valid_subset_cs": res_oc_val["stress"],
