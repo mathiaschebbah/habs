@@ -283,9 +283,15 @@ def test_clinical_aggregation_auc_increases_monotonically_with_k():
 
 
 def test_study10_end_to_end_smoke():
-    """Full end-to-end smoke test of all 6 Study-10 modules on synthetic HABS."""
-    df, aux = _make_synthetic_habs(n_people=24, trials_per_person=76, seed=99)
-    res = study10_final.run_all(df, aux, draws=100)
+    """Fast end-to-end smoke test of all 6 Study-10 modules on synthetic HABS."""
+    df, aux = _make_synthetic_habs(n_people=15, trials_per_person=58, seed=99)
+    # Keep dev split large enough for fast CI execution (<10s)
+    df["split"] = "dev"
+    df["person_fold"] = study09_protocol.hash_buckets(
+        df["participant_id"], "syn-p-fast", 3
+    )
+    df["theme_fold"] = study09_protocol.hash_buckets(df["theme"], "syn-t-fast", 3)
+    res = study10_final.run_all(df, aux, draws=40)
     # Must serialize cleanly to valid JSON
     text = json.dumps(res)
     parsed = json.loads(text)

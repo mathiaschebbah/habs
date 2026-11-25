@@ -1,7 +1,7 @@
 # Étude 10 (Expérience finale) — Généralisation réaliste, personnalisation, stabilité longitudinale, cohérence autonome–subjective et monitoring clinique passif sur 314 personnes
 
-**Statut :** Protocole pré-enregistré avant toute exécution (2026-11-25).  
-**Base bibliographique :** Revue de littérature complète de l'Équipe 12 (Ashley Russo, 29 publications couvrant réponses autonomes rapides, décalage EEG/SNA, généralisation inter-sujets et adaptation de domaine, cohérence subjective–physiologique et monitoring clinique non verbal) + acquis vérifiés des Études 04 à 09.  
+**Statut :** Exécuté, vérifié et complété (2026-11-25 ; protocole pré-enregistré avant calcul au commit `62bc955`).  
+**Base bibliographique :** Revue de littérature complète de l'Équipe 12 (Ashley Russo, 39 publications couvrant réponses autonomes rapides, décalage EEG/SNA, généralisation inter-sujets et adaptation de domaine, cohérence subjective–physiologique et monitoring clinique non verbal) + acquis vérifiés des Études 04 à 09.  
 **Objectif :** Clôturer les six angles empiriques ouverts par la revue de littérature sur les 314 participants / 22 974 essais de HABS, sans nouvelle dépense GPU (en exploitant les tables causales et représentations `REVE-base` déjà extraites et vérifiées), afin d'étayer l'article scientifique final complet de l'Équipe 12 (`docs/paper/final_paper_fr.pdf`).
 
 ---
@@ -65,3 +65,19 @@ Toutes les analyses prédictives respectent les garde-fous établis en Étude 09
 ## 2. Discipline épistémique
 
 Tout résultat (positif, nuancé ou négatif) sera rapporté intégralement avec IC 95 %, tailles d'effet appariées et effectifs exacts, sans retuning sur un split exposé ni extrapolation clinique au-delà des limites d'un paradigme vidéo passif chez l'adulte sain.
+
+---
+
+## 3. Journal d'exécution et verdicts vérifiés (2026-11-25)
+
+- **Protocole pré-enregistré :** commit `62bc955` (strictement antérieur au code et à l'exécution).
+- **Code & tests unitaires :** `decoding/study10_final.py`, `tests/test_study10_final.py` (commit `51394bc`, lint `ruff` vert, 4/4 tests locaux passés).
+- **Run CPU reproductible :** GitHub Actions `decoding.yml` run `45604993423` (`study=study10_final`, `split=all`, `2 145,67 s` CPU, **0,00 H100-h GPU**), agrégat sauvé dans `docs/research/study10/results/study10_metrics.json`.
+- **Verdicts H10.1–H10.6 :**
+  - **H10.1 (Confirmée avec nuance organe) :** `S07` `R1=0,5887 → R3=0,5827 → R2=0,5729 → R4=0,5688` (70 % de l'inflation vient des thèmes vus ; `+0,0408` d'inflation poolée biométrique sur `REVE` LogReg). En R4, `−EEG` (`−0,0284*`) et `−EDA` (`−0,0177*`) sont les deux chutes significatives ; `ECG_only = 0,5075`, `All_plus_REVE = 0,5699`.
+  - **H10.2 (Confirmée) :** stabilité tonique `J1→J2` la plus faible pour l'EDA (`0,420` vs `0,569–0,724`) ; décodeur `EDA_only` chute significativement entre J1 et J2 (`0,5597 → 0,5228`, `−0,0392 [−0,0728 ; −0,0085]`), comme `Resp_only` (`−0,0299*`), tandis qu'EEG (`0,543 → 0,552`, REVE `0,540 → 0,559`) et multimodal (`0,572 → 0,559`) tiennent. Habituation intra-session sur `SCR` (`−0,0322*`), absence sur `RR` (`+5,66 ms*`), accentuation alpha (`−0,0710*`).
+  - **H10.3 (Confirmée sur la chute naïve ; réplication LOCO 5/5 sur ECG `M2−M0`) :** `Naive` s'effondre de `−0,081` à `k=5` jusqu'à `−0,053` à `k=40` (et `−0,040*` / `−0,069*` en `J1→J2`) ; `EB-MAP` supprime la chute (`0,564` S07, `+0,010` à `k=15` REVE) ; `LOCO` stress = `0,5893` (CORAL neutre) ; `LOCO` prévision cardiaque `M2 − M0 = +0,0107 [+0,0071 ; +0,0145]` (68,8 % améliorés, **5/5 cohortes positives**).
+  - **H10.4 (Répliquée sur $N = 314$, $n = 16\,276$) :** 3 facteurs Varimax orthogonaux (`F1 EDA 20,9 %`, `F2 Neuro-Auto 18,9 %` orthogonal au subjectif, `F3 Subj.-Cardio 13,6 %`) ; composite neuro-autonome `méd. +0,111`, `79,0 % > 0`, `21,0 % < 0`, effet d'intensité `+0,1008*` ; pont `M2−M0` indépendant du trait ($\rho = +0,091$, $p = 0,18$).
+  - **H10.5 (Confirmée avec prudence clinique) :** agrégation `K=1→10` (`10 s → 100 s`) en Cold-Start R4 porte l'AUC à `0,680` (std), `0,692` (menace) et `0,698` (3/7 vs relaxé, `Sens@Spec90` `31 % → 53 %`, `Sens@Spec80` `59 %`), confirmé sans remise (`K=3, 5`).
+  - **H10.6 (Confirmée et nuancée) :** dégoût domine `δ CP` précoce (`−0,098*`) et `γ` frontal tardif (`L−E −0,178*`, prudence micro-EMG) ; peur domine `α` soutenu (`−0,137*`), bradycardie tardive (`−0,104*`) et explosion `EDA` tardive (`+0,193*`, `L−E +0,303*`).
+- **Livrables finaux :** `docs/research/study10/RESULTS.md`, 4 figures vérifiées dans `docs/research/study10/figures/`, et article final consolidé `docs/paper/final_paper_fr.pdf`.
