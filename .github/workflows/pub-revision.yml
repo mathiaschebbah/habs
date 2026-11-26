@@ -5,7 +5,7 @@ on:
     inputs:
       analysis:
         type: choice
-        options: [primary, order-diagnostic, same-fit]
+        options: [primary, order-diagnostic, same-fit, finite-curves]
         default: primary
         description: "Primary experiments or exploratory fold-score diagnostic"
       source_job:
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stage: ${{ fromJSON(inputs.analysis == 'order-diagnostic' && '["order-diagnostic"]' || inputs.analysis == 'same-fit' && '["ridge-cell","reve-cell"]' || '["controls","ridge","reve"]') }}
+        stage: ${{ fromJSON(inputs.analysis == 'order-diagnostic' && '["order-diagnostic"]' || inputs.analysis == 'finite-curves' && '["finite-curves"]' || inputs.analysis == 'same-fit' && '["ridge-cell","reve-cell"]' || '["controls","ridge","reve"]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: azure/login@v2
@@ -56,7 +56,10 @@ jobs:
       - name: Run Priorities 1-3 + Figure 1 coverage
         shell: bash
         run: |
-          if [[ "$STAGE" == order-diagnostic ]]; then
+          if [[ "$STAGE" == finite-curves ]]; then
+            mkdir -p out_p123
+            python tools/finite_timecourse.py "$TRIAL_DATA" out_p123/pub_revision_p123_metrics.json | tee run_p123.log
+          elif [[ "$STAGE" == order-diagnostic ]]; then
             mkdir -p out_p123
             python tools/order_sensitivity.py "$TRIAL_DATA" out_p123/pub_revision_p123_metrics.json | tee run_p123.log
           else
