@@ -3,53 +3,31 @@ name: Code checks
 on:
   push:
     paths:
-      - "habs/**"
-      - "decoding/**"
-      - "data/eda.py"
-      - "process.py"
-      - "tools/**"
+      - "src/**"
+      - "scripts/**"
       - "tests/**"
-      - "requirements*.txt"
+      - "results/**"
+      - "process.py"
       - "pyproject.toml"
+      - "requirements.txt"
       - ".github/workflows/check.yml"
   pull_request:
-    paths:
-      - "habs/**"
-      - "decoding/**"
-      - "data/eda.py"
-      - "process.py"
-      - "tools/**"
-      - "tests/**"
-      - "requirements*.txt"
-      - "pyproject.toml"
-      - ".github/workflows/check.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  lint:
+  lint-and-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.12"
-      - run: pip install ruff
-      - run: ruff check habs decoding process.py data/eda.py tests tools/fetch_trial_table.py
-
-  tests:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install --extra-index-url https://download.pytorch.org/whl/cpu torch torchaudio
-      - run: pip install -r requirements.txt -r requirements-dev.txt pytest-xdist
-      - run: pip install -e .
-      - run: python -m pytest tests -n auto -q
+      - run: pip install --quiet ruff setuptools -r requirements.txt
+      - run: pip install --quiet --no-deps --no-build-isolation -e .
+      - run: ruff check src scripts tests process.py
+      - run: pytest -q

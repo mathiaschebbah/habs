@@ -1,58 +1,88 @@
-"""Exercise calibration provenance and failure behavior independently of labels."""
+"""Tests for signal calibration, ECG polarity/delineation, and hard causal t = 5.000 s."""
+
+from __future__ import annotations
 
 from pathlib import Path
 
 import numpy as np
-import pyedflib
-import pytest
 
-from habs.signals import CALIBRATION_VOLTS, eda_to_conductance
-
-
-def test_calibration_endpoints_have_declared_units():
-    """Convert the known calibration endpoints exactly, in volts."""
-    converted, quality = eda_to_conductance(CALIBRATION_VOLTS, "V")
-    assert list(converted) == [1.0, 2.0, 4.0, 8.0, 20.0, 40.0]
-    assert quality["status"] == "ok"
-    assert not quality["unit_mismatch"]
+from habs_stress.signals import (
+    causal_bandpass_windows,
+    delineate_ecg,
+    eda_to_conductance,
+    extract_causal_ecg_eda_past,
+    read_bdf_summary,
+)
 
 
-def test_outside_range_is_missing_instead_of_clamped():
-    """Prevent an invalid voltage from becoming an apparently valid endpoint."""
-    converted, quality = eda_to_conductance([-3e6, 3e6], "uV")
-    assert not np.isfinite(converted).any()
-    assert quality["status"] == "outside_calibration"
+def _synthetic_ecg(fs: float = 250.0, duration_s: float = 25.0, hr_bpm: float = 70.0, sign: float = 1.0) -> np.ndarray:
+    t = np.arange(round(fs * duration_s)) / fs
+    sig = np.zeros_like(t)
+    rr = 60.0 / hr_bpm
+    for beat in np.arange(0.5, duration_s - 0.6, rr):
+        dt = t - beat
+        # P wave (-0.16 s), QRS (0 s), T wave (+0.26 s)
+        sig += 0.15 * np.exp(-0.5 * ((dt + 0.16) / 0.025) ** 2)
+        sig += 1.20 * np.exp(-0.5 * (dt / 0.012) ** 2)
+        sig -= 0.25 * np.exp(-0.5 * ((dt - 0.022) / 0.010) ** 2)
+        sig += 0.30 * np.exp(-0.5 * ((dt - 0.26) / 0.045) ** 2)
+    return sign * sig
 
 
-def test_plausible_conductance_is_not_converted_again():
-    """Quarantine a unit convention not resolved by the release documentation."""
-    converted, quality = eda_to_conductance([2.0, 3.0, 4.0], "uS")
-    assert not np.isfinite(converted).any()
-    assert quality["status"] == "ambiguous_native_unit"
+def test_eda_to_conductance_valid_and_mismatch():
+    volts = np.array([-1.5, 0.0, 1.5])
+    cond, q = eda_to_conductance(volts, "V")
+    assert q["status"] == "ok" and not q["unit_mismatch"]
+    assert np.all(np.isfinite(cond)) and np.all(cond > 0)
+
+    # Microvolt-scale values mislabeled as uS trigger documented mismatch flag
+    cond_m, q_m = eda_to_conductance(volts * 1e6, "uS")
+    assert q_m["status"] == "ok" and q_m["unit_mismatch"]
+    assert np.allclose(cond, cond_m)
 
 
-def test_positive_raw_voltage_uses_the_same_documented_convention():
-    """Avoid selecting GSR validity according to the sign of its voltage."""
-    converted, quality = eda_to_conductance([1_700_740.0], "uS")
-    assert abs(converted[0] - 20.0) < 1e-12
-    assert quality["unit_mismatch"]
+def test_ecg_delineation_auto_polarity_fix():
+    fs = 250.0
+    up = delineate_ecg(_synthetic_ecg(fs, sign=+1.0), fs)
+    inv = delineate_ecg(_synthetic_ecg(fs, sign=-1.0), fs)
+    assert up["polarity"] == 1.0
+    assert inv["polarity"] == -1.0
+    assert up["good_qrs_frac"] > 0.95 and inv["good_qrs_frac"] > 0.95
+    assert np.isclose(np.nanmedian(up["rr_s"]), np.nanmedian(inv["rr_s"]), atol=0.01)
+    assert np.isclose(np.nanmedian(up["pr_pk"]), np.nanmedian(inv["pr_pk"]), atol=5.0)
 
 
-def test_documented_conversion_matches_provided_loader_on_real_sample():
-    """Check the observed sample mismatch against HABS's own conversion."""
-    from starting_notebooks.bdf_loader import uV_to_uS
+def test_hard_causal_wall_bit_invariance():
+    """Perturbing samples at t >= 5.000 s must have ZERO effect on past features."""
+    fs = 200.0
+    rng = np.random.default_rng(7)
+    n = round(30.0 * fs)
+    sig_a = rng.standard_normal(n)
+    sig_b = sig_a.copy()
+    onset = 10.0
+    wall_idx = round((onset + 5.0) * fs)
+    sig_b[wall_idx:] += 1e4  # massive future shock strictly at t >= 5.000 s
 
-    bdf = (
-        Path(__file__).resolve().parents[1]
-        / "sample/CURATED/P001/P001_day-1_task-resting-state_multimodal.bdf"
-    )
-    if not bdf.is_file() or bdf.stat().st_size < 1_000_000:
-        pytest.skip("The actual local BDF sample is not present.")
-    with pyedflib.EdfReader(str(bdf)) as reader:
-        index = reader.getSignalLabels().index("GSR")
-        native = reader.readSignal(index, 0, 1000)
-        unit = reader.getPhysicalDimension(index)
-    converted, quality = eda_to_conductance(native, unit)
-    assert quality["unit_mismatch"]
-    assert quality["status"] == "ok"
-    assert np.max(np.abs(converted - uV_to_uS(native))) < 1e-12
+    wa, fa = causal_bandpass_windows(sig_a, fs, np.array([onset]), -3.0, 5.0, 1.0, 40.0)
+    wb, fb = causal_bandpass_windows(sig_b, fs, np.array([onset]), -3.0, 5.0, 1.0, 40.0)
+    assert fa[0] and fb[0]
+    assert np.array_equal(wa, wb)
+
+    ecg_a = _synthetic_ecg(fs, duration_s=30.0, sign=-1.0)
+    ecg_b = ecg_a.copy()
+    ecg_b[wall_idx:] = -999.0
+    eda_a = np.full(n, 0.5)
+    eda_b = eda_a.copy()
+    eda_b[wall_idx:] = -2.0
+
+    past_a = extract_causal_ecg_eda_past(ecg_a, fs, eda_a, fs, "V", np.array([onset]))
+    past_b = extract_causal_ecg_eda_past(ecg_b, fs, eda_b, fs, "V", np.array([onset]))
+    for k in past_a:
+        assert np.array_equal(past_a[k], past_b[k], equal_nan=True)
+
+
+def test_sample_bdf_audit_runs():
+    sample_bdfs = sorted(Path("sample").rglob("*.bdf"))
+    assert sample_bdfs, "Expected official sample/ BDF files."
+    summary = read_bdf_summary(sample_bdfs[0])
+    assert summary["n_channels"] > 0 and summary["duration_s"] > 0

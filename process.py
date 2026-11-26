@@ -1,125 +1,41 @@
-"""Audit the released HABS annotations and native recording coverage."""
+"""Minimal HABS platform entrypoint.
 
-import hashlib
+Runs a signal-quality and polarity audit on any mounted BDF dataset (including
+the local ``sample/`` participant) using ``habs_stress.signals``.
+"""
+
+from __future__ import annotations
+
 import json
-import os
-import shutil
-import subprocess
-import sys
 from pathlib import Path
+
+from habs_stress.signals import read_bdf_summary
 
 
 def process(data_dir: Path, out_dir: Path) -> None:
-    """Audit the mounted dataset and retain the measured evidence.
+    """Audit mounted BDF recordings and write publication-safe summaries.
 
     Parameters
     ----------
     data_dir : pathlib.Path
-        Read-only HABS dataset root.
+        Read-only HABS dataset root (e.g. ``./sample`` or ``/data``).
     out_dir : pathlib.Path
-        Writable directory retained by the HABS platform.
-
-    Returns
-    -------
-    None
-        Summaries and detailed audit outputs are written below out_dir.
-
-    Raises
-    ------
-    RuntimeError
-        If any analysis cell fails or the final summary is absent.
+        Writable directory where JSON audit summaries are stored.
     """
-    root = Path(__file__).resolve().parent
     out_dir.mkdir(parents=True, exist_ok=True)
-    digest = out_dir / "eda_cells.md"
-    environment = {
-        **os.environ,
-        "HABS_DATA_ROOT": str(data_dir.resolve()),
-        "HABS_ANALYSIS_OUT": str(out_dir.resolve()),
-        "MPLBACKEND": "Agg",
-        "OMP_NUM_THREADS": "1",
-        "OPENBLAS_NUM_THREADS": "1",
-        "MKL_NUM_THREADS": "1",
+    public_dir = out_dir / "public"
+    public_dir.mkdir(parents=True, exist_ok=True)
+
+    bdfs = sorted(data_dir.rglob("*.bdf"))
+    if not bdfs:
+        raise RuntimeError(f"No BDF files found under {data_dir}")
+
+    summaries = [read_bdf_summary(p) for p in bdfs[:12]]
+    report = {
+        "data_dir": str(data_dir),
+        "n_bdf_found": len(bdfs),
+        "n_audited": len(summaries),
+        "recordings": summaries,
     }
-    cached = root / ".habs_inputs" / "data"
-    temporal = (root / "temporal_run.json").is_file()
-    if temporal and not cached.is_dir():
-        raise RuntimeError(
-            "The temporal study requires the audited native feature cache."
-        )
-    if cached.is_dir():
-        evidence = json.loads((cached / "eda_summary.json").read_text())
-        label_hash = hashlib.sha256(
-            (data_dir / "labels_train.csv").read_bytes()
-        ).hexdigest()
-        if label_hash != evidence["labels_sha256"]:
-            raise RuntimeError(
-                "The resumed audit belongs to a different label release."
-            )
-        shutil.copytree(cached, out_dir / "data", dirs_exist_ok=True)
-        checkpoints = root / ".habs_inputs" / "feature_checkpoints"
-        if checkpoints.is_dir():
-            shutil.copytree(
-                checkpoints, out_dir / "feature_checkpoints", dirs_exist_ok=True
-            )
-        print(
-            "Reused the team's audited inputs after checking the label fingerprint.",
-            flush=True,
-        )
-    else:
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "vendor.run_cells",
-                str(root / "data" / "eda.py"),
-                str(digest),
-            ],
-            env=environment,
-            cwd=root,
-            check=True,
-        )
-        if (
-            "**error:**" in digest.read_text()
-            or not (out_dir / "data" / "eda_summary.json").is_file()
-        ):
-            raise RuntimeError("The data audit failed; see eda_cells.md.")
-    summary = json.loads((out_dir / "data" / "eda_summary.json").read_text())
-    if summary["status"] == "sample_without_ratings":
-        print("Sample audit complete; no labelled study is possible on this sample.")
-        return
-    stage = json.loads((root / "run_config.json").read_text())["stage"]
-    if stage in ("features", "body_features"):
-        module = "decoding.extract"
-    elif stage == "timecourse_features":
-        module = "decoding.timecourse_extract"
-    elif stage == "hep_features":
-        module = "decoding.hep_extract"
-    elif stage == "rich_features":
-        module = "decoding.rich_extract"
-    elif stage == "ssl_audit":
-        module = "decoding.ssl_audit"
-    elif stage == "ssl_fm_extract":
-        module = "decoding.ssl_fm_extract"
-    elif stage in (
-        "ssl_jepa_suite",
-        "ssl_jepa_primary",
-        "ssl_jepa_ablations",
-        "ssl_jepa_abl_modwin",
-        "ssl_jepa_abl_stratscale",
-    ):
-        module = "decoding.ssl_train"
-    elif stage == "study09_extract":
-        module = "decoding.study09_extract"
-    elif stage in ("study09_lora", "study09_lora_forecast", "study09_lora_mt"):
-        module = "decoding.study09_lora"
-    elif temporal:
-        module = "experiments.02_emotional_carryover"
-    else:
-        module = "experiments.01_aversive_reactivity"
-    subprocess.run(
-        [sys.executable, "-u", "-m", module],
-        cwd=root,
-        env=environment,
-        check=True,
-    )
+    (public_dir / "signal_audit.json").write_text(json.dumps(report, indent=2))
+    print(f"Audited {len(summaries)}/{len(bdfs)} BDF files -> {public_dir / 'signal_audit.json'}")

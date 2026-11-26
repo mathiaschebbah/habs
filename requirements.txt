@@ -1,25 +1,8 @@
-# Your dependencies. These are installed into the container your job runs in.
-# Pin versions, or a rebuild can change them under you.
-#
-# mne reads the BDF files; pandas and scipy are what the example uses. pyedflib
-# is what starting_notebooks/bdf_loader.py needs, if you copy it in here.
-#
-# Don't add habs-hack here: the platform runs your code itself, and the CLI is
-# installed separately by the workflow.
-mne==1.13.2
-pyedflib==0.1.42
+# Pinned reproducible environment for Team 12 (HABS Neuro-AI Hackathon 2026)
 numpy==2.4.6
 pandas==3.0.1
 scipy==1.17.1
 scikit-learn==1.9.1
-skrub==0.11.0
-skore[jupyter]==0.29.1
-ipython==9.18.1
 matplotlib==3.11.2
-pyarrow==26.0.1
+pyedflib==0.1.42
 pytest==9.2.0
-einops==0.8.2
-safetensors==0.8.0
-huggingface-hub==2.4.0
-transformers==5.24.0
-braindecode==2.1.0
