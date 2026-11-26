@@ -1,0 +1,97 @@
+{
+  "analysis": "Study 11 publication revision",
+  "base_paper_commit": "abd9d6970ed79825d72eec780d349b180cd3b398",
+  "study09_code": "501d24b",
+  "manuscript_table_mapping": "scripts/study11_tables.py",
+  "figure_mapping": "scripts/study11_figures.py",
+  "raw_team_job": "20261126T164320-d4f202",
+  "unsuccessful_extraction": {
+    "run": "https://github.com/mathiaschebbah/habs/actions/runs/45855489096",
+    "outcome": "Rejected a non-CURATED alignment entry; no estimates from that run used. Corrected input selection before calibration and streamed per-recording output."
+  },
+  "model_revisions": {
+    "reve_base": "33841986f6cc1438d9dcdbca5a2137d60f6007d9",
+    "reve_positions": "befa5b57a455b77cf302daf610c2e9ed8140bace"
+  },
+  "artifacts": {
+    "controls.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45854683170",
+      "commit": "c1eadc5103c4c4bf66c60b6f058241f858962f0a",
+      "function": "pub_revision.run_priority2_post_ablation / run_priority3_confound_controls / compute_fig1_coverage",
+      "population_and_estimand": "Mean per-ID classifier AUC for paired R4 folds, training windows and clocks; 228 development IDs, 208 ranking-eligible. Timecourse includes both historical salts and actual per-bin denominators.",
+      "sha256": "73d876808a3595f2e19e16f1a9db2773e1f4b299989b2c555d94829d877dba1a"
+    },
+    "ladder_ridge.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45854683170",
+      "commit": "c1eadc5103c4c4bf66c60b6f058241f858962f0a",
+      "function": "pub_revision.run_priority1_matched_ladder",
+      "population_and_estimand": "448-feature model; both VA and logistic heads; full and matched training pools; same evaluation cells, 10 matched samples per cell.",
+      "sha256": "d08b03d9916447297b3a8e9d2261498207da8bf85b9731504a2bf26786fc5393"
+    },
+    "ladder_reve.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45854683170",
+      "commit": "c1eadc5103c4c4bf66c60b6f058241f858962f0a",
+      "function": "pub_revision.run_priority1_matched_ladder",
+      "population_and_estimand": "Frozen REVE using 10 s of EEG; VA and logistic heads, same row indices/seeds as multimodal Ridge.",
+      "sha256": "48ac7d7fea69e85fca4cbcdda1b0ccf4095097e16066a6f1df4802b9f35f0d91"
+    },
+    "finite_curves.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45862938130",
+      "commit": "0048e0b4596d49d5e36c2bfdf54f94d534709ffa",
+      "function": "tools/finite_timecourse.py:contrast, run",
+      "population_and_estimand": "Figure 1A; case-complete class variances and >=3 finite trials per class, ID and bin. Distinguishes this from the historical eligibility rule.",
+      "sha256": "25ce3375d88e13e7dd421a035af034c94812f8134a0929de2a5ea29d7958bb2c"
+    },
+    "order_diagnostic.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45856670569",
+      "commit": "74c9179",
+      "function": "tools/order_sensitivity.py:run",
+      "population_and_estimand": "Exploratory same-fitted-model versus ordinary within-ID ROC pairing for fold-only and time-only predictions.",
+      "sha256": "d86c43e30b25acdcac239702086b5630d323f4b611b253ab60fe22f68f8ae244"
+    },
+    "same_ridge.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45857089203",
+      "commit": "6d442897e17d5446cce898a4c029a4af3c6f1d8e",
+      "function": "pub_revision.run_priority1_matched_ladder / evaluate_score_vector(same_fit_only=True)",
+      "population_and_estimand": "Identical protocol to ladder_ridge; ROC pairs restricted to the same participant ID and the same outer fitted model.",
+      "sha256": "82b97a010d9d9ed120c3f677a2f0b644c249d7b06ba6aa6d9da3785abc5418d0"
+    },
+    "same_reve.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45857089203",
+      "commit": "6d442897e17d5446cce898a4c029a4af3c6f1d8e",
+      "function": "pub_revision.run_priority1_matched_ladder / evaluate_score_vector(same_fit_only=True)",
+      "population_and_estimand": "Identical protocol to ladder_reve; ROC pairs restricted to the same ID and the same outer fitted model.",
+      "sha256": "ab9a3fa42c139b1ec979fe729b8015c67a99ffd6fe756f69a19b7331635884d0"
+    },
+    "raw_coverage.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45861097065",
+      "commit": "b391dd34dd1d8e4f7c18e4d878d56248f8f5b5f3",
+      "function": "tools/raw_gpu.py:process, raw_eeg.prefix, learn_transfer",
+      "population_and_estimand": "CURATED-only development epochs, common raw quality gates, disjoint ECG-regression calibration IDs; pre-0 and pre-5 perturbation checks.",
+      "sha256": "3ff9ca4323bc3e1f213ed8070f9c6d75fc754aa5205450c57084aece45e82e07"
+    },
+    "raw_scores.json": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/45863883866",
+      "commit": "0048e0b4596d49d5e36c2bfdf54f94d534709ffa",
+      "function": "tools/score_raw.py:score with decoding/study09_protocol.py at 501d24b",
+      "population_and_estimand": "Common usable trial intersections and within-ID Pearson r, centered and raw R², RMSE in bpm, paired differences; chronological-prefix classification and corrected-vs-uncorrected controls.",
+      "sha256": "4bec778f1bfc14c02b5ce45798405c213e6739e71c056f8c46c9c4a31c9593a3"
+    }
+  },
+  "historical_verification": {
+    "timecourse": {
+      "run": "https://github.com/mathiaschebbah/habs/actions/runs/44635398113/attempts/2",
+      "commit": "9dfefdfde30970472878fca0abbf0112074c26ff",
+      "source": "timecourse.curves / _person_d",
+      "file_sha256": "22be7db9d4638f745d6e6e48fa50d7d29a8eca5360688a6a2667062a8ca87042"
+    },
+    "rmssd": {
+      "nested_5s_in_60s": "https://github.com/mathiaschebbah/habs/actions/runs/44635461916/attempts/2",
+      "early_vs_late": "https://github.com/mathiaschebbah/habs/actions/runs/45092356704"
+    },
+    "fixed_video": {
+      "historical": "https://github.com/mathiaschebbah/habs/actions/runs/45091493959",
+      "R4_and_fear_disgust": "https://github.com/mathiaschebbah/habs/actions/runs/45604993423"
+    }
+  }
+}

@@ -1,0 +1,81 @@
+% Derived from results/study11 by scripts/study11_tables.py.
+\newcommand{\RidgeGap}{-0.0072\;[-0.0138;\,-0.0003]}
+\newcommand{\RidgeGapShort}{-0.007}
+\newcommand{\ReveGap}{0.0258\;[0.0137;\,0.0382]}
+\newcommand{\RidgeSame}{-0.0129\;[-0.0214;\,-0.0047]}
+\newcommand{\ReveSame}{0.0004\;[-0.0088;\,0.0104]}
+\newcommand{\RidgeFullGap}{-0.0153\;[-0.0226;\,-0.0087]}
+\newcommand{\FourPhase}{0.5694}
+\newcommand{\ThreePhase}{0.5655}
+\newcommand{\PostDiff}{0.0039\;[-0.0042;\,0.0129]}
+\newcommand{\TreeRaw}{0.462}
+\newcommand{\TreeSame}{0.505\;[0.491;\,0.519]}
+\newcommand{\FoldPrior}{0.427}
+\newcommand{\LadderTable}{\begin{tabular}{lccccc}
+\toprule
+Model & R1 & R2 & R3 & R4 & $\Delta$ R4$-$R1 (95\% CI) \\
+\midrule
+Multimodal Ridge & $0.577$ & $0.570$ & $0.579$ & $0.569$ & $-0.007\;[-0.014;\,-0.000]$ \\
+REVE + Ridge & $0.558$ & $0.557$ & $0.561$ & $0.560$ & $0.002\;[-0.007;\,0.011]$ \\
+REVE + logit & $0.538$ & $0.543$ & $0.558$ & $0.564$ & $0.026\;[0.014;\,0.038]$ \\
+\bottomrule
+\end{tabular}}
+\newcommand{\OrderTable}{\begin{tabular}{lccc}
+\toprule
+Input & AUC (95\% CI) & C1--2 & C3--5 \\
+\midrule
+Trial index & $0.501\;[0.482;\,0.520]$ & $0.494$ & $0.518$ \\
+Cohort $\times$ index & $0.488\;[0.469;\,0.507]$ & $0.484$ & $0.497$ \\
+Nominal pre-stimulus & $0.504\;[0.488;\,0.520]$ & $0.504$ & $0.503$ \\
+Previous trial & $0.496\;[0.483;\,0.509]$ & $0.492$ & $0.508$ \\
+Current clip, no post & $0.566\;[0.551;\,0.579]$ & $0.559$ & $0.582$ \\
+\bottomrule
+\end{tabular}}
+\newcommand{\CalIDs}{21}
+\newcommand{\NonRawRows}{41}
+\newcommand{\NonRawRecords}{1}
+\newcommand{\BeforeQC}{11\,368}
+\newcommand{\AfterQC}{11\,002}
+\newcommand{\RawIDs}{205}
+\newcommand{\RawEvaluable}{203}
+\newcommand{\RawRows}{10\,031}
+\newcommand{\BodyRMSE}{6.27}
+\newcommand{\BodyR}{0.677}
+\newcommand{\OrigRMSE}{5.442}
+\newcommand{\TreeRMSE}{5.308}
+\newcommand{\TreeWithEEG}{5.294}
+\newcommand{\TreeGain}{0.0139\;[-0.0084;\,0.0370]}
+\newcommand{\TreeGainR}{0.0020\;[-0.0013;\,0.0054]}
+\newcommand{\RawOriginalGain}{0.0828\;[0.0490;\,0.1179]}
+\newcommand{\ArchiveOriginalGain}{0.0850\;[0.0517;\,0.1190]}
+\newcommand{\RawGainR}{0.0006\;[-0.0069;\,0.0083]}
+\newcommand{\RawGainRMSE}{0.1085\;[0.0476;\,0.1971]}
+\newcommand{\RawGainShort}{0.108}
+\newcommand{\RawBefore}{0.037\;[-0.050;\,0.097]}
+\newcommand{\RawCleanup}{0.072\;[-0.010;\,0.221]}
+\newcommand{\RawVsRelease}{0.067\;[-0.007;\,0.195]}
+\newcommand{\ResidualGain}{0.074\;[0.037;\,0.110]}
+\newcommand{\StrongBodyImprove}{-0.824\;[-1.829;\,-0.271]}
+\newcommand{\ReleaseMatched}{-0.030\;[-0.238;\,0.092]}
+\newcommand{\RawOther}{0.051\;[0.040;\,0.061]}
+\newcommand{\RawShuffle}{0.047\;[0.037;\,0.058]}
+\newcommand{\RawInteraction}{-1.86\;[-3.84;\,-0.14]}
+\newcommand{\InteractionN}{182}
+\newcommand{\CouplingBefore}{0.128}
+\newcommand{\CouplingAfter}{0.131}
+\newcommand{\StrictPre}{0.519\;[0.504;\,0.536]}
+\newcommand{\StrictPreN}{188}
+\newcommand{\BodyTable}{\begin{tabular}{lcc}
+\toprule
+Model & $r$ & RMSE (bpm) \\
+\midrule
+Recent RR sequence & $0.517$ & $6.649$ \\
+Archived body (57 features) & $0.690$ & $5.442$ \\
+Body plus raw trajectories & $0.677$ & $6.266$ \\
+Body + bands after ECG regression & $0.677$ & $6.221$ \\
+Body + raw REVE & $0.676$ & $6.229$ \\
+Body + raw REVE after ECG regression & $0.678$ & $6.157$ \\
+Body only, trees & $0.701$ & $5.308$ \\
+Body + REVE after ECG regression, trees & $0.703$ & $5.294$ \\
+\bottomrule
+\end{tabular}}

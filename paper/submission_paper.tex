@@ -1,220 +1,60 @@
-\documentclass[10pt,twocolumn]{article}
-\usepackage[margin=0.53in, top=0.53in, bottom=0.53in]{geometry}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{lmodern}
-\usepackage{microtype}
-\usepackage{amsmath,amssymb}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{caption}
-\usepackage{titlesec}
-
-\definecolor{navy}{HTML}{1B365D}
-\definecolor{slate}{HTML}{4D5B6A}
-
-\hypersetup{
-  colorlinks=true,
-  linkcolor=navy,
-  citecolor=navy,
-  urlcolor=navy,
-  pdftitle={Multimodal Neurophysiology of Acute Distress: Leakage Audits, Generalization Limits, and Exploratory Brain-Heart Prediction},
-  pdfauthor={Mathias Chebbah, Aurelien Saint-Gregoire, Ashley Russo}
-}
-
-\titleformat{\section}{\normalsize\bfseries\color{navy}}{\thesection.}{0.45em}{}
-\titleformat{\subsection}{\small\bfseries\color{slate}}{\thesubsection}{0.45em}{}
-\titlespacing*{\section}{0pt}{4.5pt}{1.8pt}
-\titlespacing*{\subsection}{0pt}{3.0pt}{1.2pt}
-
-\captionsetup{font=footnotesize, labelfont=bf, skip=2.2pt}
-\setlength{\columnsep}{13pt}
-\setlength{\parskip}{1.2pt}
-\setlength{\textfloatsep}{5.5pt plus 1.8pt minus 1.8pt}
-\setlength{\dbltextfloatsep}{5.5pt plus 1.8pt minus 1.8pt}
-
-\title{\vspace{-1.9em}\Large\bfseries\color{navy}
-Multimodal neurophysiology of acute distress:\\
-leakage audits, generalization limits, and exploratory brain-heart prediction}
-
-\author{\small
-Mathias Chebbah \quad Aur\'elien Saint-Gr\'egoire \quad Ashley Russo\\
-\footnotesize Team 12 (Multimodal AI), Universit\'e Paris-Saclay $\times$ HABS Neuro-AI Hackathon 2026 \quad Mentor: Andrew Jeyathasan}
-\date{}
-
-\begin{document}
-\maketitle
-\vspace{-2.0em}
-\fontsize{8.98pt}{10.40pt}\selectfont
-
-\begin{abstract}
-\noindent
-What can biosignals tell us about reported acute distress when both the participant ID and the video theme are new? On the HABS multimodal dataset (314 healthy adult participant IDs, 22,974 aligned trials, 508 recordings, 252 ten-second clips, 84 themes, 5 cohorts, 169 multi-day IDs), we combine 62-channel EEG, ECG, electrodermal activity (EDA), and respiration while excluding misaligned eye-tracking per organizer guidance. Auditing our early pipelines exposed leakage from global per-ID centering ($+0.014$ ROC-AUC) and bidirectional encoding over seen themes. Once controlled inside the development split ($N = 228$ IDs, Cold-Start nested ID-by-theme CV), single-trial distress classification ($V \le 4 \cap A \ge 6$) reaches within-ID ROC-AUC $0.569\;[0.553, 0.584]$ for multimodal 4-phase Ridge ($[-3,12)\,\text{s}$) and spans $0.526$ (\texttt{S-JEPA}) to $0.572$ (\texttt{EEGNet}, $[0,10)\,\text{s}$) across EEG encoders; on the distinct across-viewer fixed-video pairing, R4 weighted AUC is $0.525$. Across one week, EDA-only decoding drops (paired $-0.039$, $N = 103$) with no detected drop for EEG ($+0.025\;[-0.006, +0.055]$), and naive personal retraining lags Cold-Start through $k = 40$ ($-0.053$). Descriptively, 10-s distress shows early central delta, heart rate deceleration (RR lengthening $d = +0.12$; plain Bazett QTc drop $\beta = -0.09$ disappearing after $\Delta\text{RR}$ adjustment, $\beta = -0.007$), and a late skin conductance rise. In a separate exploratory task beyond a post-release $t = 5.000\,\text{s}$ cutoff, trial-matched early EEG reduces future heart rate change RMSE by $0.077\text{--}0.086\,\text{bpm}$ ($\Delta r = +0.009\text{--}0.011$ over $M_0 = 0.685$) while degrading EDA prediction ($-0.010$ to $-0.030$) with no detectable change on respiration; upstream zero-phase filtering and whole-recording ICA leave strict end-to-end causality open. Finally, averaging $K = 10$ known-class episodes offline yields AUC $0.680\text{--}0.698$ (with per-ID oracle thresholds used to compute sensitivity at 90\% specificity), illustrating noise averaging rather than real-time transition detection.
+\documentclass[10pt,a4paper]{article}
+\usepackage[top=17mm,bottom=18mm,left=19mm,right=19mm]{geometry}
+\usepackage[T1]{fontenc}\usepackage[utf8]{inputenc}
+\usepackage{lmodern,microtype,graphicx,booktabs,xcolor,hyperref,amsmath}
+\definecolor{ink}{HTML}{193F50}
+\hypersetup{colorlinks=true,urlcolor=ink,linkcolor=ink,citecolor=ink,pdftitle={Decoding self-reported distress during emotional videos},pdfauthor={Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo}}
+\setlength{\parindent}{0pt}\setlength{\parskip}{4pt}
+\input{study11_numbers}
+\title{\vspace{-2em}\Large\bfseries\color{ink} Decoding self-reported distress during emotional videos\\[2pt]\large Matched training budgets and a raw EEG test of cardiac forecasting}
+\author{\normalsize Mathias Chebbah \quad Aurélien Saint-Grégoire \quad Ashley Russo\\\small Team 12, Université Paris-Saclay $\times$ HABS Neuro-AI Hackathon\\\small Mentor: Andrew Jeyathasan}
+\date{}\begin{document}\maketitle\vspace{-1.5em}
+\begin{abstract}\noindent
+Across 22,974 emotional-video trials from 314 HABS participant IDs, we tested whether biosignals rank self-reported distress when both IDs and video themes are new. At equal training size, holding out both reduced the multimodal Ridge AUC by 0.0072 (95\% CI for R4 minus R1: $-0.0138$ to $-0.0003$). Trial index alone ranked distress near chance; a strictly pre-onset EEG--body model reached AUC 0.519. In a separate task, adding raw EEG after ECG regression reduced heart-rate-change RMSE by 0.1085 bpm against an enriched but weaker-performing linear body model. Against the best body-only comparator, boosted trees, the paired reduction was $\TreeGain$ bpm. The ECG projection did not reduce the measured scalp coupling. Small predictive gains depend on the comparator, and their cortical origin remains unresolved.
 \end{abstract}
+\section{Population and outcome}
+HABS recorded EEG, ECG, skin conductance, respiration and ratings after written informed consent \cite{habs}. Aligned data cover 314 of 317 labeled IDs (508 recordings, 252 ten-second clips, 84 themes, five cohorts). A person could receive multiple IDs across cohorts. We used development data after an earlier internal holdout was inspected; the 29 organizer-reserved IDs were unavailable.
 
-\section{Introduction}
-Non-verbal detection of acute distress or pain in pediatrics, intensive care, anesthesia, and locked-in or consciousness disorders provides long-term clinical motivation for wearable biosignals \cite{danel2025,roue2025,adama2025}. Healthy adults viewing 10-second affective clips do not constitute a clinical cohort and can exhibit cardiac deceleration opposite to clinical pain tachycardia, yet a synchronized 314-ID corpus allows direct auditing of the physiological, statistical, and generalization bottlenecks that precede clinical work.
+Distress required valence $\le4$ and arousal $\ge6$ on nine-point scales (5,510 trials, 24.0\%). Videos were randomized in cohorts 1--2 and presented in randomized emotion blocks in cohorts 3--5. Block designs can confound EEG classification with time \cite{li}. We therefore tested session position and previous-trial physiology. An organizer timing advisory led us to exclude the eye streams.
+\section{Physiological responses}
+The audited development split contained 12,693 trials from 228 IDs and 66 themes. We recomputed the physiological curves on this split. For each one-second bin, we subtracted the trial's three-second prestimulus mean and computed a pooled-SD contrast using at least three finite values per class, ID and bin. Central delta increased in the first second ($d=0.129$), heart rate was lower at 1--2 s ($d=-0.05$), respiratory amplitude was lower at 2--3 s ($d=-0.088$), and conductance was higher at 9--10 s ($d=0.169$). These descriptive profiles do not identify the ordering of physiological onsets. For conductance, all three prestimulus intervals include zero on this split.
+\begin{center}\includegraphics[width=.94\textwidth]{figures/study11_time.pdf}\end{center}
+{\small\textbf{Figure 1.} A. Mean contrasts and pointwise 95\% intervals; shaded clip. Per bin, 208 IDs contribute EEG, HR and respiration, and 179--180 contribute EDA (historical split: 235 eligible, 206--208 finite EDA effects under the earlier rule). B. Held-out AUC for current signals, time and prior-trial signals; the last control excludes each session's first aligned trial.}
+\clearpage
+\section{Generalization at equal training volume}
+We ranked distress versus other trials within each ID and averaged the resulting ROC-AUCs over IDs with at least three trials per class ($n=208$). Imputation, scaling, PCA and model selection used training folds. The Ridge head predicts valence and arousal and combines their standardized predictions. Frozen REVE \cite{reve} was evaluated with this head and with logistic regression. Its nominal input is [0,10) s. The 448 engineered features span reference, early, late and post-clip phases, from $-3$ to $+12$ s. The post-clip phase can overlap the rating prompt.
 
-Three methodological questions frame this study. First, short-window autonomic responses combine rapid vagal deceleration at the sino-atrial node with slower sympathetic sweating and distinct habituation kinetics \cite{somsen2002,chen2014}. While 10-s resting RMSSD can approximate longer resting averages across people \cite{munoz2015}, within-recording short-segment repeatability is much weaker and 30-s valence discrimination remains limited \cite{schippers2018}; beat-by-beat AV-node PR conduction, RR-adjusted QT, and raw versus ICA heartbeat-evoked potentials (HEP) remain rarely examined on 10-s episodes \cite{parkblanke2019}. Second, affective benchmarks often inflate scores through random splits, seen stimuli, bidirectional windows, or transductive person centering \cite{engemann2018}, whereas one-week electrodermal drift and domain adaptation (CORAL) remain under-audited \cite{sakimura2025,mihirette2025}. Third, subjective-autonomic alignment is modest \cite{brown2019,cuve2023} and trait versus state affective substrates differ \cite{saviola2020}, leaving open how much single-trial variance reflects stimulus aversiveness, stable individual differences, or finite-trial noise.
+Every regime scored the same nine ID-by-theme test cells. Training pools permitted overlap on both axes (R1), excluded test themes (R2), excluded test IDs (R3), or excluded both (R4). Even R1 excludes the joint test cell: overlap is allowed on each axis separately. Within each cell, all regimes trained on exactly the number of rows available to R4 (mean 5,641 across cells). R1--R3 used ten fixed subsampling seeds shared by models. We averaged each ID's AUC over seeds before calculating paired ID-bootstrap intervals. The full-pool comparison used the same test cells; its R1 is the complement of a cell (about 89\% of development), distinct from the historical 80\% random split.
+\begin{center}\small\LadderTable\end{center}
+\begin{center}\includegraphics[width=.93\textwidth]{figures/study11_ladder.pdf}\end{center}
+{\small\textbf{Figure 2.} Mean within-ID AUC across the four equal-budget regimes (left) and paired R4 minus R1 contrasts with 95\% intervals (right). Filled circles use all within-ID pairs; open squares use only pairs from the same fitted model.}\par
+With the full training pools, the paired Ridge contrast was $\RidgeFullGap$. Removing the extra R1 training rows alone cost 0.0082 AUC [0.0047; 0.0116]. The seed-to-seed SD of the matched contrast was 0.0040. A smaller gap remained at equal volume ($\RidgeGap$). The REVE logistic head moved in the opposite direction ($\ReveGap$). A secondary analysis, motivated by the fold-offset control below, compared only trial pairs scored by the same fitted model. The corresponding contrasts were $\RidgeSame$ for multimodal Ridge and $\ReveSame$ for REVE logistic regression. The Ridge drop remains for within-model pairs. The apparent REVE logistic gain largely vanishes. A fixed percentage of the historical decline cannot be attributed to familiar themes across these classifiers.
 
-We investigate one focused question on the HABS multimodal dataset ($N = 314$ participant IDs, 22,974 trials): \textbf{how do cortical and peripheral signals unfold during acute distress, how do leakage controls and cross-day drift constrain multimodal decoding, and does early EEG add prospective information about future autonomic reactivity beyond past body dynamics?}
+\textbf{Post-clip ablation.} Removing all 164 features explicitly involving [10,12) s left 284 features. Four-phase Ridge AUC was $\FourPhase$, compared with $\ThreePhase$ without the post phase (paired difference $\PostDiff$). A logistic head benefited more from post-clip features ($+0.0133$ [0.0024; 0.0246]). This ablation tests the contribution of explicit post-clip features. Upstream full-recording filters can still influence earlier values.
+\clearpage
+\section{Session time and raw cardiac forecasting}
+\textbf{Timing controls.} We reconstructed aligned trial order within ID and day before restricting to development themes. The preceding-trial model used unlabeled physiology from the previous aligned trial in the same session. Normalized position assumes session length is known. The table reports the Ridge valence/arousal head; 153 eligible IDs came from cohorts 1--2 and 55 from cohorts 3--5.
+\begin{center}\small\OrderTable\end{center}
+The nonlinear time classifier's ordinary within-ID AUC was $\TreeRaw$. Some pairs compare predictions across withheld theme folds. A model returning only its training fold's positive rate scored $\FoldPrior$ on these pairs. Restricting comparisons to the same fitted model gave exactly 0.500 for this control and $\TreeSame$ for the nonlinear time classifier. Multimodal inputs extracted from raw prefixes independently cut at stimulus onset yielded $\StrictPre$ ($n=\StrictPreN$). An index-only analysis cannot exclude carryover local to a randomized emotion block.
 
-\section{Methods}
-\subsection{Dataset, inclusion path, stress criteria, and eligibility}
-We use the HABS multimodal emotion dataset \cite{habs2026} (source corpus: 383 French-speaking healthy adults, mean age $39.6 \pm 12\,\text{yr}$, 271 female, written informed consent, Paris lab; hackathon release: 317 labeled participant IDs plus 29 reserved by organizers). Because HABS documentation notes that one physical individual could receive multiple \texttt{participant\_id}s across cohorts, all ID-level grouping, splitting, and within-ID bootstrapping operate strictly on \texttt{participant\_id}. Retaining IDs with aligned ratings and biosignals yields \textbf{314} participant IDs across 508 recordings, 252 presented ten-second clips (of 256 planned; 84 themes), 5 cohorts (Cohorts 3--5 used randomized emotional blocks), and 169 multi-day IDs tested roughly one week apart (22,974 trials; 0 flagged outliers; 16,276 complete-sensor trials, 70.8\%, for Varimax PCA; composite coherence uses per-variable finite masks). Per HABS preprocessing \cite{habs2026}, channels T9 and T10 are excluded ($64 \to 62$ EEG channels), and \texttt{PREPROCESSED} EEG underwent continuous $0.5\text{--}48\,\text{Hz}$ zero-phase FIR bandpass filtering, common average referencing, and whole-recording Picard ICA with ICLabel auto-rejection for eye ($\ge 0.75$) and muscle, line, or channel noise ($\ge 0.90$), without systematic cardiac-component rejection. Following the HABS organizer advisory documenting eye-tracking and pupillometry temporal misalignment, we exclude gaze and pupil streams; an independent check found binocular correlation ($r = 0.86$) alongside a null onset pupil reflex ($p = 0.999$) and chance stress decoding (AUC $0.506$).
+\textbf{Cardiac target.} We predicted HR in [5,10) s minus HR in [$-3.5$,0) s. The common target uses the archived CURATED ECG extraction. Both beats of each target RR interval fall in [5,10) s; peak detection uses a [4,12) s context on the outcome side. The baseline also has access to that pre-clip reference. This task uses all eligible trials regardless of distress. An enriched body model combines the 57 archived body features, up to 16 recent RR intervals, time since the last beat and half-second summaries of raw ECG, respiration and EDA.
 
-Without cortisol assays or pain induction, primary acute distress is defined per trial as negative valence and high arousal ($V \le 4 \cap A \ge 6$; 24.0\% of trials, 5,510 total; among the 3,938 with rank-1 emotion reported, 89.2\% select anger, fear, disgust, sadness, or guilt; 97.2\% in ranks 1--3). Specificity contrasts evaluate strict distress ($V \le 3 \cap A \ge 7$ vs. all other, $N = 172$, or vs. relaxed $V \ge 6 \cap A \le 4$, $N = 147$), acute threat (rank-1 fear, anger, or disgust vs. neutral or relaxation, $N = 139$), distress vs. excitement ($V \ge 6 \cap A \ge 6$, $N = 195$), calm negative ($V \le 4 \cap A \le 4$, $N = 125$), and relaxed ($V \ge 6 \cap A \le 4$, $N = 173$), plus a threshold sweep to $V \le 2 \cap A \ge 8$. Eligibility is prespecified: within-person ROC-AUC requires $\ge 3$ positive and $\ge 3$ negative trials ($N = 208/228$ dev; $N = 162$ Day~1, $N = 149/169$ Day~2, $N = 103$ both days); prospective forecasting requires $\ge 5$ valid trials per target ($N = 224$ HR, $N = 200$ EDA, $N = 228$ respiration). Because an initial holdout was viewed prior to our leakage audit, all post-audit modeling stays inside dev ($N = 228$) via nested blocked CV rather than claiming a sealed test score.
+We excluded \NonRawRows{} trials from one recording aligned outside the raw branch. We extracted the 62 EEG channels from \texttt{CURATED}. Original samples were cropped at 5 s before QC, filtered forward (0.5--45 Hz), sampled at 200 Hz and rereferenced across valid electrodes. Trials required at least 50 valid electrodes (peak-to-peak $\le800\,\mu$V, SD $\ge0.01\,\mu$V); all compared models used the same retained rows. REVE received [$-3.2$,5) s. We learned a fixed, channel-specific 0--120 ms ECG lag regression on \CalIDs{} development IDs reserved exclusively for calibration. These IDs never entered predictive CV. Perturbing the samples at and after the cutoff left the tested features and frozen encoder outputs unchanged, with a separate check at 0 s for the pre-onset branch. The comparison between release, raw and ECG-corrected raw representations used identical trials, targets and outer folds.
+\begin{center}\small\BodyTable\end{center}
+Of \BeforeQC{} evaluation trials before raw QC, \AfterQC{} had usable raw signals. The cardiac comparison retained \RawRows{} common trials from \RawIDs{} IDs; \RawEvaluable{} IDs had sufficient data for the primary within-ID comparison. The primary endpoint was paired RMSE reduction in bpm relative to the enriched body-only Ridge, with positive values indicating smaller errors. Correlation gain measures a change in within-ID linear association.
+\clearpage
+\section{What adds information about future heart rate?}
+\begin{center}\includegraphics[width=.91\textwidth]{figures/study11_cardiac.pdf}\end{center}
+{\small\textbf{Figure 3.} Increment over the corresponding body-only regressor on common trials. The first row uses the archived EEG branch, which preferred the full-recording-preprocessed release and allowed a raw fallback; the other rows require raw EEG. The final row uses boosted trees for both regressors. Intervals resample IDs and condition on the stimulus set.}\par
+With the original 57 body features, the held-out RMSE reduction was $\ArchiveOriginalGain$ bpm for archived REVE and $\RawOriginalGain$ for uncorrected raw REVE. Thus the small increment against that reference also occurs on a prefix-limited raw signal. Expanding the body inputs increased linear Ridge RMSE from $\OrigRMSE$ to $\BodyRMSE$ bpm. Against this weaker-performing linear fit, adding raw REVE after ECG regression reduced RMSE by $\RawGainRMSE$ bpm, with correlation gain $\RawGainR$. Allowing a zero EEG weight in a separate residual fit gave an RMSE reduction of $\ResidualGain$ bpm. The best body-only comparator was the boosted-tree model ($\TreeRMSE$ bpm); adding REVE yielded $\TreeWithEEG$ bpm, a paired reduction of $\TreeGain$ bpm. The interval includes no improvement. The evidence for additional EEG information depends on the comparator and outcome metric.
 
-\subsection{Calibration, ECG delineation, and decoding windows}
-Raw GSR voltages map to microsiemens via the documented resistance curve (\texttt{signals.py}), flagging unit mismatches rather than clamping. Auditing ECG flagged Lead~I polarity inversion by recording on 96.6\% of trial rows (trial-weighted aggregate across recordings). Our delineator (\texttt{delineate\_ecg}) constructs a median beat per recording, aligns P and T waves upright, rejects beats with QRS template correlation $r < 0.70$ (trial-weighted median 99.2\% retained; morphological error against blinded clinician markings was not directly benchmarked), and extracts RR, PR interval, PR segment (P-offset to QRS-onset), QRS, raw QT, Bazett QTc, and T amplitude. Within-person regression of $\Delta\text{QTc}$ (and $\Delta\text{QT}$) on $\Delta\text{RR}$ separates repolarization from heart rate. To check whether release ICA altered cardiac-locked cortical activity, we extract HEP on identical R-peaks from both \texttt{PREPROCESSED} EEG and common-average-referenced raw \texttt{CURATED} EEG ($0.5\text{--}30\,\text{Hz}$, no ICA).
+The real-minus-permuted EEG contrast in correlation was $\RawOther$ when the donor was a different ID watching the same clip. For within-ID trial shuffling it was $\RawShuffle$. The difference in squared-error benefit between distress and other trials was $\RawInteraction$ bpm$^2$ ($n=\InteractionN$ IDs). The negative interaction estimate indicates a smaller observed squared-error benefit during distress; the comparison is exploratory. The ECG projection changed the across-ID mean of median absolute zero-lag ECG--EEG correlations from $\CouplingBefore$ to $\CouplingAfter$. Measured coupling did not decrease. The regression cannot establish removal of the cardiac field. Residual artefacts and common physiological drive remain possible. The electrical field of the heart is measurable at scalp electrodes \cite{dirlich}; ECG regression can also attenuate genuinely cardiac-locked neural activity. The enriched body model still summarizes the waveforms; any incremental EEG finding is conditional on that representation.
 
-Decoding models differ in nominal encoder input windows, which we report explicitly (distinct from upstream whole-recording filtering in classification pipelines, e.g., \texttt{sosfiltfilt} before epoching for \texttt{EEGPT}/\texttt{CBraMod}/\texttt{LaBraM}/\texttt{S-JEPA}). Engineered 4-phase features (448 features: regional EEG log band power, spatial homogeneity, gradients, volatility, ECG intervals, tonic/phasic EDA, respiration) and \texttt{PhysioJEPA} span $[-3, +12)\,\text{s}$: reference $[-3, 0)\,\text{s}$, early $[0, 5)\,\text{s}$, late $[5, 10)\,\text{s}$, and post-clip $[10, 12)\,\text{s}$. Because HABS metadata marks no fixation pause between the 10-s clip and the self-paced rating prompt, $[10, 12)\,\text{s}$ can overlap response-screen onset. By contrast, \texttt{EEGNet}, frozen \texttt{REVE-base}, and \texttt{REVE} LoRA take nominal encoder input $[0, 10)\,\text{s}$, while \texttt{EEGPT}, \texttt{CBraMod}, and \texttt{LaBraM} use $[-3, +10)\,\text{s}$ (\texttt{S-JEPA}: $[-3, +11)\,\text{s}$).
-
-\subsection{Leakage protocols, forecasting boundary, and averaging}
-Participants and themes are deterministically hashed into five buckets. Double-unseen dev evaluation (R4, $3 \times 3$ and $5 \times 5$ CV, and Day~1$\to$Day~2) enforces both unseen IDs and unseen themes, with imputation, scaling, PCA ($\le 64$ components in canonical R4), and regularization fitted inside inner folds. Ladder regimes R1 (5-fold random, $\sim 80\%$ train) and R3 (3-fold unseen IDs, seen themes, $\sim 67\%$ train) intentionally relax theme separation relative to R4 ($\sim 44\%$ train intersection); internal 5-cohort cardiac LOCO-CV holds out cohorts without a theme mask. We contrast \textbf{Cold-Start} (zero subject history at inference) against \textbf{Causal Online} centering (past trials $< i$) and global transductive centering.
-
-For exploratory forecasting, post-release processing enforces a hard cutoff at $t = 5.000\,\text{s}$ (\texttt{causal\_bandpass\_windows}, unit-tested for bit invariance to shocks at $t \ge 5.000\,\text{s}$). Forward-only IIR filtering (\texttt{sosfilt}), R-peak detection, EDA smoothing, and EEG patching use strictly pre-boundary history (ECG/EDA back to $-5\,\text{s}$, respiration $-15\,\text{s}$, EEG $[-3.2, 5.0)\,\text{s}$ with $0.5\,\text{s}$ warm-up). This certifies post-release steps only; upstream zero-phase FIR and whole-recording ICA on \texttt{PREPROCESSED} EEG remain unverified without raw-EEG recomputation. The primary cardiac target is $\text{HR}[5,10) - \text{HR}[-3.5,0)$ (change from pre-clip baseline; plus shorter guard windows $[7,10)\,\text{s}$ and $[10,12)\,\text{s}$). Baseline $M_0$ uses 57 past body features including that pre-clip baseline, 1-s HR bins, last two RR intervals, and RR slope; $M_1$ uses early EEG alone; $M_2$ adds early EEG (handcrafted or frozen \texttt{REVE-base} \cite{reve2025}) via residual shrinkage ($M_{2,\text{res}}$), joint Ridge ($M_{2,\text{jnt}}$), or GBDT.
-
-For offline multi-episode averaging (Section~3.4), same-class Cold-Start R4 trial scores within each person are grouped using test labels and averaged over $K \in \{1, 2, 3, 5, 8, 10\}$ draws with replacement (200 draws/class), cross-checked on disjoint same-class blocks for $K \le 5$ ($\ge 2K$ trials/class). Sensitivity at 90\% specificity uses a per-person oracle threshold (90th quantile of that person's negative scores), not a fixed population threshold. Uncertainty intervals use 2,000 paired ID-bootstrap draws (conditioning on the dev stimulus set: 12,693 trials, 228 IDs, 66 themes; fixed-video AUC bootstraps videos weighted by $n_+ n_-$), Wilcoxon tests, and Benjamini-Hochberg FDR.
-
-\section{Results}
-\subsection{Descriptive timecourse, ECG morphology, and appraisal}
-Figure~\ref{fig:phys}A plots 1-s within-person stress contrasts on dev ($N = 235$) baselined to $[-3, 0)\,\text{s}$. Descriptively (inter-modality latency differences were not formally tested), central-parietal EEG delta rises within $<1\,\text{s}$ (overlapping the affective late positive potential, LPP \cite{hajcak2010,codispoti2023}), heart rate decelerates from $1\,\text{s}$ (10-s mean $d = -0.11$, peak $-0.12$ near $7.5\,\text{s}$), respiration dampens ($2\text{--}6\,\text{s}$), and skin conductance shows a negative pre-onset contrast ($+0.12$ at $[-3,-2)\,\text{s}$ to $-0.15$ at $[-1,0)\,\text{s}$, possibly reflecting slow prior-trial recovery) before a late positive rise ($4\text{--}10\,\text{s}$, $d = +0.15$). In an earlier non-dev check ($N = 52$, distinct from HABS's 29 reserved participants), two consecutive non-zero pointwise CIs detected delta at $1\,\text{s}$ and positive SC at $4\,\text{s}$, with no qualifying HR or respiration onset. Tightening the threshold to $V \le 2 \cap A \ge 8$ raises EDA ($+0.14 \to +0.34$) and delta ($+0.13 \to +0.30$) while shrinking HR deceleration ($-0.11 \to -0.04$). Across 10,263 10-s segments nested inside 60-s windows of aligned emotion-video recordings, pooled correlation is $r = 0.942$ (HR) and $0.745$ (RMSSD), whereas within-recording correlation drops to $r = 0.553$ (HR) and $0.425$ (RMSSD; $0.274$ over 5\,s), distinguishing cross-person resting validity \cite{munoz2015} from within-recording repeatability and 30-s valence testing \cite{schippers2018}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.88\textwidth]{figures/fig1_physiology_cascade.png}
-\caption{\textbf{Descriptive multimodal distress timecourse and ECG morphology.} (A) 1-s within-person Cohen's $d$ on dev ($N = 235$) baselined to $[-3, 0)\,\text{s}$ (shaded clip): early delta ($<1\,\text{s}$, LPP overlap), HR deceleration ($1\,\text{s}$), respiration ($2\text{--}6\,\text{s}$), and late positive skin conductance rise ($4\text{--}10\,\text{s}$ after prior-trial recovery). (B) Beat-by-beat ECG intervals after recording-level Lead~I polarity alignment (96.6\% of trial rows flagged; $d$ for intervals/HEP, standardized $\beta$ for QTc): RR lengthens ($+0.116$), PR segment is null ($-0.005$), Bazett QTc drop ($\beta = -0.088$) vanishes after $\Delta\text{RR}$ adjustment ($\beta = -0.007$), and raw CURATED HEP matches ICA HEP.}
-\label{fig:phys}
-\end{figure*}
-
-Beat-by-beat ECG delineation (Figure~\ref{fig:phys}B) clarifies the cardiac pattern. Across 10\,s, RR lengthens by $+5.1\,\text{ms}$ ($d = +0.12\;[+0.07, +0.16]$), while PR segment ($d = -0.005\;[-0.05, +0.04]$), PR interval ($+0.01$), and QRS ($+0.01$) show no shift. Raw QT increases slightly (standardized $\beta = +0.05\;[+0.01, +0.08]$; RR-adjusted $\beta = +0.03\;[-0.005, +0.07]$, $N = 285$), while plain Bazett QTc drops ($\beta = -0.09$) and vanishes after within-ID $\Delta\text{RR}$ adjustment ($\beta = -0.007\;[-0.04, +0.02]$), compatible with vagal deceleration at the sino-atrial node \cite{somsen2002} without measurable AV-node or RR-independent repolarization shifts over 10\,s. Raw \texttt{CURATED} HEP ($d = +0.038\;[-0.001, +0.077]$) and \texttt{PREPROCESSED} ICA HEP ($d = +0.039\;[-0.002, +0.078]$, $N = 287$) both have CIs spanning zero (no formal equivalence margin tested).
-
-Beside within-ID R4 ($0.569$), evaluating the distinct across-viewer fixed-video pairing yields weighted AUC $0.525\;[0.511, 0.540]$ ($0.519$ unweighted) across 117 videos, and $0.492\;[0.456, 0.534]$ weighted ($0.524$ unweighted) across 37 videos contrasting distress with calm viewers (the two metrics compare different trial pairs). Calm viewers watching aversive clips show a small non-significant HR shift ($-0.49\,\text{bpm}$) and flat EDA ($+0.01\,\mu\text{S}$), while occipital alpha suppression is still observed ($d = -0.33$ to $-0.41$, compatible with visual orienting \cite{codispoti2023,stegmann2024}). Comparing within-ID early ($0\text{--}5\,\text{s}$) vs. late ($5\text{--}10\,\text{s}$) windows across fear and disgust trials (potentially different clips, $N = 116\text{--}160$) reveals distinct dynamics (disgust: early delta $-0.10$, late frontal gamma $-0.11$, late-minus-early $-0.18$, micro-EMG caution; fear: late alpha $-0.14$, late EDA $+0.19$, late-minus-early $+0.30$), echoing autonomic heterogeneity across negative-emotion subtypes \cite{qin2023}. Unsupervised clustering fails ($\text{ARI} < 0.01$).
-
-\subsection{Leakage audit, model comparison, and generalization}
-Auditing our own earlier pipelines proved the most informative step. Global per-person centering inflated logistic AUC by $+0.014$ ($0.571$ vs. $0.556$ Cold-Start), and evaluating a bidirectional 13-s \texttt{REVE} encoder across 77\% seen themes produced illusory cross-modal gains ($+0.059$ HR, $+0.042$ EDA, $+0.069$ respiration).
-
-\begin{table}[t]
-\centering
-\caption{Audited Cold-Start $3 \times 3$ CV comparison by modality and nominal encoder input window, plus R4 sensor ablation (dev, $N = 208$).}
-\label{tab:bench}
-\scriptsize
-\setlength{\tabcolsep}{1.25pt}
-\begin{tabular}{@{}lllcc@{}}
-\toprule
-Scope & Model / subset & Input & AUC & 95\% CI \\
-\midrule
-EEG & \texttt{Signal-JEPA} frozen & $[-3,11)\,\text{s}$ & 0.526 & $[0.512, 0.540]$ \\
-EEG & \texttt{REVE} LoRA (21.7$\times$ GPU) & $[0,10)\,\text{s}$ & 0.550 & $[0.534, 0.565]$ \\
-EEG & 4-phase Ridge (EEG) & $[-3,12)\,\text{s}$ & 0.551 & $[0.537, 0.564]$ \\
-EEG & \texttt{EEGPT} frozen linear & $[-3,10)\,\text{s}$ & 0.560 & $[0.547, 0.573]$ \\
-EEG & \texttt{REVE-base} frozen linear & $[0,10)\,\text{s}$ & 0.561 & $[0.545, 0.577]$ \\
-EEG & \texttt{EEGNet} (3-seed ens.) & $[0,10)\,\text{s}$ & 0.572 & $[0.555, 0.590]$ \\
-\midrule
-Multi & \texttt{PhysioJEPA} fine-tuned & $[-3,12)\,\text{s}$ & 0.557 & $[0.545, 0.571]$ \\
-Multi & 4-phase Ridge (R4) & $[-3,12)\,\text{s}$ & 0.569 & $[0.553, 0.584]$ \\
-Multi & 4-phase Ridge + \texttt{REVE} & $[-3,12)\,\text{s}$ & 0.570 & $[0.555, 0.584]$ \\
-\midrule
-Ablat. & Minus ECG / Resp & $[-3,12)\,\text{s}$ & \multicolumn{2}{c}{0.569 / 0.567} \\
-Ablat. & Minus EDA / EEG & $[-3,12)\,\text{s}$ & \multicolumn{2}{c}{0.551 / 0.540} \\
-Single & EDA / EEG / Resp / ECG & $[-3,12)\,\text{s}$ & \multicolumn{2}{c}{0.555 / 0.551 / 0.522 / 0.508} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.90\textwidth]{figures/fig3_generalization_drift.png}
-\caption{\textbf{Generalization ladder, one-week drift, and chronological $k$-shot adaptation.} (A) Within-ID AUC drops from random splits (R1: $0.589$) to double-unseen Cold-Start (R4: $0.569$); the step masking themes accounts for 70\% (via R3) to 79\% (via R2) of the drop under varying training sizes. (B) Across one week (Day~1 $N = 162$ vs. Day~2 $N = 149$), EDA-only drops ($0.560 \to 0.523$; paired $-0.039$ on $N = 103$) and respiration reaches $0.501$, while EEG and multimodal Ridge hold. (C) Chronological $k$-shot adaptation ($t \ge 40$, $N = 104$): naive personal retraining lags even at $k = 40$ ($-0.053$), while EB-MAP stays near Cold-Start.}
-\label{fig:gen}
-\end{figure*}
-
-Once leaks are removed (Table~\ref{tab:bench}), single-trial discrimination remains low across architectures, and direct comparisons must respect sensor and window differences (paired architecture equivalence was not formally tested). Within EEG alone, models span $0.526$ (\texttt{S-JEPA}) to $0.572$ (\texttt{EEGNet} 3-seed ensemble; single-seed mean $0.563 \pm 0.009$, $[0,10)\,\text{s}$), with \texttt{LaBraM} ($0.549$), \texttt{CBraMod} ($0.556$), \texttt{EEGPT} ($0.560$), and \texttt{REVE-base} ($0.561$) ending at $10\,\text{s}$, while \texttt{REVE} LoRA ($0.550$, paired $-0.007\;[-0.021, +0.007]$ vs. frozen head at $21.7\times$ GPU time: $1{,}665\,\text{s}$ vs. $77\,\text{s}$) shows no detected ROC-AUC gain. Across all four sensors ($[-3,12)\,\text{s}$), canonical 4-phase Ridge achieves $0.569$ ($0.571$ with 128 PCs) alongside \texttt{PhysioJEPA} ($0.557$), and appending \texttt{REVE} adds $+0.001\;[-0.009, +0.011]$ ($0.570$; nested OOF stacking $-0.008$). Within-person ranking loss aided neural training ($+0.041$ vs. BCE), and person centering reduced subject-identity variance in \texttt{REVE} from 51\% to 37\% (distinct from psychological trait-state anxiety dissociation \cite{saviola2020}).
-
-Figure~\ref{fig:gen} dissects generalization limits. From 5-fold random CV (R1: $0.589$, $\sim 80\%$ train) to double-unseen Cold-Start (R4: $0.569$, $\sim 44\%$ train), Ridge loses $0.020$ AUC; the step masking video themes accounts for 70\% (via 3-fold unseen-ID R3 $0.583$) to 79\% (via R2 $0.573$) of the observed drop, conflated with changing training volume. For \texttt{REVE} logistic regression, R1$-$R4 is $+0.041$ on pooled AUC ($0.571 \to 0.530$) versus $-0.014$ on within-person AUC ($0.551 \to 0.564$), showing strong metric sensitivity. At R4, sensor ablation identifies EEG (paired $-0.028\;[-0.043, -0.014]$) and EDA ($-0.018\;[-0.026, -0.010]$) as the two main contributors, while ECG alone sits near chance ($0.508\;[0.495, 0.521]$).
-
-Across one week (Figure~\ref{fig:gen}B), peripheral signals drift \cite{sakimura2025}. Tonic EDA shows modest stability ($r = 0.42$), phasic SCR shows a small negative video-adjusted rank correlation with trial order ($\rho = -0.032\;[-0.054, -0.011]$ across all trials; $-0.030\;[-0.068, +0.007]$ under stress), while among distress trials, the video-adjusted RR change was $+5.7\,\text{ms}\;[+0.1, +11.6]$ larger in the final than in the first session tercile ($N = 227$ \cite{chen2014}). \texttt{EDA\_only} drops from $0.560$ (Day~1, $N = 162$) to $0.523$ (Day~2, $N = 149$; unpaired $-0.037$; paired $-0.039\;[-0.073, -0.009]$ on $N = 103$ eligible both days), \texttt{Resp\_only} falls to $0.501$, while no drop is detected for \texttt{EEG\_only} ($0.543 \to 0.552$, paired $+0.025\;[-0.006, +0.055]$) or multimodal Ridge ($0.572$ vs. $0.559$, paired $+0.004\;[-0.028, +0.037]$, $N = 103$; CIs span zero and do not prove equivalence); without a Day~2$\to$Day~2 baseline, day-level covariates can also contribute. In chronological $k$-shot calibration ($t \ge 40$, 118 eligible IDs, 104 computable tail AUCs; Figure~\ref{fig:gen}C), naive personal Ridge VA retraining lags Cold-Start across budgets ($-0.081$ at $k = 5$, $-0.053\;[-0.087, -0.021]$ at $k = 40$, $-0.040$ to $-0.069$ across days); CORAL \cite{sun2016,mihirette2025} is neutral under LOCO ($0.589 \to 0.588$) and $-0.006$ at $k = 40$, and flat EB-MAP ($-0.001\;[-0.026, +0.023]$) may simply reflect heavy shrinkage preserving population weights.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.88\textwidth]{figures/fig2_causal_brain_heart.png}
-\caption{\textbf{Exploratory prospective EEG prediction of future physiology (post-release cutoff $t = 5.000\,\text{s}$).} (A) Incremental within-person $r$ ($M_2 - M_0$, Cold-Start) across modalities and internal 5-cohort LOCO-CV: small positive cardiac increments, degradation on EDA, and null change on respiration. (B) Exploratory cardiac controls with per-row counts ($n = 207$ AC3, $n = 198$ within-video, $n = 224$ others): persists across 9 EMG/EOG/motion covariates, 46 interior channels, clean trials, prior-trial history, and within-video tests; vanishes under trial shuffle (NC1) and pre-stimulus EEG (NC3); permuting EEG across trials of the same video degrades prediction (NC2, $-0.015$; own minus permuted $+0.024$).}
-\label{fig:causal}
-\end{figure*}
-
-\subsection{Exploratory prospective EEG-heart prediction}
-Enforcing the post-release $t = 5.000\,\text{s}$ cutoff yields a small exploratory increment for cardiac change $\text{HR}[5,10) - \text{HR}[-3.5,0)$ (Table~\ref{tab:forecast}, Figure~\ref{fig:causal}). Over $M_0$ ($r = 0.685$, within-person $R^2 = 0.453$, RMSE $5.540\,\text{bpm}$, centered $5.187\,\text{bpm}$), early EEG alone ($M_1$) reaches $r = 0.204$ handcrafted / $0.200$ \texttt{REVE} (RMSE $7.70\,\text{bpm}$). Adding early EEG raises heart rate prediction by $\Delta r = +0.007\;[+0.005, +0.010]$ (handcrafted, $R^2 = 0.461$), $+0.009\;[+0.005, +0.013]$ (residual \texttt{REVE}, $R^2 = 0.464$, paired RMSE reduction $0.077\,\text{bpm}\;[0.052, 0.103]$), and $+0.011\;[+0.007, +0.016]$ (joint \texttt{REVE}, $R^2 = 0.468$, paired RMSE reduction $0.086\,\text{bpm}\;[0.053, 0.120]$, $71.4\%$ with $\Delta r > 0$, $q < 10^{-6}$), roughly $1.1\text{--}1.5\%$ extra variance. The increment holds across $5 \times 5$ CV ($+0.012$), GBDT ($+0.006$), pure incremental $\Delta\text{HR}$ ($+0.018$), 2-s ($[7,10)\,\text{s}$, $N = 222$, $+0.007$ resid / $+0.009$ joint) and 5-s ($[10,12)\,\text{s}$, $N = 223$, $+0.004$ resid / $+0.004$ joint spanning zero) guard windows (which also shorten target length to 3\,s and 2\,s post-clip), and internal 5-cohort LOCO-CV without a theme mask ($+0.011\;[+0.007, +0.015]$, $N = 224$; positive point estimates in 5/5 cohorts, 3/5 cohort CIs excluding zero while Cohorts~3 $N = 17$ and 5 $N = 8$ span zero).
-
-\begin{table}[t]
-\centering
-\caption{Exploratory prospective EEG ($[-3.2, 5.0)\,\text{s}$) prediction of future physiology ($[5, 10)\,\text{s}$) under Cold-Start $3 \times 3$ CV ($N = 200\text{--}228$) and 5-cohort LOCO-CV (no theme mask).}
-\label{tab:forecast}
-\scriptsize
-\setlength{\tabcolsep}{3.5pt}
-\begin{tabular}{@{}lccc@{}}
-\toprule
-Target / regime & $M_0$ ($r$) & $\Delta r$ ($M_{2,\text{res}}$) & $\Delta r$ ($M_{2,\text{jnt}}$) \\
-\midrule
-HR (handcrafted EEG) & 0.685 & $+0.007^*$ & n/a \\
-HR (\texttt{REVE}, 3$\times$3) & 0.685 & $+0.009^*$ & $+0.011^*$ \\
-HR (\texttt{REVE}, 5$\times$5) & 0.685 & $+0.009^*$ & $+0.012^*$ \\
-HR (GBDT nonlinear) & 0.691 & $+0.006^*$ & n/a \\
-HR (LOCO, 5 cohorts) & 0.689 & $+0.011^*$ & n/a \\
-Skin cond. $[5,10)\,\text{s}$ & 0.822 & $-0.010^\dagger$ & $-0.030^\dagger$ \\
-Respiration $[5,10)\,\text{s}$ & 0.642 & $+0.001$ & $+0.001$ \\
-\bottomrule
-\end{tabular}
-\par\vspace{1pt}\noindent\scriptsize $^*$\,95\% CI $> 0$; $^\dagger$\,95\% CI $< 0$. Primary $3\times 3$ BH-FDR family (3 targets $\times$ 3 models): HR $q < 0.002$, EDA $M_{2,\text{res}}$ $q = 0.016$; $5\times 5$, GBDT, LOCO outside primary family.
-\end{table}
-
-Control checks (Figure~\ref{fig:causal}B) persist with nine EMG/EOG/motion covariates ($+0.009$, $n = 224$), residualized covariates ($+0.009$), 46 interior channels ($+0.007$), clean trials ($+0.011$, $n = 207$), prior-trial history ($+0.007$), and within-video idiosyncratic correlation ($+0.007$, $n = 198$). Negative controls show no detected gain under trial shuffle (NC1: $0.000$) or pre-stimulus EEG (NC3: $-0.001$), intact 1-s order outperforms 1-s shuffling (NC4: $+0.004\;[+0.002, +0.006]$), and permuting EEG across trials of the same video (single derangement without checking donor \texttt{participant\_id} or excluding singletons) degrades prediction (NC2: $-0.015\;[-0.019, -0.011]$; the $+0.024$ contrast sums the $+0.009$ own-EEG gain and this $0.015$ permutation penalty). By contrast, adding EEG \emph{degrades} EDA forecasting ($-0.010\;[-0.018, -0.003]$, $q = 0.016$ residual; $-0.030\;[-0.045, -0.016]$ joint; GBDT $-0.016$), while respiration CIs span zero ($+0.001$).
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.88\textwidth]{figures/fig4_coherence_monitoring.png}
-\caption{\textbf{Within-person Varimax PCA structure and offline known-class episode averaging.} (A) Varimax-rotated PCA on correlation matrix ($N = 314$, 16,276 complete trials; 53.3\% variance) separating EDA (F1), EEG-cardiorespiratory covariance (F2), and ratings with HR/Resp (F3). (B) Offline averaging of $K = 1\text{--}10$ known-class Cold-Start R4 clips (solid: AUC; dashed: per-person oracle sensitivity at 90\% specificity).}
-\label{fig:mon}
-\end{figure*}
-
-\subsection{Varimax PCA, coherence, and known-class averaging}
-Varimax-rotated PCA on the within-person correlation matrix ($N = 314$, 16,276 complete trials $= 70.8\%$; 53.3\% variance explained, 46.7\% unexplained; Figure~\ref{fig:mon}A) imposes orthogonality across three axes \cite{cuve2023}: \textbf{F1 EDA} ($\Delta\text{SC}$ $+0.96$, $\Delta\text{SCR}$ $+0.96$, both from one channel), \textbf{F2 EEG-Cardiorespiratory} (EEG $\delta$ $+0.77$, $\gamma$ $+0.68$, $\alpha$ $+0.61$, HR $+0.41$, Resp $+0.30$; ratings $|<0.10|$), and \textbf{F3 Subjective-Cardiorespiratory} (Valence $+0.75$, Arousal $-0.69$, HR $+0.30$, Resp $+0.31$). Neuro-autonomic composite coherence (including EEG) is modest (median $\rho = +0.111$, IQR $[0.02, 0.21]$, 21.0\% $\le 0$; stronger on intense trials $+0.10$ \cite{brown2019}; autonomic-only median $+0.074$, 28.7\% $\le 0$). Individual 1-week test-retest correlation spans zero ($r = 0.066\;[-0.087, +0.211]$, $p = 0.39$, $N = 169$), consistent with substantial finite-trial sampling noise ($\text{SE} \approx 0.12\text{--}0.14$) rather than a verified discordant subgroup. Link between the EEG-heart increment and coherence is inconclusive ($\rho = +0.09$, $p = 0.18$).
-
-Figure~\ref{fig:mon}B shows an offline averaging exercise on Cold-Start R4 scores where same-class clips are grouped using test labels (yielding AUC), and sensitivity at 90\% specificity is evaluated with a per-ID oracle threshold. Across $K = 1 \to 10$ clips, AUC rises from $0.569 \to 0.680\;[0.644, 0.714]$ (standard, $N = 208$; oracle sensitivity $21.0\% \to 41.8\%$), $0.581 \to 0.692\;[0.647, 0.735]$ (acute threat, $N = 139$; $27.0\% \to 45.5\%$), and $0.602 \to 0.698\;[0.644, 0.746]$ ($+0.096$, strict $3/7$ vs. relaxed, $N = 147$; $31.5\% \to 52.8\%$). Only the standard contrast roughly doubles sensitivity. This rise matches an illustrative i.i.d. Gaussian reference ($\approx 0.71$ at $K = 10$ for $d' = 0.25$) and is checked with disjoint same-class blocks at $K = 5$ ($0.634$, $N = 148$ standard; $0.696$, $N = 86$ threat) and $K = 3/5$ ($0.658$, $N = 88$ / $0.604\;[0.513, 0.690]$, $N = 49$ strict; no disjoint check at $K = 10$). Because grouping relies on known class labels (and sensitivity relies on a per-ID oracle threshold), this exercise does not validate online alarm or transition detection.
-
-\section{Discussion}
-\subsection{What these results mean}
-Our primary contribution is diagnostic and methodological. Removing global centering, seen-theme shortcuts, and bidirectional windows leaves modest single-trial distress ROC-AUC ($0.526\text{--}0.572$ across EEG encoders, $0.569$ multimodal 4-phase Ridge; $0.525$ on across-viewer fixed-video pairs). In this low-SNR regime, split hygiene, window transparency, within-ID ranking loss, and cross-day auditing (where EDA drops across one week while EEG shows no detected drop) outweigh backbone scale or naive personal retraining. Physiologically, 10-s aversive clips show early central delta, observed occipital alpha suppression, and cardiac deceleration compatible with vagal modulation without measurable AV-node PR or RR-independent QT shifts, alongside an exploratory $0.08\text{--}0.09\,\text{bpm}$ prospective EEG-heart error reduction measured across all trials (its specificity to distress remains untested).
-
-\subsection{Limitations and decisive next tests}
-Five limitations bound these conclusions. First, healthy video viewing is not a clinical population; clinical pain often triggers sympathetic tachycardia rather than orienting bradycardia \cite{danel2025,roue2025}. Second, the exploratory EEG-heart increment was evaluated across all trials (not conditioned on distress), relies on HABS \texttt{PREPROCESSED} EEG that underwent upstream zero-phase FIR filtering and continuous Picard ICA (which did not systematically reject cardiac components), and compares against 57 engineered $M_0$ features; end-to-end causal recomputation from raw \texttt{CURATED} EEG with explicit cardiac-artifact regression and a beat-by-beat RR baseline is the decisive next test. Third, 4-phase Ridge and \texttt{PhysioJEPA} include $[10, 12)\,\text{s}$, which can overlap the post-clip rating screen; sensor-matched $[0, 10)\,\text{s}$ benchmarks with paired-difference tests are needed to rank architectures cleanly. Fourth, Figure~\ref{fig:mon}B computes AUC from known-class clip averages and sensitivity from per-ID oracle thresholds, and does not test chronological state-change alarms. Fifth, within-ID bootstrap CIs condition on the 66 dev themes (fixed-video CIs resample videos), splits separate \texttt{participant\_id} (not physical individuals across cohorts when multiple IDs exist, including LOCO), eye-tracking was excluded for misalignment, and audited results rest on dev nested CV after the initial holdout was inspected.
-
-\scriptsize
-\begin{thebibliography}{21}
-\setlength{\itemsep}{0.2pt}
-\bibitem{danel2025} J. K. Danel et al. Objective monitoring of acute pain and nociception in anaesthesia and intensive care: evidence and applications. \emph{Anaesthesiol. Intensive Ther.} 57:e365--e380, 2025.
-\bibitem{roue2025} J.-M. Rou\'e et al. Objective detection of newborn infant acute procedural pain using EEG and machine learning algorithms. \emph{Paediatr. Neonatal Pain}, doi:10.1002/pne2.70001, 2025.
-\bibitem{adama2025} S. Adama, M. Bogdan. Assessing consciousness in patients with locked-in syndrome using their EEG. \emph{Front. Neurosci.} 19:1604173, 2025.
-\bibitem{somsen2002} R. J. M. Somsen, J. R. Jennings, M. W. van der Molen. Human vagal heart rate responses in warned reaction time tasks. \emph{J. Electrocardiol.} 35(Suppl.):231--237, 2002.
-\bibitem{chen2014} K. H. Chen et al. Habituation of parasympathetic-mediated heart rate responses to recurring acoustic startle. \emph{Front. Psychol.} 5:1288, 2014.
-\bibitem{munoz2015} M. L. Munoz et al. Validity of (ultra-)short recordings for heart rate variability measurements. \emph{PLOS ONE} 10:e0138921, 2015.
-\bibitem{schippers2018} A. Schippers et al. Ultra-short term heart rate variability as a tool to assess changes in valence. \emph{Psychiatry Res.} 270:517--522, 2018.
-\bibitem{parkblanke2019} H.-D. Park, O. Blanke. Heartbeat-evoked cortical responses: mechanisms, roles, and methodology. \emph{NeuroImage} 197:502--511, 2019.
-\bibitem{engemann2018} D. A. Engemann et al. Robust EEG-based cross-site and cross-protocol classification of states of consciousness. \emph{Brain} 141:3179--3192, 2018.
-\bibitem{hajcak2010} G. Hajcak, A. MacNamara, D. M. Olvet. Event-related potentials, emotion, and emotion regulation: an integrative review. \emph{Dev. Neuropsychol.} 35(2):129--155, 2010.
-\bibitem{sakimura2025} H. Sakimura et al. Long-term variability in physiological-arousal relationships for robust emotion estimation. \emph{ACII}, arXiv:2508.18782, 2025.
-\bibitem{mihirette2025} S. Mihirette et al. Cross-contextual stress prediction: comparing features and sample domain adaptation. \emph{Appl. Intell.} 55, doi:10.1007/s10489-025-06277-9, 2025.
-\bibitem{brown2019} C. L. Brown et al. Coherence between subjective experience and physiology in emotion. \emph{Emotion} 20:818--829, 2020.
-\bibitem{saviola2020} F. Saviola et al. Trait and state anxiety are mapped differently in the human brain. \emph{Sci. Rep.} 10:11112, 2020.
-\bibitem{cuve2023} H. C. J. Cuve et al. Coherence and divergence in autonomic-subjective affective space. \emph{Psychophysiology} 60(6):e14262, 2023.
-\bibitem{reve2025} Y. El Ouahidi et al. REVE: a foundation model for EEG: adapting to any setup with large-scale pretraining. \emph{NeurIPS}, 2025 (arXiv:2510.21585).
-\bibitem{codispoti2023} M. Codispoti, A. De Cesarei, V. Ferrari. Alpha-band oscillations and emotion: a review of picture perception. \emph{Psychophysiology} 60:e14438, 2023.
-\bibitem{stegmann2024} Y. Stegmann et al. Electrocortical responses in anticipation of avoidable and inevitable threats: a multisite study. \emph{J. Neurosci.} 44(42):e0575242024, 2024.
-\bibitem{qin2023} Q. Wang (Wang Qin) et al. Different affective arousal and adaptation pattern between core and moral disgust. \emph{J. Psychol. Sci.} 46(2):320--328, 2023.
-\bibitem{sun2016} B. Sun, J. Feng, K. Saenko. Return of frustratingly easy domain adaptation (CORAL). \emph{AAAI}, pp. 2058--2065, 2016.
-\bibitem{habs2026} HABS NeuroAI Team. A large EEG dataset with ECG, skin conductance, respiration, gaze and pupillometry for emotion decoding (\texttt{HABSteam/multimodal-eeg-emotion}). Hugging Face, 2026.
-\end{thebibliography}
-
-\end{document}
+\textbf{Scope.} These findings concern self-reported affect during laboratory video viewing and a separate forecasting task. Clinical pain, naturally occurring distress and continuous alarms require different validation. Matching the number of training examples does not fix class balance, theme composition or the number of distinct IDs across regimes. The supplement documents the earlier same-video comparisons, fear and disgust, cardiac-evoked potentials, Varimax PCA, CORAL and known-class averaging.
+\textbf{Data and code.} Individual recordings are available by application to HABS. Aggregate estimates, code, source revisions and run identifiers are in the \href{https://github.com/mathiaschebbah/habs}{team repository}.
+\begin{thebibliography}{4}\small
+\bibitem{habs} HABS NeuroAI team. \emph{A large EEG dataset with ECG, skin conductance, respiration, gaze and pupillometry for emotion decoding}. 2026. \href{https://huggingface.co/datasets/HABSteam/multimodal-eeg-emotion}{Dataset}.
+\bibitem{reve} Y. El Ouahidi et al. REVE: A Foundation Model for EEG --- Adapting to Any Setup with Large-Scale Pretraining on 25,000 Subjects. \emph{NeurIPS}, 2025. \href{https://arxiv.org/abs/2510.21585}{arXiv:2510.21585}.
+\bibitem{li} R. Li et al. The Perils and Pitfalls of Block Design for EEG Classification Experiments. \emph{IEEE TPAMI}. \href{https://doi.org/10.1109/TPAMI.2020.2973153}{doi:10.1109/TPAMI.2020.2973153}.
+\bibitem{dirlich} G. Dirlich, L. Vogl, M. Plaschke, F. Strian. Cardiac field effects on the EEG. \emph{Electroencephalogr. Clin. Neurophysiol.} 102, 307--315 (1997). \href{https://pubmed.ncbi.nlm.nih.gov/9146492/}{PMID 9146492}.
+\end{thebibliography}\end{document}

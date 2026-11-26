@@ -1,8 +1,8 @@
 """One-command reproduction script for Team 12 (HABS Neuro-AI Hackathon 2026).
 
 Validates the five publication-safe aggregate JSON files in ``results/``, prints
-the headline quantitative tables cited in ``paper/submission_paper.pdf``, and
-regenerates all four 300-dpi publication figures in ``paper/figures/``.
+the historical Study 01–10 summaries, and regenerates their four 300-dpi figures.
+Study 11 uses ``study11_tables.py`` and ``study11_figures.py`` with its own aggregate files.
 """
 
 from __future__ import annotations

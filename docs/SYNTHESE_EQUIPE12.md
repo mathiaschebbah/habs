@@ -1,5 +1,7 @@
 # Synthèse complète de l'étude et guide de soumission (Équipe 12)
 
+**Version historique, études 01–10.** Ce guide et son minutage correspondent au papier du commit `abd9d69`. La révision de publication, avec les contrôles à taille égale et sur EEG brut, est dans [l’article révisé](../paper/submission_paper_fr.pdf) et [son annexe](../paper/supplement_fr.pdf).
+
 **Équipe 12 (Multimodal AI), Hackathon Neuro-AI Université Paris-Saclay x HABS 2026**
 Membres actifs : Mathias Chebbah, Aurélien Saint-Grégoire, Ashley Russo (mentor HABS : Andrew Jeyathasan).
 

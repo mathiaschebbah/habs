@@ -1,0 +1,19 @@
+{
+  "source": "CURATED",
+  "dev_trials": 12693,
+  "calibration_ids": 21,
+  "evaluation_trials_before_qc": 11368,
+  "evaluation_trials_after_qc": 11002,
+  "non_curated_alignment_trials_excluded": 41,
+  "non_curated_alignment_recordings_excluded": 1,
+  "curated_grid_ids": 228,
+  "curated_grid_trials": 12652,
+  "calibration_trials": 1284,
+  "evaluation_ids_after_qc": 207,
+  "calibration_overlap_ids": 0,
+  "bit_invariance_at_0_and_5": {
+    "0.0": true,
+    "5.0": true
+  },
+  "seconds": 926.02
+}
