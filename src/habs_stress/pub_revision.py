@@ -13,6 +13,7 @@ import json
 import os
 import time
 import warnings
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -376,11 +377,30 @@ def evaluate_score_vector(
     *,
     draws: int = DRAWS,
     include_contrasts: bool = True,
+    same_fit_only: bool = False,
 ) -> tuple[dict[str, Any], dict[str, float]]:
     """Compute within-ID stress AUC, pooled AUC, and optional specificity/fixed-video contrasts."""
     y_all = stress_label(frame).to_numpy(bool)
     ok = np.isfinite(scores)
     pmap = person_stress_aucs(frame, scores, y_all, ~y_all)
+    if same_fit_only:
+        # An ID lies in one person fold. Comparing only within its theme fold
+        # therefore guarantees that both trials were scored by the same fitted model.
+        matched = {}
+        folds = frame["theme_fold"].to_numpy()
+        for pid, rows in frame.groupby("participant_id").indices.items():
+            if str(pid) not in pmap:
+                continue
+            total, pairs = 0.0, 0
+            for t in range(3):
+                sel = rows[(folds[rows] == t) & ok[rows]]
+                count = int(y_all[sel].sum()) * int((~y_all[sel]).sum())
+                if count:
+                    total += count * roc_auc_score(y_all[sel], scores[sel])
+                    pairs += count
+            if pairs:
+                matched[str(pid)] = total / pairs
+        pmap = matched
     st = bootstrap_mean(np.array(list(pmap.values()), dtype=float), draws=draws)
     pooled = (
         round(float(roc_auc_score(y_all[ok].astype(int), scores[ok])), 4)
@@ -562,8 +582,10 @@ def run_priority1_matched_ladder(
     n_repeats: int = 10,
     max_pca: int = 64,
     draws: int = DRAWS,
+    same_fit_only: bool = False,
 ) -> dict[str, Any]:
     """Evaluate R1-R4 on identical 3x3 test cells at matched N_train (= |R4|) AND full size."""
+    report_auc = partial(evaluate_score_vector, same_fit_only=same_fit_only)
     pf = dev_df["person_fold"].to_numpy(int)
     tf = dev_df["theme_fold"].to_numpy(int)
     pids = dev_df["participant_id"].astype(str).to_numpy()
@@ -694,7 +716,7 @@ def run_priority1_matched_ladder(
         }
 
         for head in ("stress_va", "stress_logreg"):
-            res_r4, pmap_r4 = evaluate_score_vector(
+            res_r4, pmap_r4 = report_auc(
                 dev_df, full_scores["R4_double_unseen"][head], draws=draws, include_contrasts=False
             )
             for _ in range(n_repeats):
@@ -719,7 +741,7 @@ def run_priority1_matched_ladder(
                     va[ev_i] = preds["stress_va"]
                     lr[ev_i] = preds["stress_logreg"]
                 for head, sc_arr in (("stress_va", va), ("stress_logreg", lr)):
-                    res_k, pmap_k = evaluate_score_vector(
+                    res_k, pmap_k = report_auc(
                         dev_df, sc_arr, draws=200, include_contrasts=False
                     )
                     matched_pmaps[head][r].append(pmap_k)
@@ -732,7 +754,7 @@ def run_priority1_matched_ladder(
             full_summary: dict[str, Any] = {}
             full_pmaps: dict[str, dict[str, float]] = {}
             for r in regimes:
-                ev, pm = evaluate_score_vector(
+                ev, pm = report_auc(
                     dev_df, full_scores[r][head], draws=draws, include_contrasts=False
                 )
                 full_summary[r] = ev
@@ -828,6 +850,7 @@ def run_priority1_matched_ladder(
         )
 
     return {
+        "auc_pairs": "within_id_same_outer_fit" if same_fit_only else "all_within_id_pairs",
         "n_repeats": n_repeats,
         "max_pca": max_pca,
         "pool_audit_mean_across_9_cells": audit_summary,
@@ -1369,12 +1392,15 @@ def run_all(folder: Path, *, stage: str, n_repeats: int = 10, draws: int = DRAWS
         flush=True,
     )
 
-    if stage in {"ridge", "reve"}:
-        matrix = feat_df.to_numpy(dtype=np.float32) if stage == "ridge" else _extract_reve_vid10(aux, dev_mask)
+    if stage in {"ridge", "reve", "ridge-cell", "reve-cell"}:
+        ridge = stage.startswith("ridge")
+        matrix = feat_df.to_numpy(dtype=np.float32) if ridge else _extract_reve_vid10(aux, dev_mask)
         if matrix is None:
             raise ValueError("Missing REVE features for the predeclared model comparison")
-        name = "S07_with_post" if stage == "ridge" else "REVE_frozen_vid10"
-        return run_priority1_matched_ladder(dev_df, {name: matrix}, n_repeats=n_repeats, draws=draws)
+        name = "S07_with_post" if ridge else "REVE_frozen_vid10"
+        return run_priority1_matched_ladder(
+            dev_df, {name: matrix}, n_repeats=n_repeats, draws=draws, same_fit_only=stage.endswith("-cell")
+        )
 
     # Reuse the same R4 out-of-fold predictions in the order and history controls.
     p2, p2_oofs = run_priority2_post_ablation(dev_df, feat_df, draws=draws)
@@ -1414,7 +1440,7 @@ def main() -> None:
     parser.add_argument("--data", type=Path, default=Path(os.environ.get("TRIAL_DATA", "/tmp/trials")))
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=10)
-    parser.add_argument("--stage", choices=["controls", "ridge", "reve"], required=True)
+    parser.add_argument("--stage", choices=["controls", "ridge", "reve", "ridge-cell", "reve-cell"], required=True)
     args = parser.parse_args()
 
     warnings.filterwarnings("ignore", category=RuntimeWarning)

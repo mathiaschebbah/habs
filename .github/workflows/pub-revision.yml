@@ -5,7 +5,7 @@ on:
     inputs:
       analysis:
         type: choice
-        options: [primary, order-diagnostic]
+        options: [primary, order-diagnostic, same-fit]
         default: primary
         description: "Primary experiments or exploratory fold-score diagnostic"
       source_job:
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stage: ${{ fromJSON(inputs.analysis == 'order-diagnostic' && '["order-diagnostic"]' || '["controls","ridge","reve"]') }}
+        stage: ${{ fromJSON(inputs.analysis == 'order-diagnostic' && '["order-diagnostic"]' || inputs.analysis == 'same-fit' && '["ridge-cell","reve-cell"]' || '["controls","ridge","reve"]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: azure/login@v2
