@@ -1,0 +1,55 @@
+name: Score raw EEG and cardiac controls
+on:
+  workflow_dispatch:
+    inputs:
+      raw_job:
+        description: Completed team job suffix containing study11_raw.parquet
+        required: true
+permissions:
+  contents: read
+  id-token: write
+env:
+  HABS_KEY: "1f4d7f20-8ba2-4697-91cc-b898558a458c"
+  HABS_STORAGE: sthabshackweu
+  HABS_TENANT_ID: 6fc0e479-449c-4700-b89c-7c4848058e30
+  OMP_NUM_THREADS: "1"
+  OPENBLAS_NUM_THREADS: "1"
+  MKL_NUM_THREADS: "1"
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 160
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ env.HABS_KEY }}
+          tenant-id: ${{ env.HABS_TENANT_ID }}
+          allow-no-subscriptions: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install --quiet -r requirements.txt pyarrow
+      - name: Read private features and score blocked folds
+        env:
+          RAW_JOB: ${{ inputs.raw_job }}
+        shell: bash
+        run: |
+          [[ "$RAW_JOB" =~ ^[0-9]{8}T[0-9]{6}-[0-9a-f]{6}$ ]] || exit 1
+          d="$RUNNER_TEMP/feature-tables"
+          old="$RUNNER_TEMP/study09"
+          mkdir -p "$d" "$old"
+          git archive 501d24b decoding habs | tar -x -C "$old"
+          for name in study11_raw study11_pre0 study09_reve_primary; do
+            suffix="$RAW_JOB"
+            if [[ "$name" == study09_reve_primary ]]; then suffix=20261124T102049-806609; fi
+            az storage blob download --auth-mode login --account-name "$HABS_STORAGE" --container-name "$HABS_KEY" --name "out/${HABS_KEY}--${suffix}/features/$name.parquet" --file "$d/$name.parquet" --no-progress --output none
+          done
+          PYTHONPATH="$GITHUB_WORKSPACE/src:$old" python tools/score_raw.py "$d" raw_scores.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: raw-scores-aggregate
+          path: raw_scores.json
