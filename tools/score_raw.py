@@ -115,7 +115,13 @@ def score(folder):
                         xe = np.vstack([xe, xe[np.maximum(a, 0)], xe[np.maximum(b, 0)]])
                         bv = np.tile(bv, (3, 1))
                     pred, _ = old.fit_predict_m2_joint_dual_ridge(
-                        body[tr], xt, y[tr], training, bv, xe
+                        body[tr],
+                        xt,
+                        y[tr],
+                        training,
+                        bv,
+                        xe,
+                        body_alphas=(1.0, 10.0, 100.0, 1000.0, 10000.0),
                     )
                     keep(f"{kind}_{key}", ev, pred[: len(ev)])
                     if len(pred) == 3 * len(ev):
@@ -127,6 +133,17 @@ def score(folder):
                         ):
                             good = donor >= 0
                             keep(name, ev[good], vals[good])
+            # A zero EEG weight is available in the inner CV for this residual control.
+            _, residual, _ = old.fit_predict_m2_residual(
+                strong[tr],
+                blocks["net_after"][tr],
+                y[tr],
+                training,
+                strong[ev],
+                blocks["net_after"][ev],
+                eeg_pca_grid=(32,),
+            )
+            keep("strong_residual_corrected", ev, residual)
             # Nonlinear reference uses an EEG-only PCA fitted on the outer training rows.
             ze, zv = old._preprocess_fit_transform(
                 blocks["net_after"][tr], blocks["net_after"][ev], max_pca=32
@@ -154,6 +171,7 @@ def score(folder):
             "raw_minus_release": ("strong_net_before", "strong_release"),
             "strong_body_minus_57": ("body_strong", "body57"),
             "nonlinear_eeg_gain": ("gbdt_corrected", "body_gbdt"),
+            "residual_corrected_gain": ("strong_residual_corrected", "body_strong"),
             "matched_minus_other": ("strong_net_after", "other_id_same_video"),
             "matched_minus_shuffle": ("strong_net_after", "trial_shuffle"),
         }
