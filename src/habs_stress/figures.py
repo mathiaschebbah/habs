@@ -183,7 +183,7 @@ def plot_fig2_causal_brain_heart(results_dir: Path, out_path: Path) -> Path:
     ax1.set_yticklabels([b[0] for b in bars])
     ax1.set_xlim(-0.041, 0.026)
     ax1.set_xlabel("Incremental Pearson r (M2 minus M0, Cold-Start)")
-    ax1.set_title("A. Causal EEG [0, 5) s -> physiology [5, 10) s")
+    ax1.set_title("A. Early EEG [-3.2, 5) s -> physiology [5, 10) s")
 
     # Panel B: Cardiac falsification & artefact control battery
     ctrl = cf["controls"]["module3_controls"]["targets"]["tgt_ecg_hr_chg_5_10"]["paired_contrasts"]
@@ -377,10 +377,10 @@ def plot_fig4_coherence_monitoring(results_dir: Path, out_path: Path) -> Path:
     ax2.set_xticks(secs)
     ax2.set_ylim(0.53, 0.77)
     ax2_r.set_ylim(12.0, 68.0)
-    ax2.set_xlabel("Passive integration window (s; K = 1..10 episodes)")
+    ax2.set_xlabel("Cumulative episode duration (s; K = 1..10 clips)")
     ax2.set_ylabel("Within-person ROC-AUC (solid lines)")
     ax2_r.set_ylabel("Sensitivity at 90% specificity (%, dashed)", color="#444444")
-    ax2.set_title("B. Cold-Start clinical monitoring (10 s -> 100 s)")
+    ax2.set_title("B. Simulated passive monitoring (10 s -> 100 s)")
     ax2.legend(loc="upper left", fontsize=7.6)
 
     fig.tight_layout(w_pad=2.2)

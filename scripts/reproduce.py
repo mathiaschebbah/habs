@@ -49,7 +49,7 @@ def print_summary_tables(data: dict[str, dict]) -> None:
 
     pri = cf["audit_forecast"]["module2_primary_forecasting"]["primary_cold_start_3x3"]
     loco_hr = gc["module10c_coral_kshot_loco"]["loco_cross_cohort_dev"]["cardiac_forecast_loco"]
-    print("\n=== 2. Strictly Causal Early-EEG -> Future Physiology (t = 5.000 s wall) ===")
+    print("\n=== 2. Prospective Early-EEG -> Future Physiology (t = 5.000 s boundary) ===")
     for label_name, key in (
         ("Heart rate [5, 10) s", "tgt_ecg_hr_chg_5_10"),
         ("Skin cond. [5, 10) s", "tgt_eda_sc_chg_5_10"),
@@ -64,7 +64,7 @@ def print_summary_tables(data: dict[str, dict]) -> None:
 
     m10a = gc["module10a_generalization_ablation"]["generalization_ladder"]["S07_enriched"]
     m10e = gc["module10e_clinical_monitoring"]
-    print("\n=== 3. Generalization Ladder & Passive Clinical Monitoring (Cold-Start) ===")
+    print("\n=== 3. Generalization Ladder & Simulated Passive Monitoring (Cold-Start) ===")
     for rkey in (
         "R1_random_5fold",
         "R2_within_person_new_themes",
