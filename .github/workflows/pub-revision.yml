@@ -3,6 +3,11 @@ name: Publication Revision CPU (P1-P3)
 on:
   workflow_dispatch:
     inputs:
+      analysis:
+        type: choice
+        options: [primary, order-diagnostic]
+        default: primary
+        description: "Primary experiments or exploratory fold-score diagnostic"
       source_job:
         description: "Plus-separated completed HABS job suffixes holding features/*.parquet"
         required: false
@@ -33,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stage: [controls, ridge, reve]
+        stage: ${{ fromJSON(inputs.analysis == 'order-diagnostic' && '["order-diagnostic"]' || '["controls","ridge","reve"]') }}
     steps:
       - uses: actions/checkout@v5
       - uses: azure/login@v2
@@ -51,7 +56,12 @@ jobs:
       - name: Run Priorities 1-3 + Figure 1 coverage
         shell: bash
         run: |
-          python -m habs_stress.pub_revision --data "$TRIAL_DATA" --out out_p123 --stage "$STAGE" --repeats "$REPEATS" 2>&1 | tee run_p123.log
+          if [[ "$STAGE" == order-diagnostic ]]; then
+            mkdir -p out_p123
+            python tools/order_sensitivity.py "$TRIAL_DATA" out_p123/pub_revision_p123_metrics.json | tee run_p123.log
+          else
+            python -m habs_stress.pub_revision --data "$TRIAL_DATA" --out out_p123 --stage "$STAGE" --repeats "$REPEATS" 2>&1 | tee run_p123.log
+          fi
         env:
           STAGE: ${{ matrix.stage }}
           REPEATS: ${{ inputs.repeats }}
