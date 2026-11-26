@@ -55,7 +55,14 @@ def raw_blocks(path, onsets):
     before, pre_valid = reference_eeg(before)
     ecg, fs, resp, resp_fs, eda, eda_fs, _, _ = _read_body(path)
     design = ecg_design(prefix(ecg, fs, onsets))
-    return early, valid, before, pre_valid, design, (ecg, fs, resp, resp_fs, eda, eda_fs)
+    return (
+        early,
+        valid,
+        before,
+        pre_valid,
+        design,
+        (ecg, fs, resp, resp_fs, eda, eda_fs),
+    )
 
 
 def calibration_ids(frame):
@@ -170,7 +177,8 @@ def process(data_dir: Path, out_dir: Path):
             x = torch.from_numpy(np.ascontiguousarray(y[start : start + 32])).to(device)
             with torch.autocast("cuda", dtype=torch.bfloat16):
                 tokens = model(
-                    _zscore_trial_causal(x), positions.unsqueeze(0).expand(len(x), -1, -1)
+                    _zscore_trial_causal(x),
+                    positions.unsqueeze(0).expand(len(x), -1, -1),
                 )
                 if pre:
                     vector = tokens.float().mean(dim=(1, 2))
@@ -178,19 +186,48 @@ def process(data_dir: Path, out_dir: Path):
                     cm = tokens.float().mean(dim=1)
                     pool = model.attention_pooling(tokens[:, :, 4:9, :])
                     vector = torch.cat(
-                        [cm[:, 4:9].mean(1), pool.float(), cm[:, 6:9].mean(1) - cm[:, 4:6].mean(1)],
+                        [
+                            cm[:, 4:9].mean(1),
+                            pool.float(),
+                            cm[:, 6:9].mean(1) - cm[:, 4:6].mean(1),
+                        ],
                         dim=1,
                     )
             encoded.append(vector.cpu().numpy())
         return np.concatenate(encoded)
 
     grid = pd.read_parquet(Path(__file__).parent / "grid.parquet")
-    ids = calibration_ids(grid)
-    cal = grid.loc[grid.participant_id.isin(ids)]
-    evaluation = grid.loc[~grid.participant_id.isin(ids)]
+    # Historical alignment allowed a PREPROCESSED fallback. The raw experiment
+    # uses only trials whose actual alignment and peripheral targets used CURATED.
+    raw_source = grid["recording"].map(
+        lambda rec: "CURATED" in Path(rec).parts and "PREPROCESSED" not in Path(rec).parts
+    )
+    aligned_raw = grid.loc[raw_source]
+    ids = calibration_ids(aligned_raw)
+    cal = aligned_raw.loc[aligned_raw.participant_id.isin(ids)]
+    evaluation = aligned_raw.loc[~aligned_raw.participant_id.isin(ids)]
     coefs = learn_transfer(data_dir, cal)
-    pieces = []
-    pre_pieces = []
+    import pyarrow as pa
+    from pyarrow import parquet as pq
+
+    private = out_dir / "features"
+    private.mkdir(parents=True, exist_ok=True)
+    writers = {}
+
+    def write_rows(name, rows):
+        batch = pa.Table.from_pandas(rows, preserve_index=False)
+        if name not in writers:
+            writers[name] = pq.ParquetWriter(
+                private / (name + ".parquet"), batch.schema, compression="zstd"
+            )
+        writers[name].write_table(batch)
+
+    seen_trials = set()
+    seen_ids = set()
+    print(
+        f"Starting CURATED-only grid: {evaluation.recording.nunique()} evaluation recordings",
+        flush=True,
+    )
     # Exercise the complete feature path, including the encoder and fixed regression.
     rng = np.random.default_rng(2187)
     signal = rng.normal(size=13000)
@@ -236,7 +273,7 @@ def process(data_dir: Path, out_dir: Path):
         ].copy()
         prepart["net_pre"] = list(prevec)
         prepart["prebody"] = list(prebody.astype("float32"))
-        pre_pieces.append(prepart)
+        write_rows("study11_pre0", prepart)
         keep = (good.sum(axis=1) >= 50) & np.isfinite(design).all(axis=(1, 2))
         if not keep.any():
             continue
@@ -257,30 +294,36 @@ def process(data_dir: Path, out_dir: Path):
         part["median_abs_ecg_r_after"] = coupling(clean, good, design)
         for name, array in features.items():
             part[name] = list(array.astype("float32"))
-        pieces.append(part)
+        if seen_trials.intersection(part.trial_id):
+            raise ValueError("Duplicate trial in raw extraction")
+        seen_trials.update(part.trial_id)
+        seen_ids.update(part.participant_id)
+        write_rows("study11_raw", part)
         if recno % 25 == 0:
             print(
                 f"Raw: {recno + 1} recordings processed, {time.monotonic() - started:.0f} s",
                 flush=True,
             )
 
-    result = pd.concat(pieces, ignore_index=True)
-    if not result.trial_id.is_unique:
-        raise ValueError("Multiple raw feature rows for a trial")
-    private = out_dir / "features"
-    private.mkdir(parents=True, exist_ok=True)
-    result.to_parquet(private / "study11_raw.parquet", index=False, compression="zstd")
-    pd.concat(pre_pieces, ignore_index=True).to_parquet(
-        private / "study11_pre0.parquet", index=False
-    )
+    for writer in writers.values():
+        writer.close()
+    if len(writers) != 2:
+        raise ValueError("Empty extraction")
     summary = {
         "source": "CURATED",
         "dev_trials": len(grid),
         "calibration_ids": len(ids),
         "evaluation_trials_before_qc": len(evaluation),
-        "evaluation_trials_after_qc": len(result),
-        "evaluation_ids_after_qc": result.participant_id.nunique(),
-        "calibration_overlap_ids": len(set(result.participant_id) & ids),
+        "evaluation_trials_after_qc": len(seen_trials),
+        "non_curated_alignment_trials_excluded": int((~raw_source).sum()),
+        "non_curated_alignment_recordings_excluded": int(
+            grid.loc[~raw_source, "recording"].nunique()
+        ),
+        "curated_grid_ids": int(aligned_raw.participant_id.nunique()),
+        "curated_grid_trials": len(aligned_raw),
+        "calibration_trials": len(cal),
+        "evaluation_ids_after_qc": len(seen_ids),
+        "calibration_overlap_ids": len(seen_ids & ids),
         "bit_invariance_at_0_and_5": walls,
         "seconds": round(time.monotonic() - started, 2),
     }
