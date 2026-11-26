@@ -21,3 +21,11 @@ The target and 57 body features are those extracted from CURATED peripheral chan
 ## Reproduction
 
 The CPU workflow downloads private trial tables into ephemeral HABS-authenticated GitHub runners. The GPU workflow stages only the development grid and pinned extraction helpers from commit `501d24b` into a private HABS job. The raw scoring workflow retrieves the private feature table and returns aggregate metrics. Retain workflow attempt numbers, input/output checksums, the current commit, the two frozen model revisions and the analysis populations when reporting results.
+
+## Comparison with archived numbers
+
+Study 11 refits both sides of each contrast. The four-phase R4 Ridge gives 0.5694 in this refit versus 0.5688 in the historical report. The inner fold allocation is shared, but the new classifier's inner Ridge criterion averages squared prediction errors by ID, while the legacy criterion centered targets and predictions within each validation ID before computing MSE. The randomized PCA uses four power iterations in the refit versus three in Study 10. Use the paired full-pool and matched-pool estimates from the same Study 11 implementation when interpreting training volume.
+
+An exploratory complication arose after the order controls were scored. A fold-only prevalence baseline obtained AUC 0.4274 when scores were pooled within ID across withheld theme folds. A diagnostic analysis compares only positive–negative pairs scored by the same fitted model, weights cells by eligible pairs within ID, then averages across eligible IDs. It leaves all fitted models and sampled training rows unchanged. This is a sensitivity analysis motivated by the observed fold effect, not a prespecified primary outcome.
+
+The raw extractor additionally restricts the input grid to trials aligned against an actual CURATED file. The first execution stopped at a historical fallback entry pointing outside that source. The corrected run applies the source rule before calibration and reports the excluded trials and recordings. Control models are evaluated on the same retained rows. No preprocessed file substitutes for missing raw EEG.

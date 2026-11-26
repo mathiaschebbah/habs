@@ -1,0 +1,74 @@
+{
+  "training_prevalence_only": {
+    "within_id": {
+      "mean": 0.4274,
+      "ci95": [
+        0.4116,
+        0.4437
+      ],
+      "n": 208
+    },
+    "within_id_and_same_outer_model": {
+      "mean": 0.5,
+      "ci95": [
+        0.5,
+        0.5
+      ],
+      "n": 208
+    }
+  },
+  "rank": {
+    "within_id": {
+      "mean": 0.5024,
+      "ci95": [
+        0.4839,
+        0.5218
+      ],
+      "n": 208
+    },
+    "within_id_and_same_outer_model": {
+      "mean": 0.5068,
+      "ci95": [
+        0.4863,
+        0.5271
+      ],
+      "n": 208
+    }
+  },
+  "linear_rank": {
+    "within_id": {
+      "mean": 0.5014,
+      "ci95": [
+        0.4836,
+        0.5201
+      ],
+      "n": 208
+    },
+    "within_id_and_same_outer_model": {
+      "mean": 0.5068,
+      "ci95": [
+        0.4863,
+        0.5271
+      ],
+      "n": 208
+    }
+  },
+  "tree_rank": {
+    "within_id": {
+      "mean": 0.4622,
+      "ci95": [
+        0.4484,
+        0.4759
+      ],
+      "n": 208
+    },
+    "within_id_and_same_outer_model": {
+      "mean": 0.5051,
+      "ci95": [
+        0.4913,
+        0.519
+      ],
+      "n": 208
+    }
+  }
+}
