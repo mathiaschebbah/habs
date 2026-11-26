@@ -41,8 +41,7 @@ brain-to-heart predictive coupling, generalization limits, and passive monitorin
 
 \author{\small
 Mathias Chebbah \quad Aur\'elien Saint-Gr\'egoire \quad Ashley Russo\\
-\footnotesize Team 12 (Multimodal AI), Universit\'e Paris-Saclay $\times$ HABS Neuro-AI Hackathon 2026\\
-\footnotesize Mentor: Andrew Jeyathasan \quad Code: \texttt{src/habs\_stress/} (\texttt{scripts/reproduce.py})}
+\footnotesize Team 12 (Multimodal AI), Universit\'e Paris-Saclay $\times$ HABS Neuro-AI Hackathon 2026 \quad Mentor: Andrew Jeyathasan}
 \date{}
 
 \begin{document}
@@ -60,7 +59,7 @@ Non-verbal assessment of acute distress, threat, or pain motivates wearable bios
 
 Three gaps limit current multimodal stress pipelines. First, short-window autonomic responses mix rapid vagal deceleration at the sino-atrial node with slower sympathetic sweating and distinct habituation kinetics \cite{somsen2002,chen2014}. Ultra-short HRV metrics such as 10--30\,s RMSSD are unreliable and often reflect visual orienting rather than valence \cite{munoz2015,schippers2018}, while beat-by-beat AV-node PR conduction, RR-adjusted QT intervals, and raw versus ICA-cleaned heartbeat-evoked potentials (HEP) remain untested during 10-s distress \cite{parkblanke2019}. Second, cross-subject benchmarks often conflate random splits with strict unseen-subject and unseen-stimulus generalization \cite{engemann2018,alshamrani2026}, or evaluate cross-modal forecasting without a hard temporal boundary, while cross-day electrodermal drift and domain adaptation methods such as CORAL remain under-tested at scale \cite{sakimura2025,mihirette2025}. Third, subjective-autonomic alignment varies widely across individuals and separates trait disposition from momentary state reactivity \cite{brown2019,saviola2020,cuve2023}.
 
-We address one focused question on the HABS multimodal dataset ($N = 314$ adults, 22,974 trials): \emph{how do cortical and peripheral signals unfold during acute distress, does early EEG prospectively forecast future autonomic reactivity beyond past body dynamics, and what limits passive multimodal stress monitoring across unseen people, unseen stimuli, days, and cohorts?}
+We address one focused question on the HABS multimodal dataset ($N = 314$ adults, 22,974 trials): \textbf{how do cortical and peripheral signals unfold during acute distress, does early EEG prospectively forecast future autonomic reactivity beyond past body dynamics, and what limits passive multimodal stress monitoring across unseen people, unseen stimuli, days, and cohorts?}
 
 \section{Methods}
 \subsection{Dataset, stress criterion, and sensor audit}

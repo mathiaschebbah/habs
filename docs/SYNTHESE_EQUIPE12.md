@@ -97,7 +97,7 @@ Le dépôt a été réduit de **85 fichiers Python (35 798 lignes)** à **6 modu
 - `src/habs_stress/forecasting.py` : prévision causale `M0` vs `M1` vs `M2`, résidualisation des artefacts, test idiosyncratique sur même vidéo.
 - `src/habs_stress/generalization.py` : `CORAL`, personnalisation `EB-MAP`, rotation Varimax et courbes de suivi passif `10 s -> 100 s`.
 - `src/habs_stress/figures.py` + `scripts/reproduce.py` : régénération déterministe des tableaux et des 4 figures du papier depuis `results/*.json`.
-- `paper/submission_paper.pdf` : manuscrit final de 5 pages prêt à déposer.
+- `paper/submission_paper.pdf` (anglais) et `paper/submission_paper_fr.pdf` (français) : manuscrit final de 5 pages exactes prêt à déposer.
 - `notebooks/results_walkthrough.ipynb` : notebook de synthèse interactif pour le jury.
 
 ### Commandes de vérification locale (moins de 15 secondes)

@@ -21,7 +21,7 @@ We analyze all 314 healthy adults and 22,974 aligned trials (508 recordings, 252
 
 ## Key deliverables
 
-- **Submission paper (5 pages, 4 figures, 2 tables):** `paper/submission_paper.pdf` (`paper/submission_paper.tex`)
+- **Submission paper (5 pages, 4 figures, 2 tables):** `paper/submission_paper.pdf` (English; French version: `paper/submission_paper_fr.pdf`)
 - **Interactive results walkthrough:** `notebooks/results_walkthrough.ipynb`
 - **Complete team synthesis & 10-minute presentation script (French):** `docs/SYNTHESE_EQUIPE12.md`
 - **Verified aggregate outputs (zero individual data):** `results/` (5 JSON files; full exploratory history across Studies 01-10 is preserved in git commit `501d24b`)
