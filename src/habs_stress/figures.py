@@ -68,7 +68,7 @@ def plot_fig1_physiology_cascade(results_dir: Path, out_path: Path) -> Path:
         ("eeg_central_delta", "EEG central delta (<1 s)", PALETTE["navy"], "-"),
         ("hr", "Heart rate (-bpm, 1 s)", PALETTE["crimson"], "-"),
         ("resp_amp", "Respiration amplitude (2-6 s)", PALETTE["gold"], "--"),
-        ("sc", "Skin conductance (4-10 s)", PALETTE["teal"], "-"),
+        ("sc", "Skin conductance (late rise 4-10 s)", PALETTE["teal"], "-"),
     ]
     ax1.axvspan(0.0, 10.0, color=PALETTE["bg_band"], alpha=0.85, zorder=0)
     ax1.axhline(0.0, color="#666666", lw=0.8, ls=":", zorder=1)
@@ -89,7 +89,7 @@ def plot_fig1_physiology_cascade(results_dir: Path, out_path: Path) -> Path:
     ax1.set_ylim(-0.27, 0.24)
     ax1.set_xlabel("Time relative to stimulus onset (s)")
     ax1.set_ylabel("Within-person Cohen's d (stress vs. non-stress)")
-    ax1.set_title("A. Fast multimodal cascade across 15 s (N = 286-314)")
+    ax1.set_title("A. 1-s distress timecourse (dev, N = 235)")
     ax1.legend(loc="lower center", ncol=2, handlelength=1.6, columnspacing=1.0, fontsize=7.4)
 
     # Panel B: Beat-by-beat ECG morphology & RR-adjusted control + Raw vs ICA HEP
@@ -98,13 +98,13 @@ def plot_fig1_physiology_cascade(results_dir: Path, out_path: Path) -> Path:
     hep_var = ph["hep_raw"]["variants"]
 
     rows = [
-        ("RR interval (vagal)", ecg_eff["rr"]["vid_change"]["stress"], PALETTE["navy"]),
+        ("RR interval", ecg_eff["rr"]["vid_change"]["stress"], PALETTE["navy"]),
         ("Heart rate", ecg_eff["hr"]["vid_change"]["stress"], PALETTE["crimson"]),
         ("PR segment (AV node)", ecg_eff["pr_seg"]["vid_change"]["stress"], PALETTE["slate"]),
         ("PR interval (onset)", ecg_eff["pr_on"]["vid_change"]["stress"], PALETTE["slate"]),
         ("QRS duration", ecg_eff["qrs"]["vid_change"]["stress"], PALETTE["slate"]),
-        ("QTc Bazett (unadjusted)", rr_ctrl["qtc_baz"]["plain"], PALETTE["coral"]),
-        ("QTc Bazett (RR-adjusted)", rr_ctrl["qtc_baz"]["rr_controlled"], PALETTE["teal"]),
+        ("QTc Bazett (plain beta)", rr_ctrl["qtc_baz"]["plain"], PALETTE["coral"]),
+        ("QTc Bazett (RR-adj. beta)", rr_ctrl["qtc_baz"]["rr_controlled"], PALETTE["teal"]),
         ("HEP (ICA preprocessed)", hep_var["ica_preprocessed_100uV"]["contrasts_d"]["stress"], PALETTE["muted"]),
         ("HEP (raw CURATED, no ICA)", hep_var["raw_curated_100uV"]["contrasts_d"]["stress"], PALETTE["muted"]),
     ]
@@ -125,8 +125,8 @@ def plot_fig1_physiology_cascade(results_dir: Path, out_path: Path) -> Path:
     ax2.set_yticks(y_pos)
     ax2.set_yticklabels([r[0] for r in rows])
     ax2.set_xlim(-0.22, 0.24)
-    ax2.set_xlabel("Within-person Cohen's d (95% bootstrap CI)")
-    ax2.set_title("B. ECG morphology (96.6% Lead I fixed) & HEP")
+    ax2.set_xlabel("Standardized within-ID contrast (d or beta; 95% CI)")
+    ax2.set_title("B. ECG morphology (96.6% trial rows flipped) & HEP")
 
     fig.tight_layout(w_pad=2.2)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -161,7 +161,7 @@ def plot_fig2_causal_brain_heart(results_dir: Path, out_path: Path) -> Path:
     bars = [
         ("HR: M2 joint (3x3)", hr_jnt["mean"], hr_jnt["ci95"], PALETTE["navy"]),
         ("HR: M2 resid (3x3)", hr_res["mean"], hr_res["ci95"], PALETTE["navy"]),
-        ("HR: M2 LOCO (5/5 coh.)", hr_loco["mean"], hr_loco["ci95"], PALETTE["teal"]),
+        ("HR: M2 LOCO (5 coh.)", hr_loco["mean"], hr_loco["ci95"], PALETTE["teal"]),
         ("HR: M2 GBDT", hr_gbdt["mean"], hr_gbdt["ci95"], PALETTE["teal"]),
         ("Resp: M2 resid", rsp_res["mean"], rsp_res["ci95"], PALETTE["muted"]),
         ("Resp: M2 GBDT", rsp_gbdt["mean"], rsp_gbdt["ci95"], PALETTE["muted"]),
@@ -188,17 +188,17 @@ def plot_fig2_causal_brain_heart(results_dir: Path, out_path: Path) -> Path:
     # Panel B: Cardiac falsification & artefact control battery
     ctrl = cf["controls"]["module3_controls"]["targets"]["tgt_ecg_hr_chg_5_10"]["paired_contrasts"]
     ctrl_rows = [
-        ("Own vs. other viewer (same video)", ctrl["NC2_idiosyncratic_real_vs_vid_shuf"]["delta_r"], PALETTE["green"]),
-        ("Clean low-artefact trials (AC3)", ctrl["AC3_clean_subset_M2_vs_M0"]["delta_r"], PALETTE["navy"]),
-        ("Primary M2 resid vs. M0", ctrl["M2_real_vs_M0"]["delta_r"], PALETTE["navy"]),
-        ("Residualized 9 artefacts (AC2b)", ctrl["AC2b_art_resid_vs_M0"]["delta_r"], PALETTE["navy"]),
-        ("Joint 9-artefact covariates (AC1)", ctrl["AC1_M2_art_vs_M0_art"]["delta_r"], PALETTE["navy"]),
-        ("Previous-trial history (TC1)", ctrl["TC1_M2_tc1_vs_M0_tc1"]["delta_r"], PALETTE["teal"]),
-        ("46 interior non-rim EEG (AC2a)", ctrl["AC2a_interior46_vs_M0"]["delta_r"], PALETTE["teal"]),
-        ("Within-video idiosyncratic r", ctrl["within_video_idiosyncratic_M2_minus_M0"], PALETTE["teal"]),
-        ("Negative: trial shuffle (NC1)", ctrl["NC1_within_person_shuf_vs_M0"]["delta_r"], PALETTE["coral"]),
-        ("Negative: pre-stim only (NC3)", ctrl["NC3_pre_stim_only_vs_M0"]["delta_r"], PALETTE["coral"]),
-        ("Negative: other-viewer EEG (NC2)", ctrl["NC2_stimulus_mediated_vs_M0"]["delta_r"], PALETTE["crimson"]),
+        ("Own vs. permuted same-video (n=224)", ctrl["NC2_idiosyncratic_real_vs_vid_shuf"]["delta_r"], PALETTE["green"]),
+        ("Clean low-artefact trials (AC3, n=207)", ctrl["AC3_clean_subset_M2_vs_M0"]["delta_r"], PALETTE["navy"]),
+        ("Primary M2 resid vs. M0 (n=224)", ctrl["M2_real_vs_M0"]["delta_r"], PALETTE["navy"]),
+        ("Residualized 9 artefacts (AC2b, n=224)", ctrl["AC2b_art_resid_vs_M0"]["delta_r"], PALETTE["navy"]),
+        ("Joint 9-artefact covs (AC1, n=224)", ctrl["AC1_M2_art_vs_M0_art"]["delta_r"], PALETTE["navy"]),
+        ("Previous-trial history (TC1, n=224)", ctrl["TC1_M2_tc1_vs_M0_tc1"]["delta_r"], PALETTE["teal"]),
+        ("46 interior non-rim EEG (AC2a, n=224)", ctrl["AC2a_interior46_vs_M0"]["delta_r"], PALETTE["teal"]),
+        ("Within-video idiosyncratic r (n=198)", ctrl["within_video_idiosyncratic_M2_minus_M0"], PALETTE["teal"]),
+        ("Neg.: trial shuffle (NC1, n=224)", ctrl["NC1_within_person_shuf_vs_M0"]["delta_r"], PALETTE["coral"]),
+        ("Neg.: pre-stim only (NC3, n=224)", ctrl["NC3_pre_stim_only_vs_M0"]["delta_r"], PALETTE["coral"]),
+        ("Neg.: permuted same-video (NC2, n=224)", ctrl["NC2_stimulus_mediated_vs_M0"]["delta_r"], PALETTE["crimson"]),
     ]
     y2 = np.arange(len(ctrl_rows))[::-1]
     ax2.axvline(0.0, color="#333333", lw=0.9, ls="--")
@@ -214,8 +214,8 @@ def plot_fig2_causal_brain_heart(results_dir: Path, out_path: Path) -> Path:
     ax2.set_yticks(y2)
     ax2.set_yticklabels([r[0] for r in ctrl_rows])
     ax2.set_xlim(-0.028, 0.038)
-    ax2.set_xlabel("Paired cardiac delta-r (95% bootstrap CI, N = 224)")
-    ax2.set_title("B. Cardiac artefact controls & falsification battery")
+    ax2.set_xlabel("Paired cardiac delta-r (95% bootstrap CI)")
+    ax2.set_title("B. Exploratory cardiac controls & falsification")
 
     fig.tight_layout(w_pad=2.0)
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -236,13 +236,13 @@ def plot_fig3_generalization_drift(results_dir: Path, out_path: Path) -> Path:
     regimes = [
         ("R1_random_5fold", "R1\nRandom"),
         ("R2_within_person_new_themes", "R2\nNew theme"),
-        ("R3_loso_seen_themes", "R3\nLOSO seen"),
-        ("R4_double_unseen_cold_start", "R4\nDouble-unseen"),
+        ("R3_loso_seen_themes", "R3\nNew ID\nseen theme"),
+        ("R4_double_unseen_cold_start", "R4\nDouble-\nunseen"),
     ]
     x = np.arange(len(regimes))
     for model_key, lbl, col, mk in (
-        ("S07_enriched", "4-phase Ridge (0 GPU)", PALETTE["navy"], "o"),
-        ("REVE_frozen", "REVE-base EEG", PALETTE["coral"], "s"),
+        ("S07_enriched", "4-phase Ridge ([-3,12) s)", PALETTE["navy"], "o"),
+        ("REVE_frozen", "REVE-base EEG ([0,10) s)", PALETTE["coral"], "s"),
     ):
         ys, los, his = [], [], []
         for rkey, _ in regimes:
@@ -350,9 +350,9 @@ def plot_fig4_coherence_monitoring(results_dir: Path, out_path: Path) -> Path:
     ax1.set_xticklabels(["F1\nEDA\n(symp.)", "F2\nEEG-Cardio\n(auto.)", "F3\nSubjective-\nCardioResp"], fontsize=8.0)
     ax1.set_yticks(range(len(var_order)))
     ax1.set_yticklabels([lbl for _, lbl in var_order], fontsize=8.2)
-    ax1.set_title("A. Within-person Varimax factors (N = 314)")
+    ax1.set_title("A. Within-person Varimax PCA (N = 314)")
     cbar = fig.colorbar(im, ax=ax1, fraction=0.046, pad=0.04)
-    cbar.set_label("Factor loading", fontsize=8.0)
+    cbar.set_label("PCA loading", fontsize=8.0)
 
     # Panel B: Passive monitoring curve 10 s -> 100 s (AUC + Sensitivity @ 90% Spec)
     m10e = gc["module10e_clinical_monitoring"]
@@ -379,8 +379,8 @@ def plot_fig4_coherence_monitoring(results_dir: Path, out_path: Path) -> Path:
     ax2_r.set_ylim(12.0, 68.0)
     ax2.set_xlabel("Cumulative episode duration (s; K = 1..10 clips)")
     ax2.set_ylabel("Within-person ROC-AUC (solid lines)")
-    ax2_r.set_ylabel("Sensitivity at 90% specificity (%, dashed)", color="#444444")
-    ax2.set_title("B. Simulated passive monitoring (10 s -> 100 s)")
+    ax2_r.set_ylabel("Per-person sens. at 90% spec. (%, dashed)", color="#444444")
+    ax2.set_title("B. Known-class episode averaging (10 s -> 100 s)")
     ax2.legend(loc="upper left", fontsize=7.6)
 
     fig.tight_layout(w_pad=2.2)
